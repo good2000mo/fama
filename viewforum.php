@@ -97,11 +97,6 @@ if ($num_pages > 1)
 	}
 }
 
-if ($pun_config['o_feed_type'] == '1')
-	$page_head['feed'] = '<link rel="alternate" type="application/rss+xml" href="extern.php?action=feed&amp;fid='.$id.'&amp;type=rss" title="'.$lang_common['RSS forum feed'].'" />';
-else if ($pun_config['o_feed_type'] == '2')
-	$page_head['feed'] = '<link rel="alternate" type="application/atom+xml" href="extern.php?action=feed&amp;fid='.$id.'&amp;type=atom" title="'.$lang_common['Atom forum feed'].'" />';
-
 $forum_actions = array();
 
 if (!$pun_user['is_guest'])

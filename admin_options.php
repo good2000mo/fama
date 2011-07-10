@@ -57,8 +57,6 @@ if (isset($_POST['form_sent']))
 		'gzip'					=> $_POST['form']['gzip'] != '1' ? '0' : '1',
 		'search_all_forums'		=> $_POST['form']['search_all_forums'] != '1' ? '0' : '1',
 		'additional_navlinks'	=> pun_trim($_POST['form']['additional_navlinks']),
-		'feed_type'				=> intval($_POST['form']['feed_type']),
-		'feed_ttl'				=> intval($_POST['form']['feed_ttl']),
 		'report_method'			=> intval($_POST['form']['report_method']),
 		'mailing_list'			=> pun_trim($_POST['form']['mailing_list']),
 		'avatars'				=> $_POST['form']['avatars'] != '1' ? '0' : '1',
@@ -168,12 +166,6 @@ if (isset($_POST['form_sent']))
 	else if ($form['disp_posts_default'] > 75)
 		$form['disp_posts_default'] = 75;
 
-	if ($form['feed_type'] < 0 || $form['feed_type'] > 2)
-		message($lang_common['Bad request']);
-
-	if ($form['feed_ttl'] < 0)
-		message($lang_common['Bad request']);
-
 	if ($form['report_method'] < 0 || $form['report_method'] > 2)
 		message($lang_common['Bad request']);
 
@@ -202,7 +194,6 @@ if (isset($_POST['form_sent']))
 		require PUN_ROOT.'include/cache.php';
 
 	generate_config_cache();
-	clear_feed_cache();
 
 	redirect('admin_options.php', $lang_admin_options['Options updated redirect']);
 }
@@ -549,39 +540,6 @@ generate_admin_menu('options');
 									<td>
 										<textarea name="form[additional_navlinks]" rows="3" cols="55"><?php echo pun_htmlspecialchars($pun_config['o_additional_navlinks']) ?></textarea>
 										<span><?php echo $lang_admin_options['Menu items help'] ?></span>
-									</td>
-								</tr>
-							</table>
-						</div>
-					</fieldset>
-				</div>
-				<div class="inform">
-					<fieldset>
-						<legend><?php echo $lang_admin_options['Feed subhead'] ?></legend>
-						<div class="infldset">
-							<table class="aligntop" cellspacing="0">
-								<tr>
-									<th scope="row"><?php echo $lang_admin_options['Default feed label'] ?></th>
-									<td>
-										<input type="radio" name="form[feed_type]" value="0"<?php if ($pun_config['o_feed_type'] == '0') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_options['None'] ?></strong>&#160;&#160;&#160;<input type="radio" name="form[feed_type]" value="1"<?php if ($pun_config['o_feed_type'] == '1') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_options['RSS'] ?></strong>&#160;&#160;&#160;<input type="radio" name="form[feed_type]" value="2"<?php if ($pun_config['o_feed_type'] == '2') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_options['Atom'] ?></strong>
-										<span><?php echo $lang_admin_options['Default feed help'] ?></span>
-									</td>
-								</tr>
-								<tr>
-									<th scope="row"><?php echo $lang_admin_options['Feed TTL label'] ?></th>
-									<td>
-										<select name="form[feed_ttl]">
-											<option value="0"<?php if ($pun_config['o_feed_ttl'] == '0') echo ' selected="selected"'; ?>><?php echo $lang_admin_options['No cache'] ?></option>
-<?php
-
-		$times = array(5, 15, 30, 60);
-
-		foreach ($times as $time)
-			echo "\t\t\t\t\t\t\t\t\t\t\t".'<option value="'.$time.'"'.($pun_config['o_feed_ttl'] == $time ? ' selected="selected"' : '').'>'.sprintf($lang_admin_options['Minutes'], $time).'</option>'."\n";
-
-?>
-										</select>
-										<span><?php echo $lang_admin_options['Feed TTL help'] ?></span>
 									</td>
 								</tr>
 							</table>

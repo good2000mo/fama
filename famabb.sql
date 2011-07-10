@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 -- 
 -- 主機: localhost
--- 建立日期: Jul 11, 2011, 01:14 AM
+-- 建立日期: Jul 11, 2011, 01:38 AM
 -- 伺服器版本: 5.0.51
 -- PHP 版本: 5.2.6
 
@@ -147,8 +147,6 @@ INSERT INTO `fbb_config` VALUES ('o_rules_message', '在此填寫論壇服務條
 INSERT INTO `fbb_config` VALUES ('o_maintenance', '0');
 INSERT INTO `fbb_config` VALUES ('o_maintenance_message', '論壇維護中。請稍後訪問。');
 INSERT INTO `fbb_config` VALUES ('o_default_dst', '0');
-INSERT INTO `fbb_config` VALUES ('o_feed_type', '2');
-INSERT INTO `fbb_config` VALUES ('o_feed_ttl', '0');
 INSERT INTO `fbb_config` VALUES ('p_message_bbcode', '1');
 INSERT INTO `fbb_config` VALUES ('p_message_img_tag', '1');
 INSERT INTO `fbb_config` VALUES ('p_message_all_caps', '1');
@@ -291,8 +289,8 @@ CREATE TABLE `fbb_online` (
 -- 列出以下資料庫的數據： `fbb_online`
 -- 
 
-INSERT INTO `fbb_online` VALUES (1, '127.0.0.1', 1310318002, 0, NULL, NULL);
-INSERT INTO `fbb_online` VALUES (2, 'admin', 1310318007, 0, NULL, NULL);
+INSERT INTO `fbb_online` VALUES (1, '127.0.0.1', 1310318683, 0, NULL, NULL);
+INSERT INTO `fbb_online` VALUES (2, 'admin', 1310318007, 1, NULL, NULL);
 
 -- --------------------------------------------------------
 
