@@ -3,7 +3,7 @@
 // Language definitions used in admin-options.php
 $lang_admin_options = array(
 
-'Bad HTTP Referer message'			=>	'HTTP_REFERER錯誤。如果您將論壇從一個目錄轉到另一個目錄或是變更了域名，您需要在數據庫中手動更新根目錄URL(在config表中的查找o_base_url)然後刪除/cache目錄下的所有.php文件以清空cache。',
+'Bad HTTP Referer message'			=>	'HTTP_REFERER錯誤。如果您將論壇從一個目錄轉到另一個目錄或是變更了域名，您需要在數據庫中手動更新根目錄URL(base_url)然後刪除/cache目錄下的所有.php文件以清空cache。',
 'Must enter title message'			=>	'您必須填寫論壇標題。',
 'Invalid e-mail message'			=>	'您填寫了一個無效的管理信箱地址。',
 'Invalid webmaster e-mail message'	=>	'您填寫了一個無效的郵件服務信箱地址。',

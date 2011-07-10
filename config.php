@@ -14,4 +14,6 @@ $cookie_path = '/';
 $cookie_secure = 0;
 $cookie_seed = '6446b1653ff17ca4';
 
+$base_url = 'http://127.0.0.1/xman3/famabb';
+
 define('PUN', 1);
