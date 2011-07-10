@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 -- 
 -- 主機: localhost
--- 建立日期: Jul 11, 2011, 01:38 AM
+-- 建立日期: Jul 11, 2011, 01:53 AM
 -- 伺服器版本: 5.0.51
 -- PHP 版本: 5.2.6
 
@@ -97,7 +97,6 @@ INSERT INTO `fbb_config` VALUES ('o_date_format', 'Y-m-d');
 INSERT INTO `fbb_config` VALUES ('o_timeout_visit', '1800');
 INSERT INTO `fbb_config` VALUES ('o_timeout_online', '300');
 INSERT INTO `fbb_config` VALUES ('o_redirect_delay', '1');
-
 INSERT INTO `fbb_config` VALUES ('o_show_user_info', '1');
 INSERT INTO `fbb_config` VALUES ('o_show_post_count', '1');
 INSERT INTO `fbb_config` VALUES ('o_signatures', '1');
@@ -289,8 +288,8 @@ CREATE TABLE `fbb_online` (
 -- 列出以下資料庫的數據： `fbb_online`
 -- 
 
-INSERT INTO `fbb_online` VALUES (1, '127.0.0.1', 1310318683, 0, NULL, NULL);
-INSERT INTO `fbb_online` VALUES (2, 'admin', 1310318007, 1, NULL, NULL);
+INSERT INTO `fbb_online` VALUES (1, '127.0.0.1', 1310319515, 0, NULL, NULL);
+INSERT INTO `fbb_online` VALUES (2, 'admin', 1310319591, 0, NULL, NULL);
 
 -- --------------------------------------------------------
 
