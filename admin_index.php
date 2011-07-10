@@ -32,7 +32,7 @@ if ($action == 'check_upgrade')
 	if (empty($latest_version))
 		message($lang_admin_index['Upgrade check failed message']);
 
-	if (version_compare($pun_config['o_cur_version'], $latest_version, '>='))
+	if (version_compare(FORUM_VERSION, $latest_version, '>='))
 		message($lang_admin_index['Running latest version message']);
 	else
 		message(sprintf($lang_admin_index['New version available message'], '<a href="http://fluxbb.org/">FluxBB.org</a>'));
@@ -147,7 +147,7 @@ generate_admin_menu('index');
 				<dl>
 					<dt><?php echo $lang_admin_index['FluxBB version label'] ?></dt>
 					<dd>
-						<?php printf($lang_admin_index['FluxBB version data']."\n", $pun_config['o_cur_version'], '<a href="admin_index.php?action=check_upgrade">'.$lang_admin_index['Check for upgrade'].'</a>') ?>
+						<?php printf($lang_admin_index['FluxBB version data']."\n", FORUM_VERSION, '<a href="admin_index.php?action=check_upgrade">'.$lang_admin_index['Check for upgrade'].'</a>') ?>
 					</dd>
 					<dt><?php echo $lang_admin_index['Server load label'] ?></dt>
 					<dd>

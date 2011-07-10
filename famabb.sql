@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 -- 
 -- 主機: localhost
--- 建立日期: Jul 10, 2011, 03:44 PM
+-- 建立日期: Jul 10, 2011, 06:07 PM
 -- 伺服器版本: 5.0.51
 -- PHP 版本: 5.2.6
 
@@ -89,10 +89,6 @@ CREATE TABLE `fbb_config` (
 -- 列出以下資料庫的數據： `fbb_config`
 -- 
 
-INSERT INTO `fbb_config` VALUES ('o_cur_version', '1.4.5');
-INSERT INTO `fbb_config` VALUES ('o_database_revision', '11');
-INSERT INTO `fbb_config` VALUES ('o_searchindex_revision', '2');
-INSERT INTO `fbb_config` VALUES ('o_parser_revision', '2');
 INSERT INTO `fbb_config` VALUES ('o_board_title', 'FamaBB');
 INSERT INTO `fbb_config` VALUES ('o_board_desc', '<p><span>Unfortunately no one can be told what FluxBB is - you have to see it for yourself.</span></p>');
 INSERT INTO `fbb_config` VALUES ('o_default_timezone', '0');
@@ -297,7 +293,7 @@ CREATE TABLE `fbb_online` (
 -- 列出以下資料庫的數據： `fbb_online`
 -- 
 
-INSERT INTO `fbb_online` VALUES (1, '127.0.0.1', 1310283816, 0, NULL, NULL);
+INSERT INTO `fbb_online` VALUES (1, '127.0.0.1', 1310289280, 0, NULL, NULL);
 
 -- --------------------------------------------------------
 
