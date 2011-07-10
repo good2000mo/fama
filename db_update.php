@@ -44,13 +44,6 @@ if (file_exists(PUN_ROOT.'config.php'))
 if (defined('FORUM'))
 	define('PUN', FORUM);
 
-// If PUN isn't defined, config.php is missing or corrupt
-if (!defined('PUN'))
-{
-	header('Location: install.php');
-	exit;
-}
-
 // Enable debug mode
 if (!defined('PUN_DEBUG'))
 	define('PUN_DEBUG', 1);
