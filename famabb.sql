@@ -97,7 +97,7 @@ INSERT INTO `fbb_config` VALUES ('o_date_format', 'Y-m-d');
 INSERT INTO `fbb_config` VALUES ('o_timeout_visit', '1800');
 INSERT INTO `fbb_config` VALUES ('o_timeout_online', '300');
 INSERT INTO `fbb_config` VALUES ('o_redirect_delay', '1');
-INSERT INTO `fbb_config` VALUES ('o_show_version', '0');
+
 INSERT INTO `fbb_config` VALUES ('o_show_user_info', '1');
 INSERT INTO `fbb_config` VALUES ('o_show_post_count', '1');
 INSERT INTO `fbb_config` VALUES ('o_signatures', '1');
