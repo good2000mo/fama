@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 -- 
 -- 主機: localhost
--- 建立日期: Jul 10, 2011, 06:20 PM
+-- 建立日期: Jul 10, 2011, 10:31 PM
 -- 伺服器版本: 5.0.51
 -- PHP 版本: 5.2.6
 
@@ -90,8 +90,8 @@ CREATE TABLE `fbb_config` (
 -- 
 
 INSERT INTO `fbb_config` VALUES ('o_board_title', 'FamaBB');
-INSERT INTO `fbb_config` VALUES ('o_board_desc', '<p><span>Unfortunately no one can be told what FluxBB is - you have to see it for yourself.</span></p>');
-INSERT INTO `fbb_config` VALUES ('o_default_timezone', '0');
+INSERT INTO `fbb_config` VALUES ('o_board_desc', '<p><span>這是我們應該做的.</span></p>');
+INSERT INTO `fbb_config` VALUES ('o_default_timezone', '8');
 INSERT INTO `fbb_config` VALUES ('o_time_format', 'H:i:s');
 INSERT INTO `fbb_config` VALUES ('o_date_format', 'Y-m-d');
 INSERT INTO `fbb_config` VALUES ('o_timeout_visit', '1800');
@@ -292,7 +292,7 @@ CREATE TABLE `fbb_online` (
 -- 列出以下資料庫的數據： `fbb_online`
 -- 
 
-INSERT INTO `fbb_online` VALUES (1, '127.0.0.1', 1310289280, 0, NULL, NULL);
+INSERT INTO `fbb_online` VALUES (1, '127.0.0.1', 1310308284, 0, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -535,4 +535,4 @@ CREATE TABLE `fbb_users` (
 -- 
 
 INSERT INTO `fbb_users` VALUES (1, 3, '訪客', '訪客', '訪客', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 'Traditional_Chinese', 'Lithium', 0, NULL, NULL, NULL, 0, '0.0.0.0', 0, NULL, NULL, NULL);
-INSERT INTO `fbb_users` VALUES (2, 1, 'admin', 'c3d873d7fa9ac799e35693d4cc288d4a16ad3f96', 'comus2010mo@hotmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 'Traditional_Chinese', 'Lithium', 1, 1310283814, NULL, NULL, 1310283814, '127.0.0.1', 1310283814, NULL, NULL, NULL);
+INSERT INTO `fbb_users` VALUES (2, 1, 'admin', 'c3d873d7fa9ac799e35693d4cc288d4a16ad3f96', 'comus2010mo@hotmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, 1, 1, 1, 1, 1, 8, 0, 0, 0, 'Traditional_Chinese', 'Lithium', 1, 1310283814, NULL, NULL, 1310283814, '127.0.0.1', 1310307552, NULL, NULL, NULL);
