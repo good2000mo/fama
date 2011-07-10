@@ -76,12 +76,6 @@ else if (isset($_POST['del_cat']) || isset($_POST['del_cat_comply']))
 		// Delete the category
 		$db->query('DELETE FROM '.$db->prefix.'categories WHERE id='.$cat_to_delete) or error('Unable to delete category', __FILE__, __LINE__, $db->error());
 
-		// Regenerate the quick jump cache
-		if (!defined('FORUM_CACHE_FUNCTIONS_LOADED'))
-			require PUN_ROOT.'include/cache.php';
-
-		generate_quickjump_cache();
-
 		redirect('admin_categories.php', $lang_admin_categories['Category deleted redirect']);
 	}
 	else // If the user hasn't comfirmed the delete
@@ -143,12 +137,6 @@ else if (isset($_POST['update'])) // Change position and name of the categories
 
 		$db->query('UPDATE '.$db->prefix.'categories SET cat_name=\''.$db->escape($cur_cat['name']).'\', disp_position='.$cur_cat['order'].' WHERE id='.intval($cat_id)) or error('Unable to update category', __FILE__, __LINE__, $db->error());
 	}
-
-	// Regenerate the quick jump cache
-	if (!defined('FORUM_CACHE_FUNCTIONS_LOADED'))
-		require PUN_ROOT.'include/cache.php';
-
-	generate_quickjump_cache();
 
 	redirect('admin_categories.php', $lang_admin_categories['Categories updated redirect']);
 }

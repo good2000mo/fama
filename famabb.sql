@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 -- 
 -- 主機: localhost
--- 建立日期: Jul 10, 2011, 10:31 PM
+-- 建立日期: Jul 11, 2011, 01:14 AM
 -- 伺服器版本: 5.0.51
 -- PHP 版本: 5.2.6
 
@@ -118,7 +118,6 @@ INSERT INTO `fbb_config` VALUES ('o_censoring', '0');
 INSERT INTO `fbb_config` VALUES ('o_ranks', '1');
 INSERT INTO `fbb_config` VALUES ('o_show_dot', '0');
 INSERT INTO `fbb_config` VALUES ('o_topic_views', '1');
-INSERT INTO `fbb_config` VALUES ('o_quickjump', '1');
 INSERT INTO `fbb_config` VALUES ('o_gzip', '0');
 INSERT INTO `fbb_config` VALUES ('o_additional_navlinks', '');
 INSERT INTO `fbb_config` VALUES ('o_report_method', '0');
@@ -292,7 +291,8 @@ CREATE TABLE `fbb_online` (
 -- 列出以下資料庫的數據： `fbb_online`
 -- 
 
-INSERT INTO `fbb_online` VALUES (1, '127.0.0.1', 1310308284, 0, NULL, NULL);
+INSERT INTO `fbb_online` VALUES (1, '127.0.0.1', 1310318002, 0, NULL, NULL);
+INSERT INTO `fbb_online` VALUES (2, 'admin', 1310318007, 0, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -535,4 +535,4 @@ CREATE TABLE `fbb_users` (
 -- 
 
 INSERT INTO `fbb_users` VALUES (1, 3, '訪客', '訪客', '訪客', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 'Traditional_Chinese', 'Lithium', 0, NULL, NULL, NULL, 0, '0.0.0.0', 0, NULL, NULL, NULL);
-INSERT INTO `fbb_users` VALUES (2, 1, 'admin', 'c3d873d7fa9ac799e35693d4cc288d4a16ad3f96', 'comus2010mo@hotmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, 1, 1, 1, 1, 1, 8, 0, 0, 0, 'Traditional_Chinese', 'Lithium', 1, 1310283814, NULL, NULL, 1310283814, '127.0.0.1', 1310307552, NULL, NULL, NULL);
+INSERT INTO `fbb_users` VALUES (2, 1, 'admin', 'c3d873d7fa9ac799e35693d4cc288d4a16ad3f96', 'comus2010mo@hotmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, 1, 1, 1, 1, 1, 8, 0, 0, 0, 'Traditional_Chinese', 'Lithium', 1, 1310283814, NULL, NULL, 1310283814, '127.0.0.1', 1310317997, NULL, NULL, NULL);
