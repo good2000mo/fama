@@ -81,6 +81,7 @@ $lang_profile = array(
 'Realname'						=>	'姓名',
 'Location'						=>	'所在地',
 'Website'						=>	'個人網站',
+'Invalid website URL'					=>	'The website URL you entered is invalid.',
 'Jabber'						=>	'Jabber',
 'ICQ'							=>	'ICQ',
 'MSN'							=>	'MSN Messenger',

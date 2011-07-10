@@ -12,6 +12,9 @@ $lang_update = array(
 'Database password info'		=>	'要執行數據庫升級請填寫FluxBB所使用的數據庫密碼。如果您不慎忘記了密碼，請查看 \'config.php\' 文件中儲存的密碼。',
 'Database password note'		=>	'如果您使用的是SQLite數據庫(無須密碼)請使用數據庫名稱代替密碼。它必須與配置文件中您所給出的數據庫名稱完全匹配。',
 'Database password'				=>	'數據庫密碼',
+'Maintenance'					=>	'Maintenance',
+'Maintenance message info'		=>	'The message that will be displayed to users during the updating process. This text will not be parsed like regular posts and thus may contain HTML.',
+'Maintenance message'		    =>	'Maintenance message',
 'Next'							=>	'下一步',
 
 'You are running error'			=>	'您所運行的 %1$s 版本號為 %2$s。FluxBB %3$s 至少必須 %1$s %4$s 才能正確運行。繼續之前您必須先將您的 %1$s 升級。',
@@ -69,9 +72,5 @@ $lang_update = array(
 'Username bad characters error'	=>	'用戶名不可一次包含字符 \'、 " 與 [ 或 ] 。請重新選擇用戶名。',
 'Username BBCode error'			=>	'用戶名不得包含論壇所使用的樣式標籤格式 (BBCode) 。請重新選擇用戶名。',
 'Username duplicate error'		=>	'已有用戶註冊了用戶名 %s 。您填寫的用戶名與之太相似。用戶名必須與之不同，至少擁有一個字母、數字的差異 (a-z or 0-9)。請重新選擇用戶名。',
-
-'JavaScript disabled'			=>	'JavaScript 可能已被禁用。%s。',
-'Click here to continue'		=>	'點此繼續',
-'Required field'				=>	'在此表單是必填項目。'
 
 );

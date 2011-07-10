@@ -137,24 +137,6 @@ $lang_common = array(
 'Query'								=>	'Query',
 'Total query time'					=>	'Total query time: %s',
 
-// Email related notifications
-'New user notification'				=>	'警報 - 有新用戶註冊',
-'New user message'					=>	'用戶 \'%s\' 已在論壇註冊如下 %s',
-'Banned email notification'			=>	'警報 - 發現封禁的電子信箱',
-'Banned email register message'		=>	'用戶 \'%s\' 註冊時使用了一個被封禁的電子信箱： %s',
-'Banned email change message'		=>	'用戶 \'%s\' 已更改為一個被封禁的電子郵箱： %s',
-'Banned email post message'			=>	'用戶 \'%s\' 發帖時使用了被封禁的電子信箱： %s',
-'Duplicate email notification'		=>	'警報 - 發現重複的電子信箱',
-'Duplicate email register message'	=>	'用戶 \'%s\' 註冊使用的電子郵箱已經被 %s 使用',
-'Duplicate email change message'	=>	'用戶 \'%s\' 更改後的電子信箱地址已經被 %s 使用',
-'Report notification'				=>	'Report(%d) - \'%s\'',
-'Report message 1'					=>	'用戶 \'%s\' 舉報了以下內容： %s',
-'Report message 2'					=>	'理由： %s',
-
-'User profile'						=>	'用戶個人資料： %s',
-'Post URL'							=>	'帖子URL： %s',
-'Email signature'					=>	'論壇郵件服務'."\n".'(請勿回復該郵件)',
-
 // For extern.php RSS feed
 'RSS description'					=>	'%s 最近發表的主題。',
 'RSS description topic'				=>	'%s 最近發表的帖子。',
