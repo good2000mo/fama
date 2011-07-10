@@ -22,40 +22,6 @@ define('PUN_SEARCH_MAX_WORD', 20);
 
 define('PUN_ROOT', dirname(__FILE__).'/');
 
-// If we've been passed a default language, use it
-$install_lang = isset($_REQUEST['install_lang']) ? trim($_REQUEST['install_lang']) : 'English';
-
-// If such a language pack doesn't exist, or isn't up-to-date enough to translate this page, default to English
-if (!file_exists(PUN_ROOT.'lang/'.$install_lang.'/install.php'))
-	$install_lang = 'English';
-
-require PUN_ROOT.'lang/'.$install_lang.'/install.php';
-
-if (file_exists(PUN_ROOT.'config.php'))
-{
-	// Check to see whether FluxBB is already installed
-	include PUN_ROOT.'config.php';
-
-	// If we have the 1.3-legacy constant defined, define the proper 1.4 constant so we don't get an incorrect "need to install" message
-	if (defined('FORUM'))
-		define('PUN', FORUM);
-
-	// If PUN is defined, config.php is probably valid and thus the software is installed
-	if (defined('PUN'))
-		exit($lang_install['Already installed']);
-}
-
-// Define PUN because email.php requires it
-define('PUN', 1);
-
-// If the cache directory is not specified, we use the default setting
-if (!defined('FORUM_CACHE_DIR'))
-	define('FORUM_CACHE_DIR', PUN_ROOT.'cache/');
-
-// Make sure we are running at least MIN_PHP_VERSION
-if (!function_exists('version_compare') || version_compare(PHP_VERSION, MIN_PHP_VERSION, '<'))
-	exit(sprintf($lang_install['You are running error'], 'PHP', PHP_VERSION, FORUM_VERSION, MIN_PHP_VERSION));
-
 // Load the functions script
 require PUN_ROOT.'include/functions.php';
 
@@ -95,6 +61,42 @@ if (get_magic_quotes_gpc())
 // Turn off PHP time limit
 @set_time_limit(0);
 
+
+// If we've been passed a default language, use it
+$install_lang = isset($_REQUEST['install_lang']) ? trim($_REQUEST['install_lang']) : 'English';
+
+// If such a language pack doesn't exist, or isn't up-to-date enough to translate this page, default to English
+if (!file_exists(PUN_ROOT.'lang/'.$install_lang.'/install.php'))
+	$install_lang = 'English';
+
+require PUN_ROOT.'lang/'.$install_lang.'/install.php';
+
+if (file_exists(PUN_ROOT.'config.php'))
+{
+	// Check to see whether FluxBB is already installed
+	include PUN_ROOT.'config.php';
+
+	// If we have the 1.3-legacy constant defined, define the proper 1.4 constant so we don't get an incorrect "need to install" message
+	if (defined('FORUM'))
+		define('PUN', FORUM);
+
+	// If PUN is defined, config.php is probably valid and thus the software is installed
+	if (defined('PUN'))
+		exit($lang_install['Already installed']);
+}
+
+// Define PUN because email.php requires it
+define('PUN', 1);
+
+// If the cache directory is not specified, we use the default setting
+if (!defined('FORUM_CACHE_DIR'))
+	define('FORUM_CACHE_DIR', PUN_ROOT.'cache/');
+
+// Make sure we are running at least MIN_PHP_VERSION
+if (!function_exists('version_compare') || version_compare(PHP_VERSION, MIN_PHP_VERSION, '<'))
+	exit(sprintf($lang_install['You are running error'], 'PHP', PHP_VERSION, FORUM_VERSION, MIN_PHP_VERSION));
+
+
 //
 // Generate output to be used for config.php
 //
@@ -129,7 +131,7 @@ if (!isset($_POST['form_sent']))
 {
 	// Make an educated guess regarding base_url
 	$base_url  = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? 'https://' : 'http://';	// protocol
-	$base_url .= preg_replace('/:(80|443)$/', '', $_SERVER['HTTP_HOST']);							// host[:port]
+	$base_url .= preg_replace('%:(80|443)$%', '', $_SERVER['HTTP_HOST']);							// host[:port]
 	$base_url .= str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));							// path
 
 	if (substr($base_url, -1) == '/')
@@ -172,11 +174,11 @@ else
 		$alerts[] = $lang_install['Username 2'];
 	else if (!strcasecmp($username, 'Guest'))
 		$alerts[] = $lang_install['Username 3'];
-	else if (preg_match('/[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}/', $username) || preg_match('/((([0-9A-Fa-f]{1,4}:){7}[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){6}:[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){5}:([0-9A-Fa-f]{1,4}:)?[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){4}:([0-9A-Fa-f]{1,4}:){0,2}[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){3}:([0-9A-Fa-f]{1,4}:){0,3}[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){2}:([0-9A-Fa-f]{1,4}:){0,4}[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){6}((\b((25[0-5])|(1\d{2})|(2[0-4]\d)|(\d{1,2}))\b)\.){3}(\b((25[0-5])|(1\d{2})|(2[0-4]\d)|(\d{1,2}))\b))|(([0-9A-Fa-f]{1,4}:){0,5}:((\b((25[0-5])|(1\d{2})|(2[0-4]\d)|(\d{1,2}))\b)\.){3}(\b((25[0-5])|(1\d{2})|(2[0-4]\d)|(\d{1,2}))\b))|(::([0-9A-Fa-f]{1,4}:){0,5}((\b((25[0-5])|(1\d{2})|(2[0-4]\d)|(\d{1,2}))\b)\.){3}(\b((25[0-5])|(1\d{2})|(2[0-4]\d)|(\d{1,2}))\b))|([0-9A-Fa-f]{1,4}::([0-9A-Fa-f]{1,4}:){0,5}[0-9A-Fa-f]{1,4})|(::([0-9A-Fa-f]{1,4}:){0,6}[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){1,7}:))/', $username))
+	else if (preg_match('%[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}%', $username) || preg_match('%((([0-9A-Fa-f]{1,4}:){7}[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){6}:[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){5}:([0-9A-Fa-f]{1,4}:)?[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){4}:([0-9A-Fa-f]{1,4}:){0,2}[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){3}:([0-9A-Fa-f]{1,4}:){0,3}[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){2}:([0-9A-Fa-f]{1,4}:){0,4}[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){6}((\b((25[0-5])|(1\d{2})|(2[0-4]\d)|(\d{1,2}))\b)\.){3}(\b((25[0-5])|(1\d{2})|(2[0-4]\d)|(\d{1,2}))\b))|(([0-9A-Fa-f]{1,4}:){0,5}:((\b((25[0-5])|(1\d{2})|(2[0-4]\d)|(\d{1,2}))\b)\.){3}(\b((25[0-5])|(1\d{2})|(2[0-4]\d)|(\d{1,2}))\b))|(::([0-9A-Fa-f]{1,4}:){0,5}((\b((25[0-5])|(1\d{2})|(2[0-4]\d)|(\d{1,2}))\b)\.){3}(\b((25[0-5])|(1\d{2})|(2[0-4]\d)|(\d{1,2}))\b))|([0-9A-Fa-f]{1,4}::([0-9A-Fa-f]{1,4}:){0,5}[0-9A-Fa-f]{1,4})|(::([0-9A-Fa-f]{1,4}:){0,6}[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){1,7}:))%', $username))
 		$alerts[] = $lang_install['Username 4'];
 	else if ((strpos($username, '[') !== false || strpos($username, ']') !== false) && strpos($username, '\'') !== false && strpos($username, '"') !== false)
 		$alerts[] = $lang_install['Username 5'];
-	else if (preg_match('/(?:\[\/?(?:b|u|i|h|colou?r|quote|code|img|url|email|list)\]|\[(?:code|quote|list)=)/i', $username))
+	else if (preg_match('%(?:\[/?(?:b|u|i|h|colou?r|quote|code|img|url|email|list)\]|\[(?:code|quote|list)=)%i', $username))
 		$alerts[] = $lang_install['Username 6'];
 
 	if (pun_strlen($password1) < 4)
@@ -286,7 +288,7 @@ function process_form(the_form)
 /* ]]> */
 </script>
 </head>
-<body onload="document.getElementById('install').req_db_type.focus();document.getElementById('install').start.disabled=false;">
+<body onload="document.getElementById('install').req_db_type.focus();document.getElementById('install').start.disabled=false;" onunload="">
 
 <div id="puninstall" class="pun">
 <div class="top-box"><div><!-- Top Corners --></div></div>
@@ -579,7 +581,7 @@ else
 	$db = new DBLayer($db_host, $db_username, $db_password, $db_name, $db_prefix, false);
 
 	// Validate prefix
-	if (strlen($db_prefix) > 0 && (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $db_prefix) || strlen($db_prefix) > 40))
+	if (strlen($db_prefix) > 0 && (!preg_match('%^[a-zA-Z_][a-zA-Z0-9_]*$%', $db_prefix) || strlen($db_prefix) > 40))
 		error(sprintf($lang_install['Table prefix error'], $db->prefix));
 
 	// Do some DB type specific checks
@@ -1485,7 +1487,7 @@ else
 			'language'			=> array(
 				'datatype'		=> 'VARCHAR(25)',
 				'allow_null'	=> false,
-				'default'		=> '\'English\''
+				'default'		=> '\''.$db->escape($default_lang).'\''
 			),
 			'style'				=> array(
 				'datatype'		=> 'VARCHAR(25)',
