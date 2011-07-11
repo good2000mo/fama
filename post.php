@@ -400,10 +400,6 @@ if (isset($_POST['form_sent']))
 		if (!$pun_user['is_guest'])
 		{
 			$db->query('UPDATE '.$db->prefix.'users SET num_posts=num_posts+1, last_post='.$now.' WHERE id='.$pun_user['id']) or error('Unable to update user', __FILE__, __LINE__, $db->error());
-
-			$tracked_topics = get_tracked_topics();
-			$tracked_topics['topics'][$new_tid] = time();
-			set_tracked_topics($tracked_topics);
 		}
 		else
 		{

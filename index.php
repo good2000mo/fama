@@ -25,8 +25,6 @@ if (!$pun_user['is_guest'])
 	$new_topics = array();
 	while ($cur_topic = $db->fetch_assoc($result))
 		$new_topics[$cur_topic['forum_id']][$cur_topic['id']] = $cur_topic['last_post'];
-
-	$tracked_topics = get_tracked_topics();
 }
 
 $page_title = array(pun_htmlspecialchars($pun_config['o_board_title']));
@@ -74,25 +72,7 @@ while ($cur_forum = $db->fetch_assoc($result))
 
 	++$forum_count;
 	$item_status = ($forum_count % 2 == 0) ? 'roweven' : 'rowodd';
-	$forum_field_new = '';
 	$icon_type = 'icon';
-
-	// Are there new posts since our last visit?
-	if (!$pun_user['is_guest'] && $cur_forum['last_post'] > $pun_user['last_visit'] && (empty($tracked_topics['forums'][$cur_forum['fid']]) || $cur_forum['last_post'] > $tracked_topics['forums'][$cur_forum['fid']]))
-	{
-		// There are new posts in this forum, but have we read all of them already?
-		foreach ($new_topics[$cur_forum['fid']] as $check_topic_id => $check_last_post)
-		{
-			if ((empty($tracked_topics['topics'][$check_topic_id]) || $tracked_topics['topics'][$check_topic_id] < $check_last_post) && (empty($tracked_topics['forums'][$cur_forum['fid']]) || $tracked_topics['forums'][$cur_forum['fid']] < $check_last_post))
-			{
-				$item_status .= ' inew';
-				$forum_field_new = '<span class="newtext">[ <a href="search.php?action=show_new&amp;fid='.$cur_forum['fid'].'">'.$lang_common['New posts'].'</a> ]</span>';
-				$icon_type = 'icon icon-new';
-
-				break;
-			}
-		}
-	}
 
 	// Is this a redirect forum?
 	if ($cur_forum['redirect_url'] != '')
@@ -104,7 +84,7 @@ while ($cur_forum = $db->fetch_assoc($result))
 	}
 	else
 	{
-		$forum_field = '<h3><a href="viewforum.php?id='.$cur_forum['fid'].'">'.pun_htmlspecialchars($cur_forum['forum_name']).'</a>'.(!empty($forum_field_new) ? ' '.$forum_field_new : '').'</h3>';
+		$forum_field = '<h3><a href="viewforum.php?id='.$cur_forum['fid'].'">'.pun_htmlspecialchars($cur_forum['forum_name']).'</a>'.'</h3>';
 		$num_topics = $cur_forum['num_topics'];
 		$num_posts = $cur_forum['num_posts'];
 	}

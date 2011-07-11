@@ -53,10 +53,6 @@ $mods_array = ($moderators != '') ? unserialize($moderators) : array();
 if ($pun_user['g_id'] != PUN_ADMIN && ($pun_user['g_moderator'] == '0' || !array_key_exists($pun_user['username'], $mods_array)))
 	message($lang_common['No permission']);
 
-// Get topic/forum tracking data
-if (!$pun_user['is_guest'])
-	$tracked_topics = get_tracked_topics();
-
 // Load the misc.php language file
 require PUN_ROOT.'lang/'.$pun_user['language'].'/misc.php';
 
@@ -912,16 +908,6 @@ if ($db->num_rows($result))
 			$item_status .= ' iclosed';
 		}
 
-		if (!$ghost_topic && $cur_topic['last_post'] > $pun_user['last_visit'] && (!isset($tracked_topics['topics'][$cur_topic['id']]) || $tracked_topics['topics'][$cur_topic['id']] < $cur_topic['last_post']) && (!isset($tracked_topics['forums'][$fid]) || $tracked_topics['forums'][$fid] < $cur_topic['last_post']))
-		{
-			$item_status .= ' inew';
-			$icon_type = 'icon icon-new';
-			$subject = '<strong>'.$subject.'</strong>';
-			$subject_new_posts = '<span class="newtext">[ <a href="viewtopic.php?id='.$cur_topic['id'].'&amp;action=new" title="'.$lang_common['New posts info'].'">'.$lang_common['New posts'].'</a> ]</span>';
-		}
-		else
-			$subject_new_posts = null;
-
 		// Insert the status text before the subject
 		$subject = implode(' ', $status_text).' '.$subject;
 
@@ -932,10 +918,9 @@ if ($db->num_rows($result))
 		else
 			$subject_multipage = null;
 
-		// Should we show the "New posts" and/or the multipage links?
-		if (!empty($subject_new_posts) || !empty($subject_multipage))
+		// Should we show the multipage links?
+		if (!empty($subject_multipage))
 		{
-			$subject .= !empty($subject_new_posts) ? ' '.$subject_new_posts : '';
 			$subject .= !empty($subject_multipage) ? ' '.$subject_multipage : '';
 		}
 

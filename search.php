@@ -591,10 +591,6 @@ if (isset($_GET['action']) || isset($_GET['search_id']))
 			$post_count = 0;
 		}
 
-		// Get topic/forum tracking data
-		if (!$pun_user['is_guest'])
-			$tracked_topics = get_tracked_topics();
-
 		foreach ($search_set as $cur_search)
 		{
 			$forum = '<a href="viewforum.php?id='.$cur_search['forum_id'].'">'.pun_htmlspecialchars($cur_search['forum_name']).'</a>';
@@ -606,18 +602,8 @@ if (isset($_GET['action']) || isset($_GET['search_id']))
 			{
 				++$post_count;
 				$icon_type = 'icon';
-
-				if (!$pun_user['is_guest'] && $cur_search['last_post'] > $pun_user['last_visit'] && (!isset($tracked_topics['topics'][$cur_search['tid']]) || $tracked_topics['topics'][$cur_search['tid']] < $cur_search['last_post']) && (!isset($tracked_topics['forums'][$cur_search['forum_id']]) || $tracked_topics['forums'][$cur_search['forum_id']] < $cur_search['last_post']))
-				{
-					$item_status = 'inew';
-					$icon_type = 'icon icon-new';
-					$icon_text = $lang_topic['New icon'];
-				}
-				else
-				{
-					$item_status = '';
-					$icon_text = '<!-- -->';
-				}
+				$item_status = '';
+				$icon_text = '<!-- -->';
 
 				if ($pun_config['o_censoring'] == '1')
 					$cur_search['message'] = censor_words($cur_search['message']);
@@ -692,16 +678,6 @@ if (isset($_GET['action']) || isset($_GET['search_id']))
 					$item_status .= ' iclosed';
 				}
 
-				if (!$pun_user['is_guest'] && $cur_search['last_post'] > $pun_user['last_visit'] && (!isset($tracked_topics['topics'][$cur_search['tid']]) || $tracked_topics['topics'][$cur_search['tid']] < $cur_search['last_post']) && (!isset($tracked_topics['forums'][$cur_search['forum_id']]) || $tracked_topics['forums'][$cur_search['forum_id']] < $cur_search['last_post']))
-				{
-					$item_status .= ' inew';
-					$icon_type = 'icon icon-new';
-					$subject = '<strong>'.$subject.'</strong>';
-					$subject_new_posts = '<span class="newtext">[ <a href="viewtopic.php?id='.$cur_search['tid'].'&amp;action=new" title="'.$lang_common['New posts info'].'">'.$lang_common['New posts'].'</a> ]</span>';
-				}
-				else
-					$subject_new_posts = null;
-
 				// Insert the status text before the subject
 				$subject = implode(' ', $status_text).' '.$subject;
 
@@ -712,10 +688,9 @@ if (isset($_GET['action']) || isset($_GET['search_id']))
 				else
 					$subject_multipage = null;
 
-				// Should we show the "New posts" and/or the multipage links?
-				if (!empty($subject_new_posts) || !empty($subject_multipage))
+				// Should we show the multipage links?
+				if (!empty($subject_multipage))
 				{
-					$subject .= !empty($subject_new_posts) ? ' '.$subject_new_posts : '';
 					$subject .= !empty($subject_multipage) ? ' '.$subject_multipage : '';
 				}
 

@@ -75,9 +75,6 @@ if (isset($_POST['form_sent']) && $action == 'in')
 	$expire = ($save_pass == '1') ? time() + 1209600 : time() + $pun_config['o_timeout_visit'];
 	pun_setcookie($cur_user['id'], $form_password_hash, $expire);
 
-	// Reset tracked topics
-	set_tracked_topics(null);
-
 	redirect(htmlspecialchars($_POST['redirect_url']), $lang_login['Login redirect']);
 }
 

@@ -46,8 +46,7 @@ else if ($action == 'new')
 	if (!$pun_user['is_guest'])
 	{
 		// We need to check if this topic has been viewed recently by the user
-		$tracked_topics = get_tracked_topics();
-		$last_viewed = isset($tracked_topics['topics'][$id]) ? $tracked_topics['topics'][$id] : $pun_user['last_visit'];
+		$last_viewed = $pun_user['last_visit'];
 
 		$result = $db->query('SELECT MIN(id) FROM '.$db->prefix.'posts WHERE topic_id='.$id.' AND posted>'.$last_viewed) or error('Unable to fetch first new post info', __FILE__, __LINE__, $db->error());
 		$first_new_post_id = $db->result($result);
@@ -109,15 +108,6 @@ else
 		$post_link .= ' / <a href="post.php?tid='.$id.'">'.$lang_topic['Post reply'].'</a>';
 
 	$post_link = "\t\t\t".'<p class="postlink conr">'.$post_link.'</p>'."\n";
-}
-
-
-// Add/update this topic in our list of tracked topics
-if (!$pun_user['is_guest'])
-{
-	$tracked_topics = get_tracked_topics();
-	$tracked_topics['topics'][$id] = time();
-	set_tracked_topics($tracked_topics);
 }
 
 

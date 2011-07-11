@@ -103,9 +103,6 @@ function check_cookie(&$pun_user)
 						$db->query('INSERT INTO '.$db->prefix.'online (user_id, ident, logged) SELECT '.$pun_user['id'].', \''.$db->escape($pun_user['username']).'\', '.$pun_user['logged'].' WHERE NOT EXISTS (SELECT 1 FROM '.$db->prefix.'online WHERE user_id='.$pun_user['id'].')') or error('Unable to insert into online list', __FILE__, __LINE__, $db->error());
 						break;
 				}
-
-				// Reset tracked topics
-				set_tracked_topics(null);
 			}
 			else
 			{
@@ -118,10 +115,6 @@ function check_cookie(&$pun_user)
 
 				$idle_sql = ($pun_user['idle'] == '1') ? ', idle=0' : '';
 				$db->query('UPDATE '.$db->prefix.'online SET logged='.$now.$idle_sql.' WHERE user_id='.$pun_user['id']) or error('Unable to update online list', __FILE__, __LINE__, $db->error());
-
-				// Update tracked topics with the current expire time
-				if (isset($_COOKIE[$cookie_name.'_track']))
-					forum_setcookie($cookie_name.'_track', $_COOKIE[$cookie_name.'_track'], $now + $pun_config['o_timeout_visit']);
 			}
 		}
 		else
@@ -568,69 +561,6 @@ function generate_page_title($page_title, $p = null)
 	$crumbs = implode($lang_common['Title separator'], $page_title);
 
 	return $crumbs;
-}
-
-
-//
-// Save array of tracked topics in cookie
-//
-function set_tracked_topics($tracked_topics)
-{
-	global $cookie_name, $cookie_path, $cookie_domain, $cookie_secure, $pun_config;
-
-	$cookie_data = '';
-	if (!empty($tracked_topics))
-	{
-		// Sort the arrays (latest read first)
-		arsort($tracked_topics['topics'], SORT_NUMERIC);
-		arsort($tracked_topics['forums'], SORT_NUMERIC);
-
-		// Homebrew serialization (to avoid having to run unserialize() on cookie data)
-		foreach ($tracked_topics['topics'] as $id => $timestamp)
-			$cookie_data .= 't'.$id.'='.$timestamp.';';
-		foreach ($tracked_topics['forums'] as $id => $timestamp)
-			$cookie_data .= 'f'.$id.'='.$timestamp.';';
-
-		// Enforce a byte size limit (4096 minus some space for the cookie name - defaults to 4048)
-		if (strlen($cookie_data) > FORUM_MAX_COOKIE_SIZE)
-		{
-			$cookie_data = substr($cookie_data, 0, FORUM_MAX_COOKIE_SIZE);
-			$cookie_data = substr($cookie_data, 0, strrpos($cookie_data, ';')).';';
-		}
-	}
-
-	forum_setcookie($cookie_name.'_track', $cookie_data, time() + $pun_config['o_timeout_visit']);
-	$_COOKIE[$cookie_name.'_track'] = $cookie_data; // Set it directly in $_COOKIE as well
-}
-
-
-//
-// Extract array of tracked topics from cookie
-//
-function get_tracked_topics()
-{
-	global $cookie_name;
-
-	$cookie_data = isset($_COOKIE[$cookie_name.'_track']) ? $_COOKIE[$cookie_name.'_track'] : false;
-	if (!$cookie_data)
-		return array('topics' => array(), 'forums' => array());
-
-	if (strlen($cookie_data) > 4048)
-		return array('topics' => array(), 'forums' => array());
-
-	// Unserialize data from cookie
-	$tracked_topics = array('topics' => array(), 'forums' => array());
-	$temp = explode(';', $cookie_data);
-	foreach ($temp as $t)
-	{
-		$type = substr($t, 0, 1) == 'f' ? 'forums' : 'topics';
-		$id = intval(substr($t, 1));
-		$timestamp = intval(substr($t, strpos($t, '=') + 1));
-		if ($id > 0 && $timestamp > 0)
-			$tracked_topics[$type][$id] = $timestamp;
-	}
-
-	return $tracked_topics;
 }
 
 
