@@ -115,7 +115,7 @@ function prune($forum_id, $prune_sticky, $prune_date)
 		$extra_sql .= ' AND sticky=\'0\'';
 
 	// Fetch topics to prune
-	$result = $db->query('SELECT id FROM '.$db->prefix.'topics WHERE forum_id='.$forum_id.$extra_sql, true) or error('Unable to fetch topics', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SELECT id FROM '.$db->prefix.'topics WHERE forum_id='.$forum_id.$extra_sql.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --', true) or error('Unable to fetch topics', __FILE__, __LINE__, $db->error());
 
 	$topic_ids = '';
 	while ($row = $db->fetch_row($result))
@@ -124,7 +124,7 @@ function prune($forum_id, $prune_sticky, $prune_date)
 	if ($topic_ids != '')
 	{
 		// Fetch posts to prune
-		$result = $db->query('SELECT id FROM '.$db->prefix.'posts WHERE topic_id IN('.$topic_ids.')', true) or error('Unable to fetch posts', __FILE__, __LINE__, $db->error());
+		$result = $db->query('SELECT id FROM '.$db->prefix.'posts WHERE topic_id IN('.$topic_ids.')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --', true) or error('Unable to fetch posts', __FILE__, __LINE__, $db->error());
 
 		$post_ids = '';
 		while ($row = $db->fetch_row($result))
@@ -133,9 +133,9 @@ function prune($forum_id, $prune_sticky, $prune_date)
 		if ($post_ids != '')
 		{
 			// Delete topics
-			$db->query('DELETE FROM '.$db->prefix.'topics WHERE id IN('.$topic_ids.')') or error('Unable to prune topics', __FILE__, __LINE__, $db->error());
+			$db->query('DELETE FROM '.$db->prefix.'topics WHERE id IN('.$topic_ids.')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to prune topics', __FILE__, __LINE__, $db->error());
 			// Delete posts
-			$db->query('DELETE FROM '.$db->prefix.'posts WHERE id IN('.$post_ids.')') or error('Unable to prune posts', __FILE__, __LINE__, $db->error());
+			$db->query('DELETE FROM '.$db->prefix.'posts WHERE id IN('.$post_ids.')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to prune posts', __FILE__, __LINE__, $db->error());
 
 			// We removed a bunch of posts, so now we have to update the search index
 			require_once PUN_ROOT.'include/search_idx.php';

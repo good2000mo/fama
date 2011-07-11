@@ -19,7 +19,7 @@ function generate_config_cache()
 	global $db;
 
 	// Get the forum config from the DB
-	$result = $db->query('SELECT * FROM '.$db->prefix.'config', true) or error('Unable to fetch forum config', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SELECT * FROM '.$db->prefix.'config'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --', true) or error('Unable to fetch forum config', __FILE__, __LINE__, $db->error());
 	while ($cur_config_item = $db->fetch_row($result))
 		$output[$cur_config_item[0]] = $cur_config_item[1];
 
@@ -45,7 +45,7 @@ function generate_bans_cache()
 	global $db;
 
 	// Get the ban list from the DB
-	$result = $db->query('SELECT * FROM '.$db->prefix.'bans', true) or error('Unable to fetch ban list', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SELECT * FROM '.$db->prefix.'bans'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --', true) or error('Unable to fetch ban list', __FILE__, __LINE__, $db->error());
 
 	$output = array();
 	while ($cur_ban = $db->fetch_assoc($result))
@@ -73,7 +73,7 @@ function generate_ranks_cache()
 	global $db;
 
 	// Get the rank list from the DB
-	$result = $db->query('SELECT * FROM '.$db->prefix.'ranks ORDER BY min_posts', true) or error('Unable to fetch rank list', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SELECT * FROM '.$db->prefix.'ranks ORDER BY min_posts'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --', true) or error('Unable to fetch rank list', __FILE__, __LINE__, $db->error());
 
 	$output = array();
 	while ($cur_rank = $db->fetch_assoc($result))
@@ -100,7 +100,7 @@ function generate_censoring_cache()
 {
 	global $db;
 
-	$result = $db->query('SELECT search_for, replace_with FROM '.$db->prefix.'censoring') or error('Unable to fetch censoring list', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SELECT search_for, replace_with FROM '.$db->prefix.'censoring'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch censoring list', __FILE__, __LINE__, $db->error());
 	$num_words = $db->num_rows($result);
 
 	$search_for = $replace_with = array();

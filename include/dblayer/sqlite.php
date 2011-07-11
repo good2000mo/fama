@@ -268,14 +268,14 @@ class DBLayer
 
 	function table_exists($table_name, $no_prefix = false)
 	{
-		$result = $this->query('SELECT 1 FROM sqlite_master WHERE name = \''.($no_prefix ? '' : $this->prefix).$this->escape($table_name).'\' AND type=\'table\'');
+		$result = $this->query('SELECT 1 FROM sqlite_master WHERE name = \''.($no_prefix ? '' : $this->prefix).$this->escape($table_name).'\' AND type=\'table\''.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --');
 		return $this->num_rows($result) > 0;
 	}
 
 
 	function field_exists($table_name, $field_name, $no_prefix = false)
 	{
-		$result = $this->query('SELECT sql FROM sqlite_master WHERE name = \''.($no_prefix ? '' : $this->prefix).$this->escape($table_name).'\' AND type=\'table\'');
+		$result = $this->query('SELECT sql FROM sqlite_master WHERE name = \''.($no_prefix ? '' : $this->prefix).$this->escape($table_name).'\' AND type=\'table\''.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --');
 		if (!$this->num_rows($result))
 			return false;
 
@@ -285,7 +285,7 @@ class DBLayer
 
 	function index_exists($table_name, $index_name, $no_prefix = false)
 	{
-		$result = $this->query('SELECT 1 FROM sqlite_master WHERE tbl_name = \''.($no_prefix ? '' : $this->prefix).$this->escape($table_name).'\' AND name = \''.($no_prefix ? '' : $this->prefix).$this->escape($table_name).'_'.$this->escape($index_name).'\' AND type=\'index\'');
+		$result = $this->query('SELECT 1 FROM sqlite_master WHERE tbl_name = \''.($no_prefix ? '' : $this->prefix).$this->escape($table_name).'\' AND name = \''.($no_prefix ? '' : $this->prefix).$this->escape($table_name).'_'.$this->escape($index_name).'\' AND type=\'index\''.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --');
 		return $this->num_rows($result) > 0;
 	}
 
@@ -381,7 +381,7 @@ class DBLayer
 	function get_table_info($table_name, $no_prefix = false)
 	{
 		// Grab table info
-		$result = $this->query('SELECT sql FROM sqlite_master WHERE tbl_name = \''.($no_prefix ? '' : $this->prefix).$this->escape($table_name).'\' ORDER BY type DESC') or error('Unable to fetch table information', __FILE__, __LINE__, $this->error());
+		$result = $this->query('SELECT sql FROM sqlite_master WHERE tbl_name = \''.($no_prefix ? '' : $this->prefix).$this->escape($table_name).'\' ORDER BY type DESC'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch table information', __FILE__, __LINE__, $this->error());
 		$num_rows = $this->num_rows($result);
 
 		if ($num_rows == 0)

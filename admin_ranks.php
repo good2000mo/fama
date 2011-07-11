@@ -35,11 +35,11 @@ if (isset($_POST['add_rank']))
 		message($lang_admin_ranks['Must be integer message']);
 
 	// Make sure there isn't already a rank with the same min_posts value
-	$result = $db->query('SELECT 1 FROM '.$db->prefix.'ranks WHERE min_posts='.$min_posts) or error('Unable to fetch rank info', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SELECT 1 FROM '.$db->prefix.'ranks WHERE min_posts='.$min_posts.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch rank info', __FILE__, __LINE__, $db->error());
 	if ($db->num_rows($result))
 		message(sprintf($lang_admin_ranks['Dupe min posts message'], $min_posts));
 
-	$db->query('INSERT INTO '.$db->prefix.'ranks (rank, min_posts) VALUES(\''.$db->escape($rank).'\', '.$min_posts.')') or error('Unable to add rank', __FILE__, __LINE__, $db->error());
+	$db->query('INSERT INTO '.$db->prefix.'ranks (rank, min_posts) VALUES(\''.$db->escape($rank).'\', '.$min_posts.')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to add rank', __FILE__, __LINE__, $db->error());
 
 	// Regenerate the ranks cache
 	if (!defined('FORUM_CACHE_FUNCTIONS_LOADED'))
@@ -68,11 +68,11 @@ else if (isset($_POST['update']))
 		message($lang_admin_ranks['Must be integer message']);
 
 	// Make sure there isn't already a rank with the same min_posts value
-	$result = $db->query('SELECT 1 FROM '.$db->prefix.'ranks WHERE id!='.$id.' AND min_posts='.$min_posts) or error('Unable to fetch rank info', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SELECT 1 FROM '.$db->prefix.'ranks WHERE id!='.$id.' AND min_posts='.$min_posts.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch rank info', __FILE__, __LINE__, $db->error());
 	if ($db->num_rows($result))
 		message(sprintf($lang_admin_ranks['Dupe min posts message'], $min_posts));
 
-	$db->query('UPDATE '.$db->prefix.'ranks SET rank=\''.$db->escape($rank).'\', min_posts='.$min_posts.' WHERE id='.$id) or error('Unable to update rank', __FILE__, __LINE__, $db->error());
+	$db->query('UPDATE '.$db->prefix.'ranks SET rank=\''.$db->escape($rank).'\', min_posts='.$min_posts.' WHERE id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update rank', __FILE__, __LINE__, $db->error());
 
 	// Regenerate the ranks cache
 	if (!defined('FORUM_CACHE_FUNCTIONS_LOADED'))
@@ -91,7 +91,7 @@ else if (isset($_POST['remove']))
 
 	$id = intval(key($_POST['remove']));
 
-	$db->query('DELETE FROM '.$db->prefix.'ranks WHERE id='.$id) or error('Unable to delete rank', __FILE__, __LINE__, $db->error());
+	$db->query('DELETE FROM '.$db->prefix.'ranks WHERE id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to delete rank', __FILE__, __LINE__, $db->error());
 
 	// Regenerate the ranks cache
 	if (!defined('FORUM_CACHE_FUNCTIONS_LOADED'))
@@ -144,7 +144,7 @@ generate_admin_menu('ranks');
 						<div class="infldset">
 <?php
 
-$result = $db->query('SELECT id, rank, min_posts FROM '.$db->prefix.'ranks ORDER BY min_posts') or error('Unable to fetch rank list', __FILE__, __LINE__, $db->error());
+$result = $db->query('SELECT id, rank, min_posts FROM '.$db->prefix.'ranks ORDER BY min_posts'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch rank list', __FILE__, __LINE__, $db->error());
 if ($db->num_rows($result))
 {
 

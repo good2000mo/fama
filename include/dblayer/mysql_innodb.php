@@ -201,20 +201,20 @@ class DBLayer
 
 	function get_names()
 	{
-		$result = $this->query('SHOW VARIABLES LIKE \'character_set_connection\'');
+		$result = $this->query('SHOW VARIABLES LIKE \'character_set_connection\''.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --');
 		return $this->result($result, 0, 1);
 	}
 
 
 	function set_names($names)
 	{
-		return $this->query('SET NAMES \''.$this->escape($names).'\'');
+		return $this->query('SET NAMES \''.$this->escape($names).'\''.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --');
 	}
 
 
 	function get_version()
 	{
-		$result = $this->query('SELECT VERSION()');
+		$result = $this->query('SELECT VERSION()'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --');
 
 		return array(
 			'name'		=> 'MySQL Standard (InnoDB)',
@@ -225,14 +225,14 @@ class DBLayer
 
 	function table_exists($table_name, $no_prefix = false)
 	{
-		$result = $this->query('SHOW TABLES LIKE \''.($no_prefix ? '' : $this->prefix).$this->escape($table_name).'\'');
+		$result = $this->query('SHOW TABLES LIKE \''.($no_prefix ? '' : $this->prefix).$this->escape($table_name).'\''.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --');
 		return $this->num_rows($result) > 0;
 	}
 
 
 	function field_exists($table_name, $field_name, $no_prefix = false)
 	{
-		$result = $this->query('SHOW COLUMNS FROM '.($no_prefix ? '' : $this->prefix).$table_name.' LIKE \''.$this->escape($field_name).'\'');
+		$result = $this->query('SHOW COLUMNS FROM '.($no_prefix ? '' : $this->prefix).$table_name.' LIKE \''.$this->escape($field_name).'\''.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --');
 		return $this->num_rows($result) > 0;
 	}
 
@@ -241,7 +241,7 @@ class DBLayer
 	{
 		$exists = false;
 
-		$result = $this->query('SHOW INDEX FROM '.($no_prefix ? '' : $this->prefix).$table_name);
+		$result = $this->query('SHOW INDEX FROM '.($no_prefix ? '' : $this->prefix).$table_name.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --');
 		while ($cur_index = $this->fetch_assoc($result))
 		{
 			if (strtolower($cur_index['Key_name']) == strtolower(($no_prefix ? '' : $this->prefix).$table_name.'_'.$index_name))

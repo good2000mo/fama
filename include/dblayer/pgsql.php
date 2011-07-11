@@ -249,20 +249,20 @@ class DBLayer
 
 	function get_names()
 	{
-		$result = $this->query('SHOW client_encoding');
+		$result = $this->query('SHOW client_encoding'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --');
 		return strtolower($this->result($result)); // MySQL returns lowercase so lets be consistent
 	}
 
 
 	function set_names($names)
 	{
-		return $this->query('SET NAMES \''.$this->escape($names).'\'');
+		return $this->query('SET NAMES \''.$this->escape($names).'\''.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --');
 	}
 
 
 	function get_version()
 	{
-		$result = $this->query('SELECT VERSION()');
+		$result = $this->query('SELECT VERSION()'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --');
 
 		return array(
 			'name'		=> 'PostgreSQL',
@@ -273,21 +273,21 @@ class DBLayer
 
 	function table_exists($table_name, $no_prefix = false)
 	{
-		$result = $this->query('SELECT 1 FROM pg_class WHERE relname = \''.($no_prefix ? '' : $this->prefix).$this->escape($table_name).'\'');
+		$result = $this->query('SELECT 1 FROM pg_class WHERE relname = \''.($no_prefix ? '' : $this->prefix).$this->escape($table_name).'\''.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --');
 		return $this->num_rows($result) > 0;
 	}
 
 
 	function field_exists($table_name, $field_name, $no_prefix = false)
 	{
-		$result = $this->query('SELECT 1 FROM pg_class c INNER JOIN pg_attribute a ON a.attrelid = c.oid WHERE c.relname = \''.($no_prefix ? '' : $this->prefix).$this->escape($table_name).'\' AND a.attname = \''.$this->escape($field_name).'\'');
+		$result = $this->query('SELECT 1 FROM pg_class c INNER JOIN pg_attribute a ON a.attrelid = c.oid WHERE c.relname = \''.($no_prefix ? '' : $this->prefix).$this->escape($table_name).'\' AND a.attname = \''.$this->escape($field_name).'\''.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --');
 		return $this->num_rows($result) > 0;
 	}
 
 
 	function index_exists($table_name, $index_name, $no_prefix = false)
 	{
-		$result = $this->query('SELECT 1 FROM pg_index i INNER JOIN pg_class c1 ON c1.oid = i.indrelid INNER JOIN pg_class c2 ON c2.oid = i.indexrelid WHERE c1.relname = \''.($no_prefix ? '' : $this->prefix).$this->escape($table_name).'\' AND c2.relname = \''.($no_prefix ? '' : $this->prefix).$this->escape($table_name).'_'.$this->escape($index_name).'\'');
+		$result = $this->query('SELECT 1 FROM pg_index i INNER JOIN pg_class c1 ON c1.oid = i.indrelid INNER JOIN pg_class c2 ON c2.oid = i.indexrelid WHERE c1.relname = \''.($no_prefix ? '' : $this->prefix).$this->escape($table_name).'\' AND c2.relname = \''.($no_prefix ? '' : $this->prefix).$this->escape($table_name).'_'.$this->escape($index_name).'\''.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --');
 		return $this->num_rows($result) > 0;
 	}
 

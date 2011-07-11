@@ -77,7 +77,7 @@ else
 
 
 // Get number of current visitors
-$result = $db->query('SELECT COUNT(user_id) FROM '.$db->prefix.'online WHERE idle=0') or error('Unable to fetch online count', __FILE__, __LINE__, $db->error());
+$result = $db->query('SELECT COUNT(user_id) FROM '.$db->prefix.'online WHERE idle=0'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch online count', __FILE__, __LINE__, $db->error());
 $num_online = $db->result($result);
 
 
@@ -85,7 +85,7 @@ $num_online = $db->result($result);
 if ($db_type == 'mysql' || $db_type == 'mysqli' || $db_type == 'mysql_innodb' || $db_type == 'mysqli_innodb')
 {
 	// Calculate total db size/row count
-	$result = $db->query('SHOW TABLE STATUS LIKE \''.$db->prefix.'%\'') or error('Unable to fetch table status', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SHOW TABLE STATUS LIKE \''.$db->prefix.'%\''.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch table status', __FILE__, __LINE__, $db->error());
 
 	$total_records = $total_size = 0;
 	while ($status = $db->fetch_assoc($result))
