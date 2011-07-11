@@ -112,7 +112,6 @@ INSERT INTO `fbb_config` VALUES ('o_disp_posts_default', '25');
 INSERT INTO `fbb_config` VALUES ('o_indent_num_spaces', '4');
 INSERT INTO `fbb_config` VALUES ('o_quote_depth', '3');
 INSERT INTO `fbb_config` VALUES ('o_quickpost', '1');
-INSERT INTO `fbb_config` VALUES ('o_users_online', '1');
 INSERT INTO `fbb_config` VALUES ('o_censoring', '0');
 INSERT INTO `fbb_config` VALUES ('o_ranks', '1');
 INSERT INTO `fbb_config` VALUES ('o_show_dot', '0');
