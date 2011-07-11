@@ -46,24 +46,6 @@ if ($action == 'rules')
 }
 
 
-// Mark the topics/posts in a forum as read?
-else if ($action == 'markforumread')
-{
-	if ($pun_user['is_guest'])
-		message($lang_common['No permission']);
-
-	$fid = isset($_GET['fid']) ? intval($_GET['fid']) : 0;
-	if ($fid < 1)
-		message($lang_common['Bad request']);
-
-	$tracked_topics = get_tracked_topics();
-	$tracked_topics['forums'][$fid] = time();
-	set_tracked_topics($tracked_topics);
-
-	redirect('viewforum.php?id='.$fid, $lang_misc['Mark forum read redirect']);
-}
-
-
 else if (isset($_GET['email']))
 {
 	if ($pun_user['is_guest'] || $pun_user['g_send_email'] == '0')
