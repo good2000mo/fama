@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 -- 
 -- 主機: localhost
--- 建立日期: Jul 11, 2011, 09:32 AM
+-- 建立日期: Jul 11, 2011, 11:32 AM
 -- 伺服器版本: 5.0.51
 -- PHP 版本: 5.2.6
 
@@ -130,8 +130,6 @@ INSERT INTO `fbb_config` VALUES ('o_avatars_size', '10240');
 INSERT INTO `fbb_config` VALUES ('o_search_all_forums', '1');
 INSERT INTO `fbb_config` VALUES ('o_admin_email', 'comus2010mo@hotmail.com');
 INSERT INTO `fbb_config` VALUES ('o_webmaster_email', 'comus2010mo@hotmail.com');
-INSERT INTO `fbb_config` VALUES ('o_forum_subscriptions', '1');
-INSERT INTO `fbb_config` VALUES ('o_topic_subscriptions', '1');
 INSERT INTO `fbb_config` VALUES ('o_smtp_host', NULL);
 INSERT INTO `fbb_config` VALUES ('o_smtp_user', NULL);
 INSERT INTO `fbb_config` VALUES ('o_smtp_pass', NULL);
@@ -210,23 +208,6 @@ CREATE TABLE `fbb_forum_perms` (
 -- --------------------------------------------------------
 
 -- 
--- 資料表格式： `fbb_forum_subscriptions`
--- 
-
-CREATE TABLE `fbb_forum_subscriptions` (
-  `user_id` int(10) unsigned NOT NULL default '0',
-  `forum_id` int(10) unsigned NOT NULL default '0',
-  PRIMARY KEY  (`user_id`,`forum_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
--- 
--- 列出以下資料庫的數據： `fbb_forum_subscriptions`
--- 
-
-
--- --------------------------------------------------------
-
--- 
 -- 資料表格式： `fbb_groups`
 -- 
 
@@ -287,7 +268,7 @@ CREATE TABLE `fbb_online` (
 -- 列出以下資料庫的數據： `fbb_online`
 -- 
 
-INSERT INTO `fbb_online` VALUES (2, 'admin', 1310346244, 0, NULL, NULL);
+INSERT INTO `fbb_online` VALUES (2, 'admin', 1310355082, 0, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -458,23 +439,6 @@ INSERT INTO `fbb_topics` VALUES (1, 'admin', '示例帖子', 1310283814, 1, 1310
 -- --------------------------------------------------------
 
 -- 
--- 資料表格式： `fbb_topic_subscriptions`
--- 
-
-CREATE TABLE `fbb_topic_subscriptions` (
-  `user_id` int(10) unsigned NOT NULL default '0',
-  `topic_id` int(10) unsigned NOT NULL default '0',
-  PRIMARY KEY  (`user_id`,`topic_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
--- 
--- 列出以下資料庫的數據： `fbb_topic_subscriptions`
--- 
-
-
--- --------------------------------------------------------
-
--- 
 -- 資料表格式： `fbb_users`
 -- 
 
@@ -497,8 +461,6 @@ CREATE TABLE `fbb_users` (
   `disp_topics` tinyint(3) unsigned default NULL,
   `disp_posts` tinyint(3) unsigned default NULL,
   `email_setting` tinyint(1) NOT NULL default '1',
-  `notify_with_post` tinyint(1) NOT NULL default '0',
-  `auto_notify` tinyint(1) NOT NULL default '0',
   `show_smilies` tinyint(1) NOT NULL default '1',
   `show_img` tinyint(1) NOT NULL default '1',
   `show_img_sig` tinyint(1) NOT NULL default '1',
@@ -529,5 +491,5 @@ CREATE TABLE `fbb_users` (
 -- 列出以下資料庫的數據： `fbb_users`
 -- 
 
-INSERT INTO `fbb_users` VALUES (1, 3, '訪客', '訪客', '訪客', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 'Traditional_Chinese', 'Lithium', 0, NULL, NULL, NULL, 0, '0.0.0.0', 0, NULL, NULL, NULL);
-INSERT INTO `fbb_users` VALUES (2, 1, 'admin', 'c3d873d7fa9ac799e35693d4cc288d4a16ad3f96', 'comus2010mo@hotmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, 1, 1, 1, 1, 1, 8, 0, 0, 0, 'Traditional_Chinese', 'Lithium', 1, 1310283814, NULL, NULL, 1310283814, '127.0.0.1', 1310321110, NULL, NULL, NULL);
+INSERT INTO `fbb_users` VALUES (1, 3, '訪客', '訪客', '訪客', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 'Traditional_Chinese', 'Lithium', 0, NULL, NULL, NULL, 0, '0.0.0.0', 0, NULL, NULL, NULL);
+INSERT INTO `fbb_users` VALUES (2, 1, 'admin', 'c3d873d7fa9ac799e35693d4cc288d4a16ad3f96', 'comus2010mo@hotmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 1, 1, 1, 1, 1, 8, 0, 0, 0, 'Traditional_Chinese', 'Lithium', 1, 1310283814, NULL, NULL, 1310283814, '127.0.0.1', 1310346244, NULL, NULL, NULL);

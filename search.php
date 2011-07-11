@@ -67,15 +67,11 @@ if (isset($_GET['action']) || isset($_GET['search_id']))
 		$search_in = (!isset($_GET['search_in']) || $_GET['search_in'] == '0') ? 0 : (($_GET['search_in'] == '1') ? 1 : -1);
 	}
 	// If it's a user search (by ID)
-	else if ($action == 'show_user_posts' || $action == 'show_user_topics' || $action == 'show_subscriptions')
+	else if ($action == 'show_user_posts' || $action == 'show_user_topics')
 	{
 		$user_id = (isset($_GET['user_id'])) ? intval($_GET['user_id']) : $pun_user['id'];
 		if ($user_id < 2)
 			message($lang_common['Bad request']);
-
-		// Subscribed topics can only be viewed by admins, moderators and the users themselves
-		if ($action == 'show_subscriptions' && !$pun_user['is_admmod'] && $user_id != $pun_user['id'])
-			message($lang_common['No permission']);
 	}
 	else if ($action == 'show_recent')
 		$interval = isset($_GET['value']) ? intval($_GET['value']) : 86400;
@@ -309,7 +305,7 @@ if (isset($_GET['action']) || isset($_GET['search_id']))
 			if (!$num_hits)
 				message($lang_search['No hits']);
 		}
-		else if ($action == 'show_new' || $action == 'show_recent' || $action == 'show_replies' || $action == 'show_user_posts' || $action == 'show_user_topics' || $action == 'show_subscriptions' || $action == 'show_unanswered')
+		else if ($action == 'show_new' || $action == 'show_recent' || $action == 'show_replies' || $action == 'show_user_posts' || $action == 'show_user_topics' || $action == 'show_unanswered')
 		{
 			$search_type = array('action', $action);
 			$show_as = 'topics';
@@ -371,21 +367,6 @@ if (isset($_GET['action']) || isset($_GET['search_id']))
 					message($lang_search['No user topics']);
 
 				// Pass on the user ID so that we can later know whos topics we're searching for
-				$search_type[2] = $user_id;
-			}
-			// If it's a search for subscribed topics
-			else if ($action == 'show_subscriptions')
-			{
-				if ($pun_user['is_guest'])
-					message($lang_common['Bad request']);
-
-				$result = $db->query('SELECT t.id FROM '.$db->prefix.'topics AS t INNER JOIN '.$db->prefix.'topic_subscriptions AS s ON (t.id=s.topic_id AND s.user_id='.$user_id.') LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (fp.forum_id=t.forum_id AND fp.group_id='.$pun_user['g_id'].') WHERE (fp.read_forum IS NULL OR fp.read_forum=1) ORDER BY t.last_post DESC') or error('Unable to fetch topic list', __FILE__, __LINE__, $db->error());
-				$num_hits = $db->num_rows($result);
-
-				if (!$num_hits)
-					message($lang_search['No subscriptions']);
-
-				// Pass on user ID so that we can later know whose subscriptions we're searching for
 				$search_type[2] = $user_id;
 			}
 			// If it's a search for unanswered posts
@@ -500,19 +481,6 @@ if (isset($_GET['action']) || isset($_GET['search_id']))
 				$crumbs_text['search_type'] = '<a href="search.php?action=show_user_topics&amp;user_id='.$search_type[2].'">'.sprintf($lang_search['Quick search show_user_topics'], pun_htmlspecialchars($search_set[0]['poster'])).'</a>';
 			else if ($search_type[1] == 'show_user_posts')
 				$crumbs_text['search_type'] = '<a href="search.php?action=show_user_posts&amp;user_id='.$search_type[2].'">'.sprintf($lang_search['Quick search show_user_posts'], pun_htmlspecialchars($search_set[0]['pposter'])).'</a>';
-			else if ($search_type[1] == 'show_subscriptions')
-			{
-				// Fetch username of subscriber
-				$subscriber_id = $search_type[2];
-				$result = $db->query('SELECT username FROM '.$db->prefix.'users WHERE id='.$subscriber_id) or error('Unable to fetch username of subscriber', __FILE__, __LINE__, $db->error());
-
-				if ($db->num_rows($result))
-					$subscriber_name = $db->result($result);
-				else
-					message($lang_common['Bad request']);
-
-				$crumbs_text['search_type'] = '<a href="search.php?action=show_subscriptions&amp;user_id='.$subscriber_id.'">'.sprintf($lang_search['Quick search show_subscriptions'], pun_htmlspecialchars($subscriber_name)).'</a>';
-			}
 			else
 				$crumbs_text['search_type'] = '<a href="search.php?action='.$search_type[1].'">'.$lang_search['Quick search '.$search_type[1]].'</a>';
 		}

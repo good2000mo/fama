@@ -65,10 +65,6 @@ else if (isset($_GET['del_forum']))
 		// Delete the forum and any forum specific group permissions
 		$db->query('DELETE FROM '.$db->prefix.'forums WHERE id='.$forum_id) or error('Unable to delete forum', __FILE__, __LINE__, $db->error());
 		$db->query('DELETE FROM '.$db->prefix.'forum_perms WHERE forum_id='.$forum_id) or error('Unable to delete group forum permissions', __FILE__, __LINE__, $db->error());
-
-		// Delete any subscriptions for this forum
-		$db->query('DELETE FROM '.$db->prefix.'forum_subscriptions WHERE forum_id='.$forum_id) or error('Unable to delete subscriptions', __FILE__, __LINE__, $db->error());
-
 		redirect('admin_forums.php', $lang_admin_forums['Forum deleted redirect']);
 	}
 	else // If the user hasn't confirmed the delete
