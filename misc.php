@@ -46,20 +46,6 @@ if ($action == 'rules')
 }
 
 
-else if ($action == 'markread')
-{
-	if ($pun_user['is_guest'])
-		message($lang_common['No permission']);
-
-	$db->query('UPDATE '.$db->prefix.'users SET last_visit='.$pun_user['logged'].' WHERE id='.$pun_user['id']) or error('Unable to update user last visit data', __FILE__, __LINE__, $db->error());
-
-	// Reset tracked topics
-	set_tracked_topics(null);
-
-	redirect('index.php', $lang_misc['Mark read redirect']);
-}
-
-
 // Mark the topics/posts in a forum as read?
 else if ($action == 'markforumread')
 {

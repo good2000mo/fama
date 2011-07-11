@@ -446,12 +446,6 @@ if (isset($_GET['action']) || isset($_GET['search_id']))
 		}
 	}
 
-	$forum_actions = array();
-
-	// If we're on the new posts search, display a "mark all as read" link
-	if (!$pun_user['is_guest'] && $search_type[0] == 'action' && $search_type[1] == 'show_new')
-		$forum_actions[] = '<a href="misc.php?action=markread">'.$lang_common['Mark all as read'].'</a>';
-
 	// Fetch results to display
 	if (!empty($search_ids))
 	{
@@ -758,7 +752,6 @@ if (isset($_GET['action']) || isset($_GET['search_id']))
 			<li><span>»&#160;</span><a href="search.php"><?php echo $crumbs_text['show_as'] ?></a></li>
 			<li><span>»&#160;</span><strong><?php echo $crumbs_text['search_type'] ?></strong></li>
 		</ul>
-<?php echo (!empty($forum_actions) ? "\t\t".'<p class="subscribelink clearb">'.implode(' - ', $forum_actions).'</p>'."\n" : '') ?>
 		<div class="clearer"></div>
 	</div>
 </div>

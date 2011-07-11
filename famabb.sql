@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 -- 
 -- 主機: localhost
--- 建立日期: Jul 11, 2011, 01:53 AM
+-- 建立日期: Jul 11, 2011, 09:32 AM
 -- 伺服器版本: 5.0.51
 -- PHP 版本: 5.2.6
 
@@ -287,8 +287,7 @@ CREATE TABLE `fbb_online` (
 -- 列出以下資料庫的數據： `fbb_online`
 -- 
 
-INSERT INTO `fbb_online` VALUES (1, '127.0.0.1', 1310319515, 0, NULL, NULL);
-INSERT INTO `fbb_online` VALUES (2, 'admin', 1310319591, 0, NULL, NULL);
+INSERT INTO `fbb_online` VALUES (2, 'admin', 1310346244, 0, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -531,4 +530,4 @@ CREATE TABLE `fbb_users` (
 -- 
 
 INSERT INTO `fbb_users` VALUES (1, 3, '訪客', '訪客', '訪客', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 'Traditional_Chinese', 'Lithium', 0, NULL, NULL, NULL, 0, '0.0.0.0', 0, NULL, NULL, NULL);
-INSERT INTO `fbb_users` VALUES (2, 1, 'admin', 'c3d873d7fa9ac799e35693d4cc288d4a16ad3f96', 'comus2010mo@hotmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, 1, 1, 1, 1, 1, 8, 0, 0, 0, 'Traditional_Chinese', 'Lithium', 1, 1310283814, NULL, NULL, 1310283814, '127.0.0.1', 1310317997, NULL, NULL, NULL);
+INSERT INTO `fbb_users` VALUES (2, 1, 'admin', 'c3d873d7fa9ac799e35693d4cc288d4a16ad3f96', 'comus2010mo@hotmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, 1, 1, 1, 1, 1, 8, 0, 0, 0, 'Traditional_Chinese', 'Lithium', 1, 1310283814, NULL, NULL, 1310283814, '127.0.0.1', 1310321110, NULL, NULL, NULL);

@@ -29,12 +29,6 @@ if (!$pun_user['is_guest'])
 	$tracked_topics = get_tracked_topics();
 }
 
-$forum_actions = array();
-
-// Display a "mark all as read" link
-if (!$pun_user['is_guest'])
-	$forum_actions[] = '<a href="misc.php?action=markread">'.$lang_common['Mark all as read'].'</a>';
-
 $page_title = array(pun_htmlspecialchars($pun_config['o_board_title']));
 define('PUN_ALLOW_INDEX', 1);
 define('PUN_ACTIVE_PAGE', 'index');
@@ -165,19 +159,6 @@ if ($cur_category > 0)
 	echo "\t\t\t".'</tbody>'."\n\t\t\t".'</table>'."\n\t\t".'</div>'."\n\t".'</div>'."\n".'</div>'."\n\n";
 else
 	echo '<div id="idx0" class="block"><div class="box"><div class="inbox"><p>'.$lang_index['Empty board'].'</p></div></div></div>';
-
-if (!empty($forum_actions))
-{
-
-?>
-<div class="linksb">
-	<div class="inbox crumbsplus">
-		<p class="subscribelink clearb"><?php echo implode(' - ', $forum_actions); ?></p>
-	</div>
-</div>
-<?php
-
-}
 
 ?>
 
