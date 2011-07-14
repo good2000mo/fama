@@ -19,7 +19,7 @@ require PUN_ROOT.'lang/'.$pun_user['language'].'/misc.php';
 $action = isset($_GET['action']) ? $_GET['action'] : null;
 
 
-else if (isset($_GET['email']))
+if (isset($_GET['email']))
 {
 	if ($pun_user['is_guest'] || $pun_user['g_send_email'] == '0')
 		message($lang_common['No permission']);
