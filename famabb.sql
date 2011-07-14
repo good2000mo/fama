@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 -- 
 -- 主機: localhost
--- 建立日期: Jul 14, 2011, 11:28 AM
+-- 建立日期: Jul 14, 2011, 11:45 AM
 -- 伺服器版本: 5.0.51
 -- PHP 版本: 5.2.6
 
@@ -75,10 +75,7 @@ INSERT INTO `fbb_config` VALUES ('o_show_dot', '0');
 INSERT INTO `fbb_config` VALUES ('o_topic_views', '1');
 INSERT INTO `fbb_config` VALUES ('o_gzip', '0');
 INSERT INTO `fbb_config` VALUES ('o_additional_navlinks', '');
-INSERT INTO `fbb_config` VALUES ('o_report_method', '0');
-INSERT INTO `fbb_config` VALUES ('o_regs_report', '0');
 INSERT INTO `fbb_config` VALUES ('o_default_email_setting', '1');
-INSERT INTO `fbb_config` VALUES ('o_mailing_list', 'comus2010mo@hotmail.com');
 INSERT INTO `fbb_config` VALUES ('o_avatars', '1');
 INSERT INTO `fbb_config` VALUES ('o_avatars_dir', 'img/avatars');
 INSERT INTO `fbb_config` VALUES ('o_avatars_width', '60');
@@ -223,7 +220,7 @@ CREATE TABLE `fbb_online` (
 -- 列出以下資料庫的數據： `fbb_online`
 -- 
 
-INSERT INTO `fbb_online` VALUES (1, '127.0.0.1', 1310612254, 0, NULL, NULL);
+INSERT INTO `fbb_online` VALUES (2, 'admin', 1310614788, 0, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -253,31 +250,6 @@ CREATE TABLE `fbb_posts` (
 -- 
 
 INSERT INTO `fbb_posts` VALUES (1, 'admin', 2, '127.0.0.1', NULL, '如果您在閱讀這個帖子(我猜正是如此)，安裝的 FluxBB 已經開始工作！現在您可以登錄，並進入頂部的管理設置面板來配置您的論壇。', 0, 1310283814, NULL, NULL, 1);
-
--- --------------------------------------------------------
-
--- 
--- 資料表格式： `fbb_reports`
--- 
-
-CREATE TABLE `fbb_reports` (
-  `id` int(10) unsigned NOT NULL auto_increment,
-  `post_id` int(10) unsigned NOT NULL default '0',
-  `topic_id` int(10) unsigned NOT NULL default '0',
-  `forum_id` int(10) unsigned NOT NULL default '0',
-  `reported_by` int(10) unsigned NOT NULL default '0',
-  `created` int(10) unsigned NOT NULL default '0',
-  `message` text,
-  `zapped` int(10) unsigned default NULL,
-  `zapped_by` int(10) unsigned default NULL,
-  PRIMARY KEY  (`id`),
-  KEY `fbb_reports_zapped_idx` (`zapped`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
--- 
--- 列出以下資料庫的數據： `fbb_reports`
--- 
-
 
 -- --------------------------------------------------------
 

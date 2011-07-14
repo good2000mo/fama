@@ -209,27 +209,6 @@ else if ($action == 'change_email')
 		{
 			if ($pun_config['p_allow_dupe_email'] == '0')
 				message($lang_prof_reg['Dupe email']);
-			else if ($pun_config['o_mailing_list'] != '')
-			{
-				while ($cur_dupe = $db->fetch_assoc($result))
-					$dupe_list[] = $cur_dupe['username'];
-
-				// Load the "dupe email change" template
-				$mail_tpl = trim(file_get_contents(PUN_ROOT.'lang/'.$pun_user['language'].'/mail_templates/dupe_email_change.tpl'));
-
-				// The first row contains the subject
-				$first_crlf = strpos($mail_tpl, "\n");
-				$mail_subject = trim(substr($mail_tpl, 8, $first_crlf-8));
-				$mail_message = trim(substr($mail_tpl, $first_crlf));
-
-				$mail_message = str_replace('<username>', $pun_user['username'], $mail_message);
-				$mail_message = str_replace('<dupe_list>', implode(', ', $dupe_list), $mail_message);
-				$mail_message = str_replace('<profile_url>', get_base_url().'/profile.php?id='.$id, $mail_message);
-				$mail_message = str_replace('<board_mailer>', $pun_config['o_board_title'].' '.$lang_common['Mailer'], $mail_message);
-
-				pun_mail($pun_config['o_mailing_list'], $mail_subject, $mail_message);
-			}
-		}
 
 
 		$new_email_key = random_pass(8);

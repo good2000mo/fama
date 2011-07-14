@@ -53,8 +53,6 @@ if (isset($_POST['form_sent']))
 		'gzip'					=> $_POST['form']['gzip'] != '1' ? '0' : '1',
 		'search_all_forums'		=> $_POST['form']['search_all_forums'] != '1' ? '0' : '1',
 		'additional_navlinks'	=> pun_trim($_POST['form']['additional_navlinks']),
-		'report_method'			=> intval($_POST['form']['report_method']),
-		'mailing_list'			=> pun_trim($_POST['form']['mailing_list']),
 		'avatars'				=> $_POST['form']['avatars'] != '1' ? '0' : '1',
 		'avatars_dir'			=> pun_trim($_POST['form']['avatars_dir']),
 		'avatars_width'			=> intval($_POST['form']['avatars_width']),
@@ -67,7 +65,6 @@ if (isset($_POST['form_sent']))
 		'smtp_ssl'				=> $_POST['form']['smtp_ssl'] != '1' ? '0' : '1',
 		'regs_allow'			=> $_POST['form']['regs_allow'] != '1' ? '0' : '1',
 		'regs_verify'			=> $_POST['form']['regs_verify'] != '1' ? '0' : '1',
-		'regs_report'			=> $_POST['form']['regs_report'] != '1' ? '0' : '1',
 		'rules'					=> $_POST['form']['rules'] != '1' ? '0' : '1',
 		'rules_message'			=> pun_trim($_POST['form']['rules_message']),
 		'default_email_setting'	=> intval($_POST['form']['default_email_setting']),
@@ -102,9 +99,6 @@ if (isset($_POST['form_sent']))
 
 	if (!is_valid_email($form['webmaster_email']))
 		message($lang_admin_options['Invalid webmaster e-mail message']);
-
-	if ($form['mailing_list'] != '')
-		$form['mailing_list'] = strtolower(preg_replace('%\s%S', '', $form['mailing_list']));
 
 	// Make sure avatars_dir doesn't end with a slash
 	if (substr($form['avatars_dir'], -1) == '/')
@@ -159,9 +153,6 @@ if (isset($_POST['form_sent']))
 		$form['disp_posts_default'] = 3;
 	else if ($form['disp_posts_default'] > 75)
 		$form['disp_posts_default'] = 75;
-
-	if ($form['report_method'] < 0 || $form['report_method'] > 2)
-		message($lang_common['Bad request']);
 
 	if ($form['default_email_setting'] < 0 || $form['default_email_setting'] > 2)
 		message($lang_common['Bad request']);
@@ -514,29 +505,6 @@ generate_admin_menu('options');
 				</div>
 				<div class="inform">
 					<fieldset>
-						<legend><?php echo $lang_admin_options['Reports subhead'] ?></legend>
-						<div class="infldset">
-							<table class="aligntop" cellspacing="0">
-								<tr>
-									<th scope="row"><?php echo $lang_admin_options['Reporting method label'] ?></th>
-									<td>
-										<input type="radio" name="form[report_method]" value="0"<?php if ($pun_config['o_report_method'] == '0') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_options['Internal'] ?></strong>&#160;&#160;&#160;<input type="radio" name="form[report_method]" value="1"<?php if ($pun_config['o_report_method'] == '1') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_options['By e-mail'] ?></strong>&#160;&#160;&#160;<input type="radio" name="form[report_method]" value="2"<?php if ($pun_config['o_report_method'] == '2') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_options['Both'] ?></strong>
-										<span><?php echo $lang_admin_options['Reporting method help'] ?></span>
-									</td>
-								</tr>
-								<tr>
-									<th scope="row"><?php echo $lang_admin_options['Mailing list label'] ?></th>
-									<td>
-										<textarea name="form[mailing_list]" rows="5" cols="55"><?php echo pun_htmlspecialchars($pun_config['o_mailing_list']) ?></textarea>
-										<span><?php echo $lang_admin_options['Mailing list help'] ?></span>
-									</td>
-								</tr>
-							</table>
-						</div>
-					</fieldset>
-				</div>
-				<div class="inform">
-					<fieldset>
 						<legend><?php echo $lang_admin_options['Avatars subhead'] ?></legend>
 						<div class="infldset">
 							<table class="aligntop" cellspacing="0">
@@ -650,13 +618,6 @@ generate_admin_menu('options');
 									<td>
 										<input type="radio" name="form[regs_verify]" value="1"<?php if ($pun_config['o_regs_verify'] == '1') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['Yes'] ?></strong>&#160;&#160;&#160;<input type="radio" name="form[regs_verify]" value="0"<?php if ($pun_config['o_regs_verify'] == '0') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['No'] ?></strong>
 										<span><?php echo $lang_admin_options['Verify help'] ?></span>
-									</td>
-								</tr>
-								<tr>
-									<th scope="row"><?php echo $lang_admin_options['Report new label'] ?></th>
-									<td>
-										<input type="radio" name="form[regs_report]" value="1"<?php if ($pun_config['o_regs_report'] == '1') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['Yes'] ?></strong>&#160;&#160;&#160;<input type="radio" name="form[regs_report]" value="0"<?php if ($pun_config['o_regs_report'] == '0') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['No'] ?></strong>
-										<span><?php echo $lang_admin_options['Report new help'] ?></span>
 									</td>
 								</tr>
 								<tr>

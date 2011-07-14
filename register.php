@@ -148,49 +148,6 @@ if (isset($_POST['form_sent']))
 		$db->query('INSERT INTO '.$db->prefix.'users (username, group_id, password, email, email_setting, timezone, dst, language, style, registered, registration_ip, last_visit) VALUES(\''.$db->escape($username).'\', '.$intial_group_id.', \''.$password_hash.'\', \''.$db->escape($email1).'\', '.$email_setting.', '.$timezone.' , '.$dst.', \''.$db->escape($language).'\', \''.$pun_config['o_default_style'].'\', '.$now.', \''.get_remote_address().'\', '.$now.')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to create user', __FILE__, __LINE__, $db->error());
 		$new_uid = $db->insert_id();
 
-		// If the mailing list isn't empty, we may need to send out some alerts
-		if ($pun_config['o_mailing_list'] != '')
-		{
-
-			// If we previously found out that the email was a dupe
-			if (!empty($dupe_list))
-			{
-				// Load the "dupe email register" template
-				$mail_tpl = trim(file_get_contents(PUN_ROOT.'lang/'.$pun_user['language'].'/mail_templates/dupe_email_register.tpl'));
-
-				// The first row contains the subject
-				$first_crlf = strpos($mail_tpl, "\n");
-				$mail_subject = trim(substr($mail_tpl, 8, $first_crlf-8));
-				$mail_message = trim(substr($mail_tpl, $first_crlf));
-
-				$mail_message = str_replace('<username>', $username, $mail_message);
-				$mail_message = str_replace('<dupe_list>', implode(', ', $dupe_list), $mail_message);
-				$mail_message = str_replace('<profile_url>', get_base_url().'/profile.php?id='.$new_uid, $mail_message);
-				$mail_message = str_replace('<board_mailer>', $pun_config['o_board_title'].' '.$lang_common['Mailer'], $mail_message);
-
-				pun_mail($pun_config['o_mailing_list'], $mail_subject, $mail_message);
-			}
-
-			// Should we alert people on the admin mailing list that a new user has registered?
-			if ($pun_config['o_regs_report'] == '1')
-			{
-				// Load the "new user" template
-				$mail_tpl = trim(file_get_contents(PUN_ROOT.'lang/'.$pun_user['language'].'/mail_templates/new_user.tpl'));
-
-				// The first row contains the subject
-				$first_crlf = strpos($mail_tpl, "\n");
-				$mail_subject = trim(substr($mail_tpl, 8, $first_crlf-8));
-				$mail_message = trim(substr($mail_tpl, $first_crlf));
-
-				$mail_message = str_replace('<username>', $username, $mail_message);
-				$mail_message = str_replace('<base_url>', get_base_url().'/', $mail_message);
-				$mail_message = str_replace('<profile_url>', get_base_url().'/profile.php?id='.$new_uid, $mail_message);
-				$mail_message = str_replace('<board_mailer>', $pun_config['o_board_title'].' '.$lang_common['Mailer'], $mail_message);
-
-				pun_mail($pun_config['o_mailing_list'], $mail_subject, $mail_message);
-			}
-		}
-
 		// Must the user verify the registration or do we log him/her in right now?
 		if ($pun_config['o_regs_verify'] == '1')
 		{

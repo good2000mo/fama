@@ -39,8 +39,7 @@ function generate_admin_menu($page = '')
 				<ul>
 					<li<?php if ($page == 'index') echo ' class="isactive"'; ?>><a href="admin_index.php"><?php echo $lang_admin_common['Index'] ?></a></li>
 					<li<?php if ($page == 'users') echo ' class="isactive"'; ?>><a href="admin_users.php"><?php echo $lang_admin_common['Users'] ?></a></li>
-<?php if ($is_admin || $pun_config['o_report_method'] == '0' || $pun_config['o_report_method'] == '2'): ?>					<li<?php if ($page == 'reports') echo ' class="isactive"'; ?>><a href="admin_reports.php"><?php echo $lang_admin_common['Reports'] ?></a></li>
-<?php endif; ?>				</ul>
+				</ul>
 			</div>
 		</div>
 <?php
