@@ -209,7 +209,7 @@ else if ($action == 'change_email')
 		{
 			if ($pun_config['p_allow_dupe_email'] == '0')
 				message($lang_prof_reg['Dupe email']);
-
+		}
 
 		$new_email_key = random_pass(8);
 
@@ -927,7 +927,7 @@ if ($pun_user['id'] != $id &&																	// If we arent the user (i.e. edit
 
 	if ($user['url'] != '')
 	{
-		$user['url'] = pun_htmlspecialchars(user['url']);
+		$user['url'] = pun_htmlspecialchars($user['url']);
 		$user_personal[] = '<dt>'.$lang_profile['Website'].'</dt>';
 		$user_personal[] = '<dd><span class="website"><a href="'.$user['url'].'">'.$user['url'].'</a></span></dd>';
 	}
