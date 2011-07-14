@@ -207,7 +207,7 @@ if (isset($_GET['tid']))
 			redirect('viewtopic.php?id='.$new_tid, $lang_misc['Split posts redirect']);
 		}
 
-		$result = $db->query('SELECT c.id AS cid, c.cat_name, f.id AS fid, f.forum_name FROM '.$db->prefix.'categories AS c INNER JOIN '.$db->prefix.'forums AS f ON c.id=f.cat_id LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (fp.forum_id=f.id AND fp.group_id='.$pun_user['g_id'].') WHERE (fp.post_topics IS NULL OR fp.post_topics=1) AND f.redirect_url IS NULL ORDER BY c.disp_position, c.id, f.disp_position'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch category/forum list', __FILE__, __LINE__, $db->error());
+		$result = $db->query('SELECT f.id AS fid, f.forum_name FROM '.$db->prefix.'forums AS f LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (fp.forum_id=f.id AND fp.group_id='.$pun_user['g_id'].') WHERE (fp.post_topics IS NULL OR fp.post_topics=1) AND f.redirect_url IS NULL ORDER BY f.disp_position'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch forum list', __FILE__, __LINE__, $db->error());
 
 		$page_title = array(pun_htmlspecialchars($pun_config['o_board_title']), $lang_misc['Moderate']);
 		$focus_element = array('subject','new_subject');
@@ -229,23 +229,12 @@ if (isset($_GET['tid']))
 						<br /><select name="move_to_forum">
 <?php
 
-	$cur_category = 0;
 	while ($cur_forum = $db->fetch_assoc($result))
 	{
-		if ($cur_forum['cid'] != $cur_category) // A new category since last iteration?
-		{
-			if ($cur_category)
-				echo "\t\t\t\t\t\t\t".'</optgroup>'."\n";
-
-			echo "\t\t\t\t\t\t\t".'<optgroup label="'.pun_htmlspecialchars($cur_forum['cat_name']).'">'."\n";
-			$cur_category = $cur_forum['cid'];
-		}
-
 		echo "\t\t\t\t\t\t\t\t".'<option value="'.$cur_forum['fid'].'"'.($fid == $cur_forum['fid'] ? ' selected="selected"' : '').'>'.pun_htmlspecialchars($cur_forum['forum_name']).'</option>'."\n";
 	}
 
 ?>
-							</optgroup>
 						</select>
 						<br /></label>
 						<p><?php echo $lang_misc['Split posts comply'] ?></p>
@@ -473,7 +462,7 @@ if (isset($_REQUEST['move_topics']) || isset($_POST['move_topics_to']))
 		$action = 'single';
 	}
 
-	$result = $db->query('SELECT c.id AS cid, c.cat_name, f.id AS fid, f.forum_name FROM '.$db->prefix.'categories AS c INNER JOIN '.$db->prefix.'forums AS f ON c.id=f.cat_id LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (fp.forum_id=f.id AND fp.group_id='.$pun_user['g_id'].') WHERE (fp.post_topics IS NULL OR fp.post_topics=1) AND f.redirect_url IS NULL ORDER BY c.disp_position, c.id, f.disp_position'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch category/forum list', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SELECT f.id AS fid, f.forum_name FROM '.$db->prefix.'forums AS f LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (fp.forum_id=f.id AND fp.group_id='.$pun_user['g_id'].') WHERE (fp.post_topics IS NULL OR fp.post_topics=1) AND f.redirect_url IS NULL ORDER BY f.disp_position'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch forum list', __FILE__, __LINE__, $db->error());
 	if ($db->num_rows($result) < 2)
 		message($lang_misc['Nowhere to move']);
 
@@ -495,24 +484,13 @@ if (isset($_REQUEST['move_topics']) || isset($_POST['move_topics_to']))
 						<br /><select name="move_to_forum">
 <?php
 
-	$cur_category = 0;
 	while ($cur_forum = $db->fetch_assoc($result))
 	{
-		if ($cur_forum['cid'] != $cur_category) // A new category since last iteration?
-		{
-			if ($cur_category)
-				echo "\t\t\t\t\t\t\t".'</optgroup>'."\n";
-
-			echo "\t\t\t\t\t\t\t".'<optgroup label="'.pun_htmlspecialchars($cur_forum['cat_name']).'">'."\n";
-			$cur_category = $cur_forum['cid'];
-		}
-
 		if ($cur_forum['fid'] != $fid)
 			echo "\t\t\t\t\t\t\t\t".'<option value="'.$cur_forum['fid'].'">'.pun_htmlspecialchars($cur_forum['forum_name']).'</option>'."\n";
 	}
 
 ?>
-							</optgroup>
 						</select>
 						<br /></label>
 						<div class="rbox">

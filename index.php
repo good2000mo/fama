@@ -32,27 +32,15 @@ define('PUN_ALLOW_INDEX', 1);
 define('PUN_ACTIVE_PAGE', 'index');
 require PUN_ROOT.'header.php';
 
-// Print the categories and forums
-$result = $db->query('SELECT c.id AS cid, c.cat_name, f.id AS fid, f.forum_name, f.forum_desc, f.redirect_url, f.moderators, f.num_topics, f.num_posts, f.last_post, f.last_post_id, f.last_poster FROM '.$db->prefix.'categories AS c INNER JOIN '.$db->prefix.'forums AS f ON c.id=f.cat_id LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (fp.forum_id=f.id AND fp.group_id='.$pun_user['g_id'].') WHERE fp.read_forum IS NULL OR fp.read_forum=1 ORDER BY c.disp_position, c.id, f.disp_position'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --', true) or error('Unable to fetch category/forum list', __FILE__, __LINE__, $db->error());
+// Print the forums
+$result = $db->query('SELECT f.id AS fid, f.forum_name, f.forum_desc, f.redirect_url, f.moderators, f.num_topics, f.num_posts, f.last_post, f.last_post_id, f.last_poster FROM '.$db->prefix.'forums AS f LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (fp.forum_id=f.id AND fp.group_id='.$pun_user['g_id'].') WHERE fp.read_forum IS NULL OR fp.read_forum=1 ORDER BY f.disp_position'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --', true) or error('Unable to fetch forum list', __FILE__, __LINE__, $db->error());
 
-$cur_category = 0;
-$cat_count = 0;
-$forum_count = 0;
-while ($cur_forum = $db->fetch_assoc($result))
+if ($db->num_rows($result) > 0)
 {
-	$moderators = '';
-
-	if ($cur_forum['cid'] != $cur_category) // A new category since last iteration?
-	{
-		if ($cur_category != 0)
-			echo "\t\t\t".'</tbody>'."\n\t\t\t".'</table>'."\n\t\t".'</div>'."\n\t".'</div>'."\n".'</div>'."\n\n";
-
-		++$cat_count;
-		$forum_count = 0;
 
 ?>
-<div id="idx<?php echo $cat_count ?>" class="blocktable">
-	<h2><span><?php echo pun_htmlspecialchars($cur_forum['cat_name']) ?></span></h2>
+<div id="idx1" class="blocktable">
+	<h2><span><?php echo $lang_common['Forum'] ?></span></h2>
 	<div class="box">
 		<div class="inbox">
 			<table cellspacing="0">
@@ -67,9 +55,10 @@ while ($cur_forum = $db->fetch_assoc($result))
 			<tbody>
 <?php
 
-		$cur_category = $cur_forum['cid'];
-	}
-
+$forum_count = 0;
+while ($cur_forum = $db->fetch_assoc($result))
+{
+	$moderators = '';
 	++$forum_count;
 	$item_status = ($forum_count % 2 == 0) ? 'roweven' : 'rowodd';
 	$icon_type = 'icon';
@@ -134,9 +123,15 @@ while ($cur_forum = $db->fetch_assoc($result))
 
 }
 
-// Did we output any categories and forums?
-if ($cur_category > 0)
-	echo "\t\t\t".'</tbody>'."\n\t\t\t".'</table>'."\n\t\t".'</div>'."\n\t".'</div>'."\n".'</div>'."\n\n";
+?>
+			</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+<?php
+
+}
 else
 	echo '<div id="idx0" class="block"><div class="box"><div class="inbox"><p>'.$lang_index['Empty board'].'</p></div></div></div>';
 

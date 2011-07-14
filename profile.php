@@ -1628,31 +1628,23 @@ else
 							<p><?php echo $lang_profile['Moderator in info'] ?></p>
 <?php
 
-			$result = $db->query('SELECT c.id AS cid, c.cat_name, f.id AS fid, f.forum_name, f.moderators FROM '.$db->prefix.'categories AS c INNER JOIN '.$db->prefix.'forums AS f ON c.id=f.cat_id WHERE f.redirect_url IS NULL ORDER BY c.disp_position, c.id, f.disp_position'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch category/forum list', __FILE__, __LINE__, $db->error());
+			$result = $db->query('SELECT f.id AS fid, f.forum_name, f.moderators FROM '.$db->prefix.'forums AS f WHERE f.redirect_url IS NULL ORDER BY f.disp_position'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch forum list', __FILE__, __LINE__, $db->error());
 
-			$cur_category = 0;
-			while ($cur_forum = $db->fetch_assoc($result))
+			if ($db->num_rows($result) > 0)
 			{
-				if ($cur_forum['cid'] != $cur_category) // A new category since last iteration?
+				echo "\t\t\t\t\t\t\t".'<div class="conl">'."\n\t\t\t\t\t\t\t\t".'<p><strong>Forum</strong></p>'."\n\t\t\t\t\t\t\t\t".'<div class="rbox">';
+				
+				while ($cur_forum = $db->fetch_assoc($result))
 				{
-					if ($cur_category)
-						echo "\n\t\t\t\t\t\t\t\t".'</div>';
-
-					if ($cur_category != 0)
-						echo "\n\t\t\t\t\t\t\t".'</div>'."\n";
-
-					echo "\t\t\t\t\t\t\t".'<div class="conl">'."\n\t\t\t\t\t\t\t\t".'<p><strong>'.$cur_forum['cat_name'].'</strong></p>'."\n\t\t\t\t\t\t\t\t".'<div class="rbox">';
-					$cur_category = $cur_forum['cid'];
+					$moderators = ($cur_forum['moderators'] != '') ? unserialize($cur_forum['moderators']) : array();
+					echo "\n\t\t\t\t\t\t\t\t\t".'<label><input type="checkbox" name="moderator_in['.$cur_forum['fid'].']" value="1"'.((in_array($id, $moderators)) ? ' checked="checked"' : '').' />'.pun_htmlspecialchars($cur_forum['forum_name']).'<br /></label>'."\n";
 				}
-
-				$moderators = ($cur_forum['moderators'] != '') ? unserialize($cur_forum['moderators']) : array();
-
-				echo "\n\t\t\t\t\t\t\t\t\t".'<label><input type="checkbox" name="moderator_in['.$cur_forum['fid'].']" value="1"'.((in_array($id, $moderators)) ? ' checked="checked"' : '').' />'.pun_htmlspecialchars($cur_forum['forum_name']).'<br /></label>'."\n";
+				
+				echo "\n\t\t\t\t\t\t\t\t".'</div>';
+				echo "\n\t\t\t\t\t\t\t".'</div>'."\n";
 			}
 
 ?>
-								</div>
-							</div>
 							<br class="clearb" /><input type="submit" name="update_forums" value="<?php echo $lang_profile['Update forums'] ?>" />
 						</div>
 					</fieldset>

@@ -25,11 +25,7 @@ if (isset($_POST['add_forum']))
 {
 	confirm_referrer('admin_forums.php');
 
-	$add_to_cat = intval($_POST['add_to_cat']);
-	if ($add_to_cat < 1)
-		message($lang_common['Bad request']);
-
-	$db->query('INSERT INTO '.$db->prefix.'forums (forum_name, cat_id) VALUES(\''.$db->escape($lang_admin_forums['New forum']).'\', '.$add_to_cat.')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to create forum', __FILE__, __LINE__, $db->error());
+	$db->query('INSERT INTO '.$db->prefix.'forums (forum_name) VALUES(\''.$db->escape($lang_admin_forums['New forum']).'\')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to create forum', __FILE__, __LINE__, $db->error());
 
 	redirect('admin_forums.php', $lang_admin_forums['Forum added redirect']);
 }
@@ -135,20 +131,16 @@ else if (isset($_GET['edit_forum']))
 		// Start with the forum details
 		$forum_name = pun_trim($_POST['forum_name']);
 		$forum_desc = pun_linebreaks(pun_trim($_POST['forum_desc']));
-		$cat_id = intval($_POST['cat_id']);
 		$sort_by = intval($_POST['sort_by']);
 		$redirect_url = isset($_POST['redirect_url']) ? trim($_POST['redirect_url']) : null;
 
 		if ($forum_name == '')
 			message($lang_admin_forums['Must enter name message']);
 
-		if ($cat_id < 1)
-			message($lang_common['Bad request']);
-
 		$forum_desc = ($forum_desc != '') ? '\''.$db->escape($forum_desc).'\'' : 'NULL';
 		$redirect_url = ($redirect_url != '') ? '\''.$db->escape($redirect_url).'\'' : 'NULL';
 
-		$db->query('UPDATE '.$db->prefix.'forums SET forum_name=\''.$db->escape($forum_name).'\', forum_desc='.$forum_desc.', redirect_url='.$redirect_url.', sort_by='.$sort_by.', cat_id='.$cat_id.' WHERE id='.$forum_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update forum', __FILE__, __LINE__, $db->error());
+		$db->query('UPDATE '.$db->prefix.'forums SET forum_name=\''.$db->escape($forum_name).'\', forum_desc='.$forum_desc.', redirect_url='.$redirect_url.', sort_by='.$sort_by.' WHERE id='.$forum_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update forum', __FILE__, __LINE__, $db->error());
 
 		// Now let's deal with the permissions
 		if (isset($_POST['read_forum_old']))
@@ -189,7 +181,7 @@ else if (isset($_GET['edit_forum']))
 	}
 
 	// Fetch forum info
-	$result = $db->query('SELECT id, forum_name, forum_desc, redirect_url, num_topics, sort_by, cat_id FROM '.$db->prefix.'forums WHERE id='.$forum_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch forum info', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SELECT id, forum_name, forum_desc, redirect_url, num_topics, sort_by FROM '.$db->prefix.'forums WHERE id='.$forum_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch forum info', __FILE__, __LINE__, $db->error());
 	if (!$db->num_rows($result))
 		message($lang_common['Bad request']);
 
@@ -219,23 +211,6 @@ else if (isset($_GET['edit_forum']))
 								<tr>
 									<th scope="row"><?php echo $lang_admin_forums['Forum description label'] ?></th>
 									<td><textarea name="forum_desc" rows="3" cols="50" tabindex="2"><?php echo pun_htmlspecialchars($cur_forum['forum_desc']) ?></textarea></td>
-								</tr>
-								<tr>
-									<th scope="row"><?php echo $lang_admin_forums['Category label'] ?></th>
-									<td>
-										<select name="cat_id" tabindex="3">
-<?php
-
-	$result = $db->query('SELECT id, cat_name FROM '.$db->prefix.'categories ORDER BY disp_position'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch category list', __FILE__, __LINE__, $db->error());
-	while ($cur_cat = $db->fetch_assoc($result))
-	{
-		$selected = ($cur_cat['id'] == $cur_forum['cat_id']) ? ' selected="selected"' : '';
-		echo "\t\t\t\t\t\t\t\t\t\t\t".'<option value="'.$cur_cat['id'].'"'.$selected.'>'.pun_htmlspecialchars($cur_cat['cat_name']).'</option>'."\n";
-	}
-
-?>
-										</select>
-									</td>
 								</tr>
 								<tr>
 									<th scope="row"><?php echo $lang_admin_forums['Sort by label'] ?></th>
@@ -341,28 +316,7 @@ generate_admin_menu('forums');
 					<fieldset>
 						<legend><?php echo $lang_admin_forums['Create new subhead'] ?></legend>
 						<div class="infldset">
-							<table class="aligntop" cellspacing="0">
-								<tr>
-									<th scope="row"><?php echo $lang_admin_forums['Add forum label'] ?><div><input type="submit" name="add_forum" value="<?php echo $lang_admin_forums['Add forum'] ?>" tabindex="2" /></div></th>
-									<td>
-										<select name="add_to_cat" tabindex="1">
-<?php
-
-	$result = $db->query('SELECT id, cat_name FROM '.$db->prefix.'categories ORDER BY disp_position'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch category list', __FILE__, __LINE__, $db->error());
-	if ($db->num_rows($result) > 0)
-	{
-		while ($cur_cat = $db->fetch_assoc($result))
-			echo "\t\t\t\t\t\t\t\t\t\t\t".'<option value="'.$cur_cat['id'].'">'.pun_htmlspecialchars($cur_cat['cat_name']).'</option>'."\n";
-	}
-	else
-		echo "\t\t\t\t\t\t\t\t\t\t\t".'<option value="0" disabled="disabled">'.$lang_admin_forums['No categories exist'].'</option>'."\n";
-
-?>
-										</select>
-										<span><?php echo $lang_admin_forums['Add forum help'] ?></span>
-									</td>
-								</tr>
-							</table>
+							<input type="submit" name="add_forum" value="<?php echo $lang_admin_forums['Add forum'] ?>" tabindex="2" />
 						</div>
 					</fieldset>
 				</div>
@@ -370,8 +324,8 @@ generate_admin_menu('forums');
 		</div>
 <?php
 
-// Display all the categories and forums
-$result = $db->query('SELECT c.id AS cid, c.cat_name, f.id AS fid, f.forum_name, f.disp_position FROM '.$db->prefix.'categories AS c INNER JOIN '.$db->prefix.'forums AS f ON c.id=f.cat_id ORDER BY c.disp_position, c.id, f.disp_position'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch category/forum list', __FILE__, __LINE__, $db->error());
+// Display all the forums
+$result = $db->query('SELECT f.id AS fid, f.forum_name, f.disp_position FROM '.$db->prefix.'forums AS f ORDER BY f.disp_position'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch forum list', __FILE__, __LINE__, $db->error());
 
 if ($db->num_rows($result) > 0)
 {
@@ -381,22 +335,9 @@ if ($db->num_rows($result) > 0)
 		<div class="box">
 			<form id="edforum" method="post" action="admin_forums.php?action=edit">
 				<p class="submittop"><input type="submit" name="update_positions" value="<?php echo $lang_admin_forums['Update positions'] ?>" tabindex="3" /></p>
-<?php
-
-$cur_index = 4;
-
-$cur_category = 0;
-while ($cur_forum = $db->fetch_assoc($result))
-{
-	if ($cur_forum['cid'] != $cur_category) // A new category since last iteration?
-	{
-		if ($cur_category != 0)
-			echo "\t\t\t\t\t\t\t".'</tbody>'."\n\t\t\t\t\t\t\t".'</table>'."\n\t\t\t\t\t\t".'</div>'."\n\t\t\t\t\t".'</fieldset>'."\n\t\t\t\t".'</div>'."\n";
-
-?>
 				<div class="inform">
 					<fieldset>
-						<legend><?php echo $lang_admin_forums['Category subhead'] ?> <?php echo pun_htmlspecialchars($cur_forum['cat_name']) ?></legend>
+						<legend><?php echo $lang_admin_forums['Category subhead'] ?></legend>
 						<div class="infldset">
 							<table cellspacing="0">
 							<thead>
@@ -409,8 +350,10 @@ while ($cur_forum = $db->fetch_assoc($result))
 							<tbody>
 <?php
 
-		$cur_category = $cur_forum['cid'];
-	}
+$cur_index = 4;
+
+while ($cur_forum = $db->fetch_assoc($result))
+{
 
 ?>
 								<tr>
