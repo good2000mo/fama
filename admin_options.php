@@ -36,8 +36,6 @@ if (isset($_POST['form_sent']))
 		'timeout_visit'			=> intval($_POST['form']['timeout_visit']),
 		'timeout_online'		=> intval($_POST['form']['timeout_online']),
 		'redirect_delay'		=> intval($_POST['form']['redirect_delay']),
-		'show_user_info'		=> $_POST['form']['show_user_info'] != '1' ? '0' : '1',
-		'show_post_count'		=> $_POST['form']['show_post_count'] != '1' ? '0' : '1',
 		'smilies'				=> $_POST['form']['smilies'] != '1' ? '0' : '1',
 		'smilies_sig'			=> $_POST['form']['smilies_sig'] != '1' ? '0' : '1',
 		'make_links'			=> $_POST['form']['make_links'] != '1' ? '0' : '1',
@@ -371,20 +369,6 @@ generate_admin_menu('options');
 						<legend><?php echo $lang_admin_options['Display subhead'] ?></legend>
 						<div class="infldset">
 							<table class="aligntop" cellspacing="0">
-								<tr>
-									<th scope="row"><?php echo $lang_admin_options['Info in posts label'] ?></th>
-									<td>
-										<input type="radio" name="form[show_user_info]" value="1"<?php if ($pun_config['o_show_user_info'] == '1') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['Yes'] ?></strong>&#160;&#160;&#160;<input type="radio" name="form[show_user_info]" value="0"<?php if ($pun_config['o_show_user_info'] == '0') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['No'] ?></strong>
-										<span><?php echo $lang_admin_options['Info in posts help'] ?></span>
-									</td>
-								</tr>
-								<tr>
-									<th scope="row"><?php echo $lang_admin_options['Post count label'] ?></th>
-									<td>
-										<input type="radio" name="form[show_post_count]" value="1"<?php if ($pun_config['o_show_post_count'] == '1') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['Yes'] ?></strong>&#160;&#160;&#160;<input type="radio" name="form[show_post_count]" value="0"<?php if ($pun_config['o_show_post_count'] == '0') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['No'] ?></strong>
-										<span><?php echo $lang_admin_options['Post count help'] ?></span>
-									</td>
-								</tr>
 								<tr>
 									<th scope="row"><?php echo $lang_admin_options['Smilies label'] ?></th>
 									<td>

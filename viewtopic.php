@@ -199,8 +199,6 @@ while ($cur_post = $db->fetch_assoc($result))
 {
 	$post_count++;
 	$user_avatar = '';
-	$user_info = array();
-	$user_contacts = array();
 	$post_actions = array();
 	$is_online = '';
 	$signature = '';
@@ -225,51 +223,12 @@ while ($cur_post = $db->fetch_assoc($result))
 			else
 				$user_avatar = $user_avatar_cache[$cur_post['poster_id']] = generate_avatar_markup($cur_post['poster_id']);
 		}
-
-		// We only show location, register date, post count and the contact links if "Show user info" is enabled
-		if ($pun_config['o_show_user_info'] == '1')
-		{
-			if ($cur_post['location'] != '')
-			{
-				$user_info[] = '<dd><span>'.$lang_topic['From'].' '.pun_htmlspecialchars($cur_post['location']).'</span></dd>';
-			}
-
-			$user_info[] = '<dd><span>'.$lang_topic['Registered'].' '.format_time($cur_post['registered'], true).'</span></dd>';
-
-			if ($pun_config['o_show_post_count'] == '1' || $pun_user['is_admmod'])
-				$user_info[] = '<dd><span>'.$lang_topic['Posts'].' '.forum_number_format($cur_post['num_posts']).'</span></dd>';
-
-			// Now let's deal with the contact links (Email and URL)
-			if ((($cur_post['email_setting'] == '0' && !$pun_user['is_guest']) || $pun_user['is_admmod']) && $pun_user['g_send_email'] == '1')
-				$user_contacts[] = '<span class="email"><a href="mailto:'.$cur_post['email'].'">'.$lang_common['Email'].'</a></span>';
-			else if ($cur_post['email_setting'] == '1' && !$pun_user['is_guest'] && $pun_user['g_send_email'] == '1')
-				$user_contacts[] = '<span class="email"><a href="misc.php?email='.$cur_post['poster_id'].'">'.$lang_common['Email'].'</a></span>';
-
-			if ($cur_post['url'] != '')
-			{
-				$user_contacts[] = '<span class="website"><a href="'.pun_htmlspecialchars($cur_post['url']).'">'.$lang_topic['Website'].'</a></span>';
-			}
-		}
-
-		if ($pun_user['is_admmod'])
-		{
-			$user_info[] = '<dd><span><a href="moderate.php?get_host='.$cur_post['id'].'" title="'.$cur_post['poster_ip'].'">'.$lang_topic['IP address logged'].'</a></span></dd>';
-
-			if ($cur_post['admin_note'] != '')
-				$user_info[] = '<dd><span>'.$lang_topic['Note'].' <strong>'.pun_htmlspecialchars($cur_post['admin_note']).'</strong></span></dd>';
-		}
 	}
 	// If the poster is a guest (or a user that has been deleted)
 	else
 	{
 		$username = pun_htmlspecialchars($cur_post['username']);
 		$user_title = get_title($cur_post);
-
-		if ($pun_user['is_admmod'])
-			$user_info[] = '<dd><span><a href="moderate.php?get_host='.$cur_post['id'].'" title="'.$cur_post['poster_ip'].'">'.$lang_topic['IP address logged'].'</a></span></dd>';
-
-		if ($pun_config['o_show_user_info'] == '1' && $cur_post['poster_email'] != '' && !$pun_user['is_guest'] && $pun_user['g_send_email'] == '1')
-			$user_contacts[] = '<span class="email"><a href="mailto:'.$cur_post['poster_email'].'">'.$lang_common['Email'].'</a></span>';
 	}
 
 	// Generation post action array (quote, edit, delete etc.)
@@ -322,8 +281,6 @@ while ($cur_post = $db->fetch_assoc($result))
 						<dt><strong><?php echo $username ?></strong></dt>
 						<dd class="usertitle"><strong><?php echo $user_title ?></strong></dd>
 <?php if ($user_avatar != '') echo "\t\t\t\t\t\t".'<dd class="postavatar">'.$user_avatar.'</dd>'."\n"; ?>
-<?php if (count($user_info)) echo "\t\t\t\t\t\t".implode("\n\t\t\t\t\t\t", $user_info)."\n"; ?>
-<?php if (count($user_contacts)) echo "\t\t\t\t\t\t".'<dd class="usercontacts">'.implode(' ', $user_contacts).'</dd>'."\n"; ?>
 					</dl>
 				</div>
 				<div class="postright">
