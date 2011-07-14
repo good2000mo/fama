@@ -64,10 +64,6 @@ if (isset($_POST['form_sent']))
 		'regs_allow'			=> $_POST['form']['regs_allow'] != '1' ? '0' : '1',
 		'regs_verify'			=> $_POST['form']['regs_verify'] != '1' ? '0' : '1',
 		'default_email_setting'	=> intval($_POST['form']['default_email_setting']),
-		'announcement'			=> $_POST['form']['announcement'] != '1' ? '0' : '1',
-		'announcement_message'	=> pun_trim($_POST['form']['announcement_message']),
-		'maintenance'			=> $_POST['form']['maintenance'] != '1' ? '0' : '1',
-		'maintenance_message'	=> pun_trim($_POST['form']['maintenance_message']),
 	);
 
 	if ($form['board_title'] == '')
@@ -113,22 +109,6 @@ if (isset($_POST['form_sent']))
 			$form['smtp_pass'] = $smtp_pass1;
 		else
 			message($lang_admin_options['SMTP passwords did not match']);
-	}
-
-	if ($form['announcement_message'] != '')
-		$form['announcement_message'] = pun_linebreaks($form['announcement_message']);
-	else
-	{
-		$form['announcement_message'] = $lang_admin_options['Enter announcement here'];
-		$form['announcement'] = '0';
-	}
-
-	if ($form['maintenance_message'] != '')
-		$form['maintenance_message'] = pun_linebreaks($form['maintenance_message']);
-	else
-	{
-		$form['maintenance_message'] = $lang_admin_options['Default maintenance message'];
-		$form['maintenance'] = '0';
 	}
 
 	// Make sure the number of displayed topics and posts is between 3 and 75
@@ -601,52 +581,6 @@ generate_admin_menu('options');
 										<input type="radio" name="form[default_email_setting]" value="0"<?php if ($pun_config['o_default_email_setting'] == '0') echo ' checked="checked"' ?> />&#160;<?php echo $lang_admin_options['Display e-mail label'] ?><br />
 										<input type="radio" name="form[default_email_setting]" value="1"<?php if ($pun_config['o_default_email_setting'] == '1') echo ' checked="checked"' ?> />&#160;<?php echo $lang_admin_options['Hide allow form label'] ?><br />
 										<input type="radio" name="form[default_email_setting]" value="2"<?php if ($pun_config['o_default_email_setting'] == '2') echo ' checked="checked"' ?> />&#160;<?php echo $lang_admin_options['Hide both label'] ?><br />
-									</td>
-								</tr>
-							</table>
-						</div>
-					</fieldset>
-				</div>
-				<div class="inform">
-					<fieldset>
-						<legend><?php echo $lang_admin_options['Announcement subhead'] ?></legend>
-						<div class="infldset">
-							<table class="aligntop" cellspacing="0">
-								<tr>
-									<th scope="row"><?php echo $lang_admin_options['Display announcement label'] ?></th>
-									<td>
-										<input type="radio" name="form[announcement]" value="1"<?php if ($pun_config['o_announcement'] == '1') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['Yes'] ?></strong>&#160;&#160;&#160;<input type="radio" name="form[announcement]" value="0"<?php if ($pun_config['o_announcement'] == '0') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['No'] ?></strong>
-										<span><?php echo $lang_admin_options['Display announcement help'] ?></span>
-									</td>
-								</tr>
-								<tr>
-									<th scope="row"><?php echo $lang_admin_options['Announcement message label'] ?></th>
-									<td>
-										<textarea name="form[announcement_message]" rows="5" cols="55"><?php echo pun_htmlspecialchars($pun_config['o_announcement_message']) ?></textarea>
-										<span><?php echo $lang_admin_options['Announcement message help'] ?></span>
-									</td>
-								</tr>
-							</table>
-						</div>
-					</fieldset>
-				</div>
-				<div class="inform">
-					<fieldset>
-						<legend><?php echo $lang_admin_options['Maintenance subhead'] ?></legend>
-						<div class="infldset">
-							<table class="aligntop" cellspacing="0">
-								<tr>
-									<th scope="row"><a name="maintenance"><?php echo $lang_admin_options['Maintenance mode label'] ?></a></th>
-									<td>
-										<input type="radio" name="form[maintenance]" value="1"<?php if ($pun_config['o_maintenance'] == '1') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['Yes'] ?></strong>&#160;&#160;&#160;<input type="radio" name="form[maintenance]" value="0"<?php if ($pun_config['o_maintenance'] == '0') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['No'] ?></strong>
-										<span><?php echo $lang_admin_options['Maintenance mode help'] ?></span>
-									</td>
-								</tr>
-								<tr>
-									<th scope="row"><?php echo $lang_admin_options['Maintenance message label'] ?></th>
-									<td>
-										<textarea name="form[maintenance_message]" rows="5" cols="55"><?php echo pun_htmlspecialchars($pun_config['o_maintenance_message']) ?></textarea>
-										<span><?php echo $lang_admin_options['Maintenance message help'] ?></span>
 									</td>
 								</tr>
 							</table>

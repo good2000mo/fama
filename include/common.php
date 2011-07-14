@@ -135,10 +135,6 @@ if (file_exists(PUN_ROOT.'lang/'.$pun_user['language'].'/common.php'))
 else
 	error('There is no valid language pack \''.pun_htmlspecialchars($pun_user['language']).'\' installed. Please reinstall a language of that name');
 
-// Check if we are to display a maintenance message
-if ($pun_config['o_maintenance'] && $pun_user['g_id'] > PUN_ADMIN && !defined('PUN_TURN_OFF_MAINT'))
-	maintenance_message();
-
 // Update online list
 update_users_online();
 

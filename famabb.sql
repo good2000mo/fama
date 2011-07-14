@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 -- 
 -- 主機: localhost
--- 建立日期: Jul 15, 2011, 12:41 AM
+-- 建立日期: Jul 15, 2011, 12:51 AM
 -- 伺服器版本: 5.0.51
 -- PHP 版本: 5.2.6
 
@@ -69,10 +69,6 @@ INSERT INTO `fbb_config` VALUES ('o_smtp_pass', NULL);
 INSERT INTO `fbb_config` VALUES ('o_smtp_ssl', '0');
 INSERT INTO `fbb_config` VALUES ('o_regs_allow', '1');
 INSERT INTO `fbb_config` VALUES ('o_regs_verify', '0');
-INSERT INTO `fbb_config` VALUES ('o_announcement', '0');
-INSERT INTO `fbb_config` VALUES ('o_announcement_message', '在此填寫您要發佈的公告。');
-INSERT INTO `fbb_config` VALUES ('o_maintenance', '0');
-INSERT INTO `fbb_config` VALUES ('o_maintenance_message', '論壇維護中。請稍後訪問。');
 INSERT INTO `fbb_config` VALUES ('o_default_dst', '0');
 INSERT INTO `fbb_config` VALUES ('p_message_bbcode', '1');
 INSERT INTO `fbb_config` VALUES ('p_message_img_tag', '1');

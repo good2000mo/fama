@@ -22,8 +22,6 @@
 	</div>
 </div>
 
-<pun_announcement>
-
 <div id="brdmain">
 <pun_main>
 </div>
