@@ -362,10 +362,6 @@ function check_username($username, $exclude_id = null)
 	else if (preg_match('%(?:\[/?(?:b|u|s|ins|del|em|i|h|colou?r|quote|code|img|url|email|list|\*|topic|post|forum|user)\]|\[(?:img|url|quote|list)=)%i', $username))
 		$errors[] = $lang_prof_reg['Username BBCode'];
 
-	// Check username for any censored words
-	if ($pun_config['o_censoring'] == '1' && censor_words($username) != $username)
-		$errors[] = $lang_register['Username censor'];
-
 	// Check that the username (or a too similar username) is not already registered
 	$query = ($exclude_id) ? ' AND id!='.$exclude_id : '';
 
@@ -600,37 +596,6 @@ function forum_clear_cache()
 			@unlink(FORUM_CACHE_DIR.$entry);
 	}
 	$d->close();
-}
-
-
-//
-// Replace censored words in $text
-//
-function censor_words($text)
-{
-	global $db;
-	static $search_for, $replace_with;
-
-	// If not already built in a previous call, build an array of censor words and their replacement text
-	if (!isset($search_for))
-	{
-		if (file_exists(FORUM_CACHE_DIR.'cache_censoring.php'))
-			include FORUM_CACHE_DIR.'cache_censoring.php';
-
-		if (!defined('PUN_CENSOR_LOADED'))
-		{
-			if (!defined('FORUM_CACHE_FUNCTIONS_LOADED'))
-				require PUN_ROOT.'include/cache.php';
-
-			generate_censoring_cache();
-			require FORUM_CACHE_DIR.'cache_censoring.php';
-		}
-	}
-
-	if (!empty($search_for))
-		$text = substr(ucp_preg_replace($search_for, $replace_with, ' '.$text.' '), 1, -1);
-
-	return $text;
 }
 
 

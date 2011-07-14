@@ -31,12 +31,6 @@ $is_admmod = ($pun_user['g_id'] == PUN_ADMIN || ($pun_user['g_moderator'] == '1'
 
 $can_edit_subject = $id == $cur_post['first_post_id'];
 
-if ($pun_config['o_censoring'] == '1')
-{
-	$cur_post['subject'] = censor_words($cur_post['subject']);
-	$cur_post['message'] = censor_words($cur_post['message']);
-}
-
 // Do we have permission to edit this post?
 if (($pun_user['g_edit_posts'] == '0' ||
 	$cur_post['poster_id'] != $pun_user['id'] ||
@@ -61,13 +55,8 @@ if (isset($_POST['form_sent']))
 	{
 		$subject = pun_trim($_POST['req_subject']);
 
-		if ($pun_config['o_censoring'] == '1')
-			$censored_subject = pun_trim(censor_words($subject));
-
 		if ($subject == '')
 			$errors[] = $lang_post['No subject'];
-		else if ($pun_config['o_censoring'] == '1' && $censored_subject == '')
-			$errors[] = $lang_post['No subject after censoring'];
 		else if (pun_strlen($subject) > 70)
 			$errors[] = $lang_post['Too long subject'];
 		else if ($pun_config['p_subject_all_caps'] == '0' && is_all_uppercase($subject) && !$pun_user['is_admmod'])
@@ -94,14 +83,6 @@ if (isset($_POST['form_sent']))
 	{
 		if ($message == '')
 			$errors[] = $lang_post['No message'];
-		else if ($pun_config['o_censoring'] == '1')
-		{
-			// Censor message to see if that causes problems
-			$censored_message = pun_trim(censor_words($message));
-
-			if ($censored_message == '')
-				$errors[] = $lang_post['No message after censoring'];
-		}
 	}
 
 	$hide_smilies = isset($_POST['hide_smilies']) ? '1' : '0';

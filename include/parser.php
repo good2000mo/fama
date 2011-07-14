@@ -839,9 +839,6 @@ function parse_message($text, $hide_smilies)
 {
 	global $pun_config, $lang_common, $pun_user;
 
-	if ($pun_config['o_censoring'] == '1')
-		$text = censor_words($text);
-
 	// Convert applicable characters to HTML entities
 	$text = pun_htmlspecialchars($text);
 
@@ -898,9 +895,6 @@ function parse_message($text, $hide_smilies)
 function parse_signature($text)
 {
 	global $pun_config, $lang_common, $pun_user;
-
-	if ($pun_config['o_censoring'] == '1')
-		$text = censor_words($text);
 
 	// Convert applicable characters to HTML entities
 	$text = pun_htmlspecialchars($text);

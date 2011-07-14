@@ -932,23 +932,23 @@ if ($pun_user['id'] != $id &&																	// If we arent the user (i.e. edit
 
 	$user_title_field = get_title($user);
 	$user_personal[] = '<dt>'.$lang_common['Title'].'</dt>';
-	$user_personal[] = '<dd>'.(($pun_config['o_censoring'] == '1') ? censor_words($user_title_field) : $user_title_field).'</dd>';
+	$user_personal[] = '<dd>'.$user_title_field.'</dd>';
 
 	if ($user['realname'] != '')
 	{
 		$user_personal[] = '<dt>'.$lang_profile['Realname'].'</dt>';
-		$user_personal[] = '<dd>'.pun_htmlspecialchars(($pun_config['o_censoring'] == '1') ? censor_words($user['realname']) : $user['realname']).'</dd>';
+		$user_personal[] = '<dd>'.pun_htmlspecialchars($user['realname']).'</dd>';
 	}
 
 	if ($user['location'] != '')
 	{
 		$user_personal[] = '<dt>'.$lang_profile['Location'].'</dt>';
-		$user_personal[] = '<dd>'.pun_htmlspecialchars(($pun_config['o_censoring'] == '1') ? censor_words($user['location']) : $user['location']).'</dd>';
+		$user_personal[] = '<dd>'.pun_htmlspecialchars($user['location']).'</dd>';
 	}
 
 	if ($user['url'] != '')
 	{
-		$user['url'] = pun_htmlspecialchars(($pun_config['o_censoring'] == '1') ? censor_words($user['url']) : $user['url']);
+		$user['url'] = pun_htmlspecialchars(user['url']);
 		$user_personal[] = '<dt>'.$lang_profile['Website'].'</dt>';
 		$user_personal[] = '<dd><span class="website"><a href="'.$user['url'].'">'.$user['url'].'</a></span></dd>';
 	}
@@ -970,7 +970,7 @@ if ($pun_user['id'] != $id &&																	// If we arent the user (i.e. edit
 	if ($user['jabber'] != '')
 	{
 		$user_messaging[] = '<dt>'.$lang_profile['Jabber'].'</dt>';
-		$user_messaging[] = '<dd>'.pun_htmlspecialchars(($pun_config['o_censoring'] == '1') ? censor_words($user['jabber']) : $user['jabber']).'</dd>';
+		$user_messaging[] = '<dd>'.pun_htmlspecialchars($user['jabber']).'</dd>';
 	}
 
 	if ($user['icq'] != '')
@@ -982,19 +982,19 @@ if ($pun_user['id'] != $id &&																	// If we arent the user (i.e. edit
 	if ($user['msn'] != '')
 	{
 		$user_messaging[] = '<dt>'.$lang_profile['MSN'].'</dt>';
-		$user_messaging[] = '<dd>'.pun_htmlspecialchars(($pun_config['o_censoring'] == '1') ? censor_words($user['msn']) : $user['msn']).'</dd>';
+		$user_messaging[] = '<dd>'.pun_htmlspecialchars($user['msn']).'</dd>';
 	}
 
 	if ($user['aim'] != '')
 	{
 		$user_messaging[] = '<dt>'.$lang_profile['AOL IM'].'</dt>';
-		$user_messaging[] = '<dd>'.pun_htmlspecialchars(($pun_config['o_censoring'] == '1') ? censor_words($user['aim']) : $user['aim']).'</dd>';
+		$user_messaging[] = '<dd>'.pun_htmlspecialchars($user['aim']).'</dd>';
 	}
 
 	if ($user['yahoo'] != '')
 	{
 		$user_messaging[] = '<dt>'.$lang_profile['Yahoo'].'</dt>';
-		$user_messaging[] = '<dd>'.pun_htmlspecialchars(($pun_config['o_censoring'] == '1') ? censor_words($user['yahoo']) : $user['yahoo']).'</dd>';
+		$user_messaging[] = '<dd>'.pun_htmlspecialchars($user['yahoo']).'</dd>';
 	}
 
 	$user_personality = array();

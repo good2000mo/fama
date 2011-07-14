@@ -38,9 +38,6 @@ if ($cur_posting['redirect_url'] != '')
 $mods_array = ($cur_posting['moderators'] != '') ? unserialize($cur_posting['moderators']) : array();
 $is_admmod = ($pun_user['g_id'] == PUN_ADMIN || ($pun_user['g_moderator'] == '1' && array_key_exists($pun_user['username'], $mods_array))) ? true : false;
 
-if ($tid && $pun_config['o_censoring'] == '1')
-	$cur_posting['subject'] = censor_words($cur_posting['subject']);
-
 // Do we have permission to post?
 if ((($tid && (($cur_posting['post_replies'] == '' && $pun_user['g_post_replies'] == '0') || $cur_posting['post_replies'] == '0')) ||
 	($fid && (($cur_posting['post_topics'] == '' && $pun_user['g_post_topics'] == '0') || $cur_posting['post_topics'] == '0')) ||
@@ -67,13 +64,8 @@ if (isset($_POST['form_sent']))
 	{
 		$subject = pun_trim($_POST['req_subject']);
 
-		if ($pun_config['o_censoring'] == '1')
-			$censored_subject = pun_trim(censor_words($subject));
-
 		if ($subject == '')
 			$errors[] = $lang_post['No subject'];
-		else if ($pun_config['o_censoring'] == '1' && $censored_subject == '')
-			$errors[] = $lang_post['No subject after censoring'];
 		else if (pun_strlen($subject) > 70)
 			$errors[] = $lang_post['Too long subject'];
 		else if ($pun_config['p_subject_all_caps'] == '0' && is_all_uppercase($subject) && !$pun_user['is_admmod'])
@@ -127,14 +119,6 @@ if (isset($_POST['form_sent']))
 	{
 		if ($message == '')
 			$errors[] = $lang_post['No message'];
-		else if ($pun_config['o_censoring'] == '1')
-		{
-			// Censor message to see if that causes problems
-			$censored_message = pun_trim(censor_words($message));
-
-			if ($censored_message == '')
-				$errors[] = $lang_post['No message after censoring'];
-		}
 	}
 
 	$hide_smilies = isset($_POST['hide_smilies']) ? '1' : '0';
@@ -269,9 +253,6 @@ if ($tid)
 
 			unset($inside);
 		}
-
-		if ($pun_config['o_censoring'] == '1')
-			$q_message = censor_words($q_message);
 
 		$q_message = pun_htmlspecialchars($q_message);
 

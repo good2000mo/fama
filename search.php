@@ -563,18 +563,12 @@ if (isset($_GET['action']) || isset($_GET['search_id']))
 		{
 			$forum = '<a href="viewforum.php?id='.$cur_search['forum_id'].'">'.pun_htmlspecialchars($cur_search['forum_name']).'</a>';
 
-			if ($pun_config['o_censoring'] == '1')
-				$cur_search['subject'] = censor_words($cur_search['subject']);
-
 			if ($show_as == 'posts')
 			{
 				++$post_count;
 				$icon_type = 'icon';
 				$item_status = '';
 				$icon_text = '<!-- -->';
-
-				if ($pun_config['o_censoring'] == '1')
-					$cur_search['message'] = censor_words($cur_search['message']);
 
 				$message = parse_message($cur_search['message'], $cur_search['hide_smilies']);
 				$pposter = pun_htmlspecialchars($cur_search['pposter']);

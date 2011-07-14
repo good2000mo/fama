@@ -281,10 +281,6 @@ if (isset($_GET['tid']))
 	$paging_links = '<span class="pages-label">'.$lang_common['Pages'].' </span>'.paginate($num_pages, $p, 'moderate.php?fid='.$fid.'&amp;tid='.$tid);
 
 
-	if ($pun_config['o_censoring'] == '1')
-		$cur_topic['subject'] = censor_words($cur_topic['subject']);
-
-
 	$page_title = array(pun_htmlspecialchars($pun_config['o_board_title']), pun_htmlspecialchars($cur_topic['forum_name']), pun_htmlspecialchars($cur_topic['subject']));
 	define('PUN_ACTIVE_PAGE', 'index');
 	require PUN_ROOT.'header.php';
@@ -337,9 +333,6 @@ if (isset($_GET['tid']))
 			// get_title() requires that an element 'username' be present in the array
 			$cur_post['username'] = $cur_post['poster'];
 			$user_title = get_title($cur_post);
-
-			if ($pun_config['o_censoring'] == '1')
-				$user_title = censor_words($user_title);
 		}
 		// If the poster is a guest (or a user that has been deleted)
 		else
@@ -348,7 +341,7 @@ if (isset($_GET['tid']))
 			$user_title = $lang_topic['Guest'];
 		}
 
-		// Perform the main parsing of the message (BBCode, smilies, censor words etc)
+		// Perform the main parsing of the message (BBCode, smilies etc)
 		$cur_post['message'] = parse_message($cur_post['message'], $cur_post['hide_smilies']);
 
 ?>
@@ -877,9 +870,6 @@ if ($db->num_rows($result))
 			$last_post = '- - -';
 			$ghost_topic = true;
 		}
-
-		if ($pun_config['o_censoring'] == '1')
-			$cur_topic['subject'] = censor_words($cur_topic['subject']);
 
 		if ($cur_topic['sticky'] == '1')
 		{

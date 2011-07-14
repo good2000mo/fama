@@ -17,7 +17,7 @@ require PUN_ROOT.'include/common_admin.php';
 if ($pun_user['g_id'] != PUN_ADMIN)
 	message($lang_common['No permission']);
 
-// Load the admin_censoring.php language file
+// Load the admin_groups.php language file
 require PUN_ROOT.'lang/'.$admin_language.'/admin_groups.php';
 
 // Add/edit a group (stage 1)

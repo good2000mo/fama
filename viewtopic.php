@@ -137,10 +137,6 @@ if ($num_pages > 1)
 }
 
 
-if ($pun_config['o_censoring'] == '1')
-	$cur_topic['subject'] = censor_words($cur_topic['subject']);
-
-
 $quickpost = false;
 if ($pun_config['o_quickpost'] == '1' &&
 	($cur_topic['post_replies'] == '1' || ($cur_topic['post_replies'] == '' && $pun_user['g_post_replies'] == '1')) &&
@@ -219,9 +215,6 @@ while ($cur_post = $db->fetch_assoc($result))
 
 		$user_title = get_title($cur_post);
 
-		if ($pun_config['o_censoring'] == '1')
-			$user_title = censor_words($user_title);
-
 		// Format the online indicator
 		$is_online = ($cur_post['is_online'] == $cur_post['poster_id']) ? '<strong>'.$lang_topic['Online'].'</strong>' : '<span>'.$lang_topic['Offline'].'</span>';
 
@@ -238,9 +231,6 @@ while ($cur_post = $db->fetch_assoc($result))
 		{
 			if ($cur_post['location'] != '')
 			{
-				if ($pun_config['o_censoring'] == '1')
-					$cur_post['location'] = censor_words($cur_post['location']);
-
 				$user_info[] = '<dd><span>'.$lang_topic['From'].' '.pun_htmlspecialchars($cur_post['location']).'</span></dd>';
 			}
 
@@ -257,9 +247,6 @@ while ($cur_post = $db->fetch_assoc($result))
 
 			if ($cur_post['url'] != '')
 			{
-				if ($pun_config['o_censoring'] == '1')
-					$cur_post['url'] = censor_words($cur_post['url']);
-
 				$user_contacts[] = '<span class="website"><a href="'.pun_htmlspecialchars($cur_post['url']).'">'.$lang_topic['Website'].'</a></span>';
 			}
 		}
@@ -313,7 +300,7 @@ while ($cur_post = $db->fetch_assoc($result))
 		$post_actions[] = '<li class="postquote"><span><a href="post.php?tid='.$id.'&amp;qid='.$cur_post['id'].'">'.$lang_topic['Quote'].'</a></span></li>';
 	}
 
-	// Perform the main parsing of the message (BBCode, smilies, censor words etc)
+	// Perform the main parsing of the message (BBCode, smilies etc)
 	$cur_post['message'] = parse_message($cur_post['message'], $cur_post['hide_smilies']);
 
 	// Do signature parsing/caching

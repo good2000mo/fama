@@ -166,9 +166,6 @@ if ($db->num_rows($result))
 		else
 			$last_post = '- - -';
 
-		if ($pun_config['o_censoring'] == '1')
-			$cur_topic['subject'] = censor_words($cur_topic['subject']);
-
 		if ($cur_topic['sticky'] == '1')
 		{
 			$item_status .= ' isticky';
