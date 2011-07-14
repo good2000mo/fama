@@ -32,34 +32,6 @@ if (isset($_GET['cancel']))
 	redirect('index.php', $lang_register['Reg cancel redirect']);
 
 
-else if ($pun_config['o_rules'] == '1' && !isset($_GET['agree']) && !isset($_POST['form_sent']))
-{
-	$page_title = array(pun_htmlspecialchars($pun_config['o_board_title']), $lang_register['Register'], $lang_register['Forum rules']);
-	define('PUN_ACTIVE_PAGE', 'register');
-	require PUN_ROOT.'header.php';
-
-?>
-<div id="rules" class="blockform">
-	<div class="hd"><h2><span><?php echo $lang_register['Forum rules'] ?></span></h2></div>
-	<div class="box">
-		<form method="get" action="register.php">
-			<div class="inform">
-				<fieldset>
-					<legend><?php echo $lang_register['Rules legend'] ?></legend>
-					<div class="infldset">
-						<div class="usercontent"><?php echo $pun_config['o_rules_message'] ?></div>
-					</div>
-				</fieldset>
-			</div>
-			<p class="buttons"><input type="submit" name="agree" value="<?php echo $lang_register['Agree'] ?>" /> <input type="submit" name="cancel" value="<?php echo $lang_register['Cancel'] ?>" /></p>
-		</form>
-	</div>
-</div>
-<?php
-
-	require PUN_ROOT.'footer.php';
-}
-
 // Start with a clean slate
 $errors = array();
 

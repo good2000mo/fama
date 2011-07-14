@@ -19,33 +19,6 @@ require PUN_ROOT.'lang/'.$pun_user['language'].'/misc.php';
 $action = isset($_GET['action']) ? $_GET['action'] : null;
 
 
-if ($action == 'rules')
-{
-	if ($pun_config['o_rules'] == '0' || ($pun_user['is_guest'] && $pun_user['g_read_board'] == '0' && $pun_config['o_regs_allow'] == '0'))
-		message($lang_common['Bad request']);
-
-	// Load the register.php language file
-	require PUN_ROOT.'lang/'.$pun_user['language'].'/register.php';
-
-	$page_title = array(pun_htmlspecialchars($pun_config['o_board_title']), $lang_register['Forum rules']);
-	define('PUN_ACTIVE_PAGE', 'rules');
-	require PUN_ROOT.'header.php';
-
-?>
-<div id="rules" class="block">
-	<div class="hd"><h2><span><?php echo $lang_register['Forum rules'] ?></span></h2></div>
-	<div class="box">
-		<div id="rules-block" class="inbox">
-			<div class="usercontent"><?php echo $pun_config['o_rules_message'] ?></div>
-		</div>
-	</div>
-</div>
-<?php
-
-	require PUN_ROOT.'footer.php';
-}
-
-
 else if (isset($_GET['email']))
 {
 	if ($pun_user['is_guest'] || $pun_user['g_send_email'] == '0')
