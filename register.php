@@ -104,17 +104,6 @@ if (isset($_POST['form_sent']))
 	else if ($pun_config['o_regs_verify'] == '1' && $email1 != $email2)
 		$errors[] = $lang_register['Email not match'];
 
-	// Check if it's a banned email address
-	if (is_banned_email($email1))
-	{
-		if ($pun_config['p_allow_banned_email'] == '0')
-			$errors[] = $lang_prof_reg['Banned email'];
-
-		$banned_email = true; // Used later when we send an alert email
-	}
-	else
-		$banned_email = false;
-
 	// Check if someone else already has registered with that email address
 	$dupe_list = array();
 
@@ -162,24 +151,6 @@ if (isset($_POST['form_sent']))
 		// If the mailing list isn't empty, we may need to send out some alerts
 		if ($pun_config['o_mailing_list'] != '')
 		{
-			// If we previously found out that the email was banned
-			if ($banned_email)
-			{
-				// Load the "banned email register" template
-				$mail_tpl = trim(file_get_contents(PUN_ROOT.'lang/'.$pun_user['language'].'/mail_templates/banned_email_register.tpl'));
-
-				// The first row contains the subject
-				$first_crlf = strpos($mail_tpl, "\n");
-				$mail_subject = trim(substr($mail_tpl, 8, $first_crlf-8));
-				$mail_message = trim(substr($mail_tpl, $first_crlf));
-
-				$mail_message = str_replace('<username>', $username, $mail_message);
-				$mail_message = str_replace('<email>', $email1, $mail_message);
-				$mail_message = str_replace('<profile_url>', get_base_url().'/profile.php?id='.$new_uid, $mail_message);
-				$mail_message = str_replace('<board_mailer>', $pun_config['o_board_title'].' '.$lang_common['Mailer'], $mail_message);
-
-				pun_mail($pun_config['o_mailing_list'], $mail_subject, $mail_message);
-			}
 
 			// If we previously found out that the email was a dupe
 			if (!empty($dupe_list))

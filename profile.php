@@ -203,30 +203,6 @@ else if ($action == 'change_email')
 		if (!is_valid_email($new_email))
 			message($lang_common['Invalid email']);
 
-		// Check if it's a banned email address
-		if (is_banned_email($new_email))
-		{
-			if ($pun_config['p_allow_banned_email'] == '0')
-				message($lang_prof_reg['Banned email']);
-			else if ($pun_config['o_mailing_list'] != '')
-			{
-				// Load the "banned email change" template
-				$mail_tpl = trim(file_get_contents(PUN_ROOT.'lang/'.$pun_user['language'].'/mail_templates/banned_email_change.tpl'));
-
-				// The first row contains the subject
-				$first_crlf = strpos($mail_tpl, "\n");
-				$mail_subject = trim(substr($mail_tpl, 8, $first_crlf-8));
-				$mail_message = trim(substr($mail_tpl, $first_crlf));
-
-				$mail_message = str_replace('<username>', $pun_user['username'], $mail_message);
-				$mail_message = str_replace('<email>', $new_email, $mail_message);
-				$mail_message = str_replace('<profile_url>', get_base_url().'/profile.php?id='.$id, $mail_message);
-				$mail_message = str_replace('<board_mailer>', $pun_config['o_board_title'].' '.$lang_common['Mailer'], $mail_message);
-
-				pun_mail($pun_config['o_mailing_list'], $mail_subject, $mail_message);
-			}
-		}
-
 		// Check if someone else already has registered with that email address
 		$result = $db->query('SELECT id, username FROM '.$db->prefix.'users WHERE email=\''.$db->escape($new_email).'\''.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
 		if ($db->num_rows($result))
@@ -525,27 +501,6 @@ else if (isset($_POST['update_forums']))
 	}
 
 	redirect('profile.php?section=admin&amp;id='.$id, $lang_profile['Update forums redirect']);
-}
-
-
-else if (isset($_POST['ban']))
-{
-	if ($pun_user['g_id'] != PUN_ADMIN && ($pun_user['g_moderator'] != '1' || $pun_user['g_mod_ban_users'] == '0'))
-		message($lang_common['No permission']);
-
-	// Get the username of the user we are banning
-	$result = $db->query('SELECT username FROM '.$db->prefix.'users WHERE id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch username', __FILE__, __LINE__, $db->error());
-	$username = $db->result($result);
-
-	// Check whether user is already banned
-	$result = $db->query('SELECT id FROM '.$db->prefix.'bans WHERE username = \''.$db->escape($username).'\' ORDER BY expire IS NULL DESC, expire DESC LIMIT 1'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch ban ID', __FILE__, __LINE__, $db->error());
-	if ($db->num_rows($result))
-	{
-		$ban_id = $db->result($result);
-		redirect('admin_bans.php?edit_ban='.$ban_id.'&amp;exists', $lang_profile['Ban redirect']);
-	}
-	else
-		redirect('admin_bans.php?add_ban='.$id, $lang_profile['Ban redirect']);
 }
 
 
@@ -1624,7 +1579,7 @@ else
 	}
 	else if ($section == 'admin')
 	{
-		if (!$pun_user['is_admmod'] || ($pun_user['g_moderator'] == '1' && $pun_user['g_mod_ban_users'] == '0'))
+		if (!$pun_user['is_admmod'])
 			message($lang_common['Bad request']);
 
 		$page_title = array(pun_htmlspecialchars($pun_config['o_board_title']), $lang_common['Profile'], $lang_profile['Section admin']);
@@ -1643,23 +1598,8 @@ else
 					<fieldset>
 <?php
 
-		if ($pun_user['g_moderator'] == '1')
+		if ($pun_user['id'] != $id)
 		{
-
-?>
-						<legend><?php echo $lang_profile['Delete ban legend'] ?></legend>
-						<div class="infldset">
-							<p><input type="submit" name="ban" value="<?php echo $lang_profile['Ban user'] ?>" /></p>
-						</div>
-					</fieldset>
-				</div>
-<?php
-
-		}
-		else
-		{
-			if ($pun_user['id'] != $id)
-			{
 
 ?>
 						<legend><?php echo $lang_profile['Group membership legend'] ?></legend>
@@ -1667,15 +1607,15 @@ else
 							<select id="group_id" name="group_id">
 <?php
 
-				$result = $db->query('SELECT g_id, g_title FROM '.$db->prefix.'groups WHERE g_id!='.PUN_GUEST.' ORDER BY g_title'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user group list', __FILE__, __LINE__, $db->error());
+			$result = $db->query('SELECT g_id, g_title FROM '.$db->prefix.'groups WHERE g_id!='.PUN_GUEST.' ORDER BY g_title'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user group list', __FILE__, __LINE__, $db->error());
 
-				while ($cur_group = $db->fetch_assoc($result))
-				{
-					if ($cur_group['g_id'] == $user['g_id'] || ($cur_group['g_id'] == $pun_config['o_default_user_group'] && $user['g_id'] == ''))
-						echo "\t\t\t\t\t\t\t\t".'<option value="'.$cur_group['g_id'].'" selected="selected">'.pun_htmlspecialchars($cur_group['g_title']).'</option>'."\n";
-					else
-						echo "\t\t\t\t\t\t\t\t".'<option value="'.$cur_group['g_id'].'">'.pun_htmlspecialchars($cur_group['g_title']).'</option>'."\n";
-				}
+			while ($cur_group = $db->fetch_assoc($result))
+			{
+				if ($cur_group['g_id'] == $user['g_id'] || ($cur_group['g_id'] == $pun_config['o_default_user_group'] && $user['g_id'] == ''))
+					echo "\t\t\t\t\t\t\t\t".'<option value="'.$cur_group['g_id'].'" selected="selected">'.pun_htmlspecialchars($cur_group['g_title']).'</option>'."\n";
+				else
+					echo "\t\t\t\t\t\t\t\t".'<option value="'.$cur_group['g_id'].'">'.pun_htmlspecialchars($cur_group['g_title']).'</option>'."\n";
+			}
 
 ?>
 							</select>
@@ -1687,19 +1627,19 @@ else
 					<fieldset>
 <?php
 
-			}
+		}
 
 ?>
 						<legend><?php echo $lang_profile['Delete ban legend'] ?></legend>
 						<div class="infldset">
-							<input type="submit" name="delete_user" value="<?php echo $lang_profile['Delete user'] ?>" /> <input type="submit" name="ban" value="<?php echo $lang_profile['Ban user'] ?>" />
+							<input type="submit" name="delete_user" value="<?php echo $lang_profile['Delete user'] ?>" />
 						</div>
 					</fieldset>
 				</div>
 <?php
 
-			if ($user['g_moderator'] == '1' || $user['g_id'] == PUN_ADMIN)
-			{
+		if ($user['g_moderator'] == '1' || $user['g_id'] == PUN_ADMIN)
+		{
 
 ?>
 				<div class="inform">
@@ -1709,27 +1649,27 @@ else
 							<p><?php echo $lang_profile['Moderator in info'] ?></p>
 <?php
 
-				$result = $db->query('SELECT c.id AS cid, c.cat_name, f.id AS fid, f.forum_name, f.moderators FROM '.$db->prefix.'categories AS c INNER JOIN '.$db->prefix.'forums AS f ON c.id=f.cat_id WHERE f.redirect_url IS NULL ORDER BY c.disp_position, c.id, f.disp_position'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch category/forum list', __FILE__, __LINE__, $db->error());
+			$result = $db->query('SELECT c.id AS cid, c.cat_name, f.id AS fid, f.forum_name, f.moderators FROM '.$db->prefix.'categories AS c INNER JOIN '.$db->prefix.'forums AS f ON c.id=f.cat_id WHERE f.redirect_url IS NULL ORDER BY c.disp_position, c.id, f.disp_position'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch category/forum list', __FILE__, __LINE__, $db->error());
 
-				$cur_category = 0;
-				while ($cur_forum = $db->fetch_assoc($result))
+			$cur_category = 0;
+			while ($cur_forum = $db->fetch_assoc($result))
+			{
+				if ($cur_forum['cid'] != $cur_category) // A new category since last iteration?
 				{
-					if ($cur_forum['cid'] != $cur_category) // A new category since last iteration?
-					{
-						if ($cur_category)
-							echo "\n\t\t\t\t\t\t\t\t".'</div>';
+					if ($cur_category)
+						echo "\n\t\t\t\t\t\t\t\t".'</div>';
 
-						if ($cur_category != 0)
-							echo "\n\t\t\t\t\t\t\t".'</div>'."\n";
+					if ($cur_category != 0)
+						echo "\n\t\t\t\t\t\t\t".'</div>'."\n";
 
-						echo "\t\t\t\t\t\t\t".'<div class="conl">'."\n\t\t\t\t\t\t\t\t".'<p><strong>'.$cur_forum['cat_name'].'</strong></p>'."\n\t\t\t\t\t\t\t\t".'<div class="rbox">';
-						$cur_category = $cur_forum['cid'];
-					}
-
-					$moderators = ($cur_forum['moderators'] != '') ? unserialize($cur_forum['moderators']) : array();
-
-					echo "\n\t\t\t\t\t\t\t\t\t".'<label><input type="checkbox" name="moderator_in['.$cur_forum['fid'].']" value="1"'.((in_array($id, $moderators)) ? ' checked="checked"' : '').' />'.pun_htmlspecialchars($cur_forum['forum_name']).'<br /></label>'."\n";
+					echo "\t\t\t\t\t\t\t".'<div class="conl">'."\n\t\t\t\t\t\t\t\t".'<p><strong>'.$cur_forum['cat_name'].'</strong></p>'."\n\t\t\t\t\t\t\t\t".'<div class="rbox">';
+					$cur_category = $cur_forum['cid'];
 				}
+
+				$moderators = ($cur_forum['moderators'] != '') ? unserialize($cur_forum['moderators']) : array();
+
+				echo "\n\t\t\t\t\t\t\t\t\t".'<label><input type="checkbox" name="moderator_in['.$cur_forum['fid'].']" value="1"'.((in_array($id, $moderators)) ? ' checked="checked"' : '').' />'.pun_htmlspecialchars($cur_forum['forum_name']).'<br /></label>'."\n";
+			}
 
 ?>
 								</div>
@@ -1740,7 +1680,6 @@ else
 				</div>
 <?php
 
-			}
 		}
 
 ?>

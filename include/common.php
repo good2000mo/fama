@@ -139,22 +139,6 @@ else
 if ($pun_config['o_maintenance'] && $pun_user['g_id'] > PUN_ADMIN && !defined('PUN_TURN_OFF_MAINT'))
 	maintenance_message();
 
-// Load cached bans
-if (file_exists(FORUM_CACHE_DIR.'cache_bans.php'))
-	include FORUM_CACHE_DIR.'cache_bans.php';
-
-if (!defined('PUN_BANS_LOADED'))
-{
-	if (!defined('FORUM_CACHE_FUNCTIONS_LOADED'))
-		require PUN_ROOT.'include/cache.php';
-
-	generate_bans_cache();
-	require FORUM_CACHE_DIR.'cache_bans.php';
-}
-
-// Check if current user is banned
-check_bans();
-
 // Update online list
 update_users_online();
 

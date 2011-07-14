@@ -112,13 +112,6 @@ if (isset($_POST['add_group']) || isset($_GET['edit_group']))
 										<span><?php echo $lang_admin_groups['Change passwords help'] ?></span>
 									</td>
 								</tr>
-								<tr>
-									<th scope="row"><?php echo $lang_admin_groups['Ban users label'] ?></th>
-									<td>
-										<input type="radio" name="mod_ban_users" value="1"<?php if ($group['g_mod_ban_users'] == '1') echo ' checked="checked"' ?> tabindex="11" />&#160;<strong><?php echo $lang_admin_common['Yes'] ?></strong>&#160;&#160;&#160;<input type="radio" name="mod_ban_users" value="0"<?php if ($group['g_mod_ban_users'] == '0') echo ' checked="checked"' ?> tabindex="12" />&#160;<strong><?php echo $lang_admin_common['No'] ?></strong>
-										<span><?php echo $lang_admin_groups['Ban users help'] ?></span>
-									</td>
-								</tr>
 <?php endif; endif; ?>								<tr>
 									<th scope="row"><?php echo $lang_admin_groups['Read board label'] ?></th>
 									<td>
@@ -248,7 +241,6 @@ else if (isset($_POST['add_edit_group']))
 	$mod_edit_users = $moderator == '1' && isset($_POST['mod_edit_users']) && $_POST['mod_edit_users'] == '1' ? '1' : '0';
 	$mod_rename_users = $moderator == '1' && isset($_POST['mod_rename_users']) && $_POST['mod_rename_users'] == '1' ? '1' : '0';
 	$mod_change_passwords = $moderator == '1' && isset($_POST['mod_change_passwords']) && $_POST['mod_change_passwords'] == '1' ? '1' : '0';
-	$mod_ban_users = $moderator == '1' && isset($_POST['mod_ban_users']) && $_POST['mod_ban_users'] == '1' ? '1' : '0';
 	$read_board = isset($_POST['read_board']) ? intval($_POST['read_board']) : '1';
 	$view_users = (isset($_POST['view_users']) && $_POST['view_users'] == '1') || $is_admin_group ? '1' : '0';
 	$post_replies = isset($_POST['post_replies']) ? intval($_POST['post_replies']) : '1';
@@ -275,7 +267,7 @@ else if (isset($_POST['add_edit_group']))
 		if ($db->num_rows($result))
 			message(sprintf($lang_admin_groups['Title already exists message'], pun_htmlspecialchars($title)));
 
-		$db->query('INSERT INTO '.$db->prefix.'groups (g_title, g_user_title, g_moderator, g_mod_edit_users, g_mod_rename_users, g_mod_change_passwords, g_mod_ban_users, g_read_board, g_view_users, g_post_replies, g_post_topics, g_edit_posts, g_delete_posts, g_delete_topics, g_set_title, g_search, g_search_users, g_send_email, g_post_flood, g_search_flood, g_email_flood) VALUES(\''.$db->escape($title).'\', '.$user_title.', '.$moderator.', '.$mod_edit_users.', '.$mod_rename_users.', '.$mod_change_passwords.', '.$mod_ban_users.', '.$read_board.', '.$view_users.', '.$post_replies.', '.$post_topics.', '.$edit_posts.', '.$delete_posts.', '.$delete_topics.', '.$set_title.', '.$search.', '.$search_users.', '.$send_email.', '.$post_flood.', '.$search_flood.', '.$email_flood.')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to add group', __FILE__, __LINE__, $db->error());
+		$db->query('INSERT INTO '.$db->prefix.'groups (g_title, g_user_title, g_moderator, g_mod_edit_users, g_mod_rename_users, g_mod_change_passwords, g_read_board, g_view_users, g_post_replies, g_post_topics, g_edit_posts, g_delete_posts, g_delete_topics, g_set_title, g_search, g_search_users, g_send_email, g_post_flood, g_search_flood, g_email_flood) VALUES(\''.$db->escape($title).'\', '.$user_title.', '.$moderator.', '.$mod_edit_users.', '.$mod_rename_users.', '.$mod_change_passwords.', '.$read_board.', '.$view_users.', '.$post_replies.', '.$post_topics.', '.$edit_posts.', '.$delete_posts.', '.$delete_topics.', '.$set_title.', '.$search.', '.$search_users.', '.$send_email.', '.$post_flood.', '.$search_flood.', '.$email_flood.')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to add group', __FILE__, __LINE__, $db->error());
 		$new_group_id = $db->insert_id();
 
 		// Now lets copy the forum specific permissions from the group which this group is based on
@@ -289,7 +281,7 @@ else if (isset($_POST['add_edit_group']))
 		if ($db->num_rows($result))
 			message(sprintf($lang_admin_groups['Title already exists message'], pun_htmlspecialchars($title)));
 
-		$db->query('UPDATE '.$db->prefix.'groups SET g_title=\''.$db->escape($title).'\', g_user_title='.$user_title.', g_moderator='.$moderator.', g_mod_edit_users='.$mod_edit_users.', g_mod_rename_users='.$mod_rename_users.', g_mod_change_passwords='.$mod_change_passwords.', g_mod_ban_users='.$mod_ban_users.', g_read_board='.$read_board.', g_view_users='.$view_users.', g_post_replies='.$post_replies.', g_post_topics='.$post_topics.', g_edit_posts='.$edit_posts.', g_delete_posts='.$delete_posts.', g_delete_topics='.$delete_topics.', g_set_title='.$set_title.', g_search='.$search.', g_search_users='.$search_users.', g_send_email='.$send_email.', g_post_flood='.$post_flood.', g_search_flood='.$search_flood.', g_email_flood='.$email_flood.' WHERE g_id='.intval($_POST['group_id']).' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update group', __FILE__, __LINE__, $db->error());
+		$db->query('UPDATE '.$db->prefix.'groups SET g_title=\''.$db->escape($title).'\', g_user_title='.$user_title.', g_moderator='.$moderator.', g_mod_edit_users='.$mod_edit_users.', g_mod_rename_users='.$mod_rename_users.', g_mod_change_passwords='.$mod_change_passwords.', g_read_board='.$read_board.', g_view_users='.$view_users.', g_post_replies='.$post_replies.', g_post_topics='.$post_topics.', g_edit_posts='.$edit_posts.', g_delete_posts='.$delete_posts.', g_delete_topics='.$delete_topics.', g_set_title='.$set_title.', g_search='.$search.', g_search_users='.$search_users.', g_send_email='.$send_email.', g_post_flood='.$post_flood.', g_search_flood='.$search_flood.', g_email_flood='.$email_flood.' WHERE g_id='.intval($_POST['group_id']).' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update group', __FILE__, __LINE__, $db->error());
 	}
 
 	if ($_POST['mode'] == 'edit')

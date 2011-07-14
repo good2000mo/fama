@@ -91,7 +91,6 @@ if (isset($_POST['form_sent']))
 	{
 		$username = pun_trim($_POST['req_username']);
 		$email = strtolower(trim(($pun_config['p_force_guest_email'] == '1') ? $_POST['req_email'] : $_POST['email']));
-		$banned_email = false;
 
 		// Load the register.php/prof_reg.php language files
 		require PUN_ROOT.'lang/'.$pun_user['language'].'/prof_reg.php';
@@ -105,16 +104,6 @@ if (isset($_POST['form_sent']))
 			require PUN_ROOT.'include/email.php';
 			if (!is_valid_email($email))
 				$errors[] = $lang_common['Invalid email'];
-
-			// Check if it's a banned email address
-			// we should only check guests because members addresses are already verified
-			if ($pun_user['is_guest'] && is_banned_email($email))
-			{
-				if ($pun_config['p_allow_banned_email'] == '0')
-					$errors[] = $lang_prof_reg['Banned email'];
-
-				$banned_email = true; // Used later when we send an alert email
-			}
 		}
 	}
 
@@ -214,25 +203,6 @@ if (isset($_POST['form_sent']))
 			update_search_index('post', $new_pid, $message, $subject);
 
 			update_forum($fid);
-		}
-
-		// If we previously found out that the email was banned
-		if ($pun_user['is_guest'] && $banned_email && $pun_config['o_mailing_list'] != '')
-		{
-			// Load the "banned email post" template
-			$mail_tpl = trim(file_get_contents(PUN_ROOT.'lang/'.$pun_user['language'].'/mail_templates/banned_email_post.tpl'));
-
-			// The first row contains the subject
-			$first_crlf = strpos($mail_tpl, "\n");
-			$mail_subject = trim(substr($mail_tpl, 8, $first_crlf-8));
-			$mail_message = trim(substr($mail_tpl, $first_crlf));
-
-			$mail_message = str_replace('<username>', $username, $mail_message);
-			$mail_message = str_replace('<email>', $email, $mail_message);
-			$mail_message = str_replace('<post_url>', get_base_url().'/viewtopic.php?pid='.$new_pid.'#p'.$new_pid, $mail_message);
-			$mail_message = str_replace('<board_mailer>', $pun_config['o_board_title'].' '.$lang_common['Mailer'], $mail_message);
-
-			pun_mail($pun_config['o_mailing_list'], $mail_subject, $mail_message);
 		}
 
 		// If the posting user is logged in, increment his/her post count

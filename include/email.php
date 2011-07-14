@@ -25,25 +25,6 @@ function is_valid_email($email)
 
 
 //
-// Check if $email is banned
-//
-function is_banned_email($email)
-{
-	global $pun_bans;
-
-	foreach ($pun_bans as $cur_ban)
-	{
-		if ($cur_ban['email'] != '' &&
-			($email == $cur_ban['email'] ||
-			(strpos($cur_ban['email'], '@') === false && stristr($email, '@'.$cur_ban['email']))))
-			return true;
-	}
-
-	return false;
-}
-
-
-//
 // Only encode with base64, if there is at least one unicode character in the string
 //
 function encode_mail_text($str)

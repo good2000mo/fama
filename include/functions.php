@@ -339,82 +339,11 @@ function forum_setcookie($name, $value, $expire)
 
 
 //
-// Check whether the connecting user is banned (and delete any expired bans while we're at it)
-//
-function check_bans()
-{
-	global $db, $pun_config, $lang_common, $pun_user, $pun_bans;
-
-	// Admins and moderators aren't affected
-	if ($pun_user['is_admmod'] || !$pun_bans)
-		return;
-
-	// Add a dot or a colon (depending on IPv4/IPv6) at the end of the IP address to prevent banned address
-	// 192.168.0.5 from matching e.g. 192.168.0.50
-	$user_ip = get_remote_address();
-	$user_ip .= (strpos($user_ip, '.') !== false) ? '.' : ':';
-
-	$bans_altered = false;
-	$is_banned = false;
-
-	foreach ($pun_bans as $cur_ban)
-	{
-		// Has this ban expired?
-		if ($cur_ban['expire'] != '' && $cur_ban['expire'] <= time())
-		{
-			$db->query('DELETE FROM '.$db->prefix.'bans WHERE id='.$cur_ban['id'].' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to delete expired ban', __FILE__, __LINE__, $db->error());
-			$bans_altered = true;
-			continue;
-		}
-
-		if ($cur_ban['username'] != '' && utf8_strtolower($pun_user['username']) == utf8_strtolower($cur_ban['username']))
-			$is_banned = true;
-
-		if ($cur_ban['ip'] != '')
-		{
-			$cur_ban_ips = explode(' ', $cur_ban['ip']);
-
-			$num_ips = count($cur_ban_ips);
-			for ($i = 0; $i < $num_ips; ++$i)
-			{
-				// Add the proper ending to the ban
-				if (strpos($user_ip, '.') !== false)
-					$cur_ban_ips[$i] = $cur_ban_ips[$i].'.';
-				else
-					$cur_ban_ips[$i] = $cur_ban_ips[$i].':';
-
-				if (substr($user_ip, 0, strlen($cur_ban_ips[$i])) == $cur_ban_ips[$i])
-				{
-					$is_banned = true;
-					break;
-				}
-			}
-		}
-
-		if ($is_banned)
-		{
-			$db->query('DELETE FROM '.$db->prefix.'online WHERE ident=\''.$db->escape($pun_user['username']).'\''.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to delete from online list', __FILE__, __LINE__, $db->error());
-			message($lang_common['Ban message'].' '.(($cur_ban['expire'] != '') ? $lang_common['Ban message 2'].' '.strtolower(format_time($cur_ban['expire'], true)).'. ' : '').(($cur_ban['message'] != '') ? $lang_common['Ban message 3'].'<br /><br /><strong>'.pun_htmlspecialchars($cur_ban['message']).'</strong><br /><br />' : '<br /><br />').$lang_common['Ban message 4'].' <a href="mailto:'.$pun_config['o_admin_email'].'">'.$pun_config['o_admin_email'].'</a>.', true);
-		}
-	}
-
-	// If we removed any expired bans during our run-through, we need to regenerate the bans cache
-	if ($bans_altered)
-	{
-		if (!defined('FORUM_CACHE_FUNCTIONS_LOADED'))
-			require PUN_ROOT.'include/cache.php';
-
-		generate_bans_cache();
-	}
-}
-
-
-//
 // Check username
 //
 function check_username($username, $exclude_id = null)
 {
-	global $db, $pun_config, $errors, $lang_prof_reg, $lang_register, $lang_common, $pun_bans;
+	global $db, $pun_config, $errors, $lang_prof_reg, $lang_register, $lang_common;
 
 	// Convert multiple whitespace characters into one (to prevent people from registering with indistinguishable usernames)
 	$username = preg_replace('%\s+%s', ' ', $username);
@@ -446,16 +375,6 @@ function check_username($username, $exclude_id = null)
 	{
 		$busy = $db->result($result);
 		$errors[] = $lang_register['Username dupe 1'].' '.pun_htmlspecialchars($busy).'. '.$lang_register['Username dupe 2'];
-	}
-
-	// Check username for any banned usernames
-	foreach ($pun_bans as $cur_ban)
-	{
-		if ($cur_ban['username'] != '' && utf8_strtolower($username) == utf8_strtolower($cur_ban['username']))
-		{
-			$errors[] = $lang_prof_reg['Banned username'];
-			break;
-		}
 	}
 }
 
@@ -511,7 +430,7 @@ function generate_profile_menu($page = '')
 <?php if ($pun_config['o_avatars'] == '1' || $pun_config['o_signatures'] == '1'): ?>					<li<?php if ($page == 'personality') echo ' class="isactive"'; ?>><a href="profile.php?section=personality&amp;id=<?php echo $id ?>"><?php echo $lang_profile['Section personality'] ?></a></li>
 <?php endif; ?>					<li<?php if ($page == 'display') echo ' class="isactive"'; ?>><a href="profile.php?section=display&amp;id=<?php echo $id ?>"><?php echo $lang_profile['Section display'] ?></a></li>
 					<li<?php if ($page == 'privacy') echo ' class="isactive"'; ?>><a href="profile.php?section=privacy&amp;id=<?php echo $id ?>"><?php echo $lang_profile['Section privacy'] ?></a></li>
-<?php if ($pun_user['g_id'] == PUN_ADMIN || ($pun_user['g_moderator'] == '1' && $pun_user['g_mod_ban_users'] == '1')): ?>					<li<?php if ($page == 'admin') echo ' class="isactive"'; ?>><a href="profile.php?section=admin&amp;id=<?php echo $id ?>"><?php echo $lang_profile['Section admin'] ?></a></li>
+<?php if ($pun_user['g_id'] == PUN_ADMIN): ?>					<li<?php if ($page == 'admin') echo ' class="isactive"'; ?>><a href="profile.php?section=admin&amp;id=<?php echo $id ?>"><?php echo $lang_profile['Section admin'] ?></a></li>
 <?php endif; ?>				</ul>
 			</div>
 		</div>
@@ -721,17 +640,8 @@ function censor_words($text)
 //
 function get_title($user)
 {
-	global $db, $pun_config, $pun_bans, $lang_common;
-	static $ban_list, $pun_ranks;
-
-	// If not already built in a previous call, build an array of lowercase banned usernames
-	if (empty($ban_list))
-	{
-		$ban_list = array();
-
-		foreach ($pun_bans as $cur_ban)
-			$ban_list[] = strtolower($cur_ban['username']);
-	}
+	global $db, $pun_config, $lang_common;
+	static $pun_ranks;
 
 	// If not already loaded in a previous call, load the cached ranks
 	if ($pun_config['o_ranks'] == '1' && !defined('PUN_RANKS_LOADED'))
@@ -752,9 +662,6 @@ function get_title($user)
 	// If the user has a custom title
 	if ($user['title'] != '')
 		$user_title = pun_htmlspecialchars($user['title']);
-	// If the user is banned
-	else if (in_array(strtolower($user['username']), $ban_list))
-		$user_title = $lang_common['Banned'];
 	// If the user group has a default user title
 	else if ($user['g_user_title'] != '')
 		$user_title = pun_htmlspecialchars($user['g_user_title']);

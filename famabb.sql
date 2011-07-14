@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 -- 
 -- 主機: localhost
--- 建立日期: Jul 11, 2011, 11:32 AM
+-- 建立日期: Jul 14, 2011, 10:53 AM
 -- 伺服器版本: 5.0.51
 -- PHP 版本: 5.2.6
 
@@ -12,29 +12,6 @@ SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 -- 
 -- 資料庫: `xman3`
 -- 
-
--- --------------------------------------------------------
-
--- 
--- 資料表格式： `fbb_bans`
--- 
-
-CREATE TABLE `fbb_bans` (
-  `id` int(10) unsigned NOT NULL auto_increment,
-  `username` varchar(200) default NULL,
-  `ip` varchar(255) default NULL,
-  `email` varchar(80) default NULL,
-  `message` varchar(255) default NULL,
-  `expire` int(10) unsigned default NULL,
-  `ban_creator` int(10) unsigned NOT NULL default '0',
-  PRIMARY KEY  (`id`),
-  KEY `fbb_bans_username_idx` (`username`(25))
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
--- 
--- 列出以下資料庫的數據： `fbb_bans`
--- 
-
 
 -- --------------------------------------------------------
 
@@ -152,7 +129,6 @@ INSERT INTO `fbb_config` VALUES ('p_sig_bbcode', '1');
 INSERT INTO `fbb_config` VALUES ('p_sig_img_tag', '0');
 INSERT INTO `fbb_config` VALUES ('p_sig_length', '400');
 INSERT INTO `fbb_config` VALUES ('p_sig_lines', '4');
-INSERT INTO `fbb_config` VALUES ('p_allow_banned_email', '1');
 INSERT INTO `fbb_config` VALUES ('p_allow_dupe_email', '0');
 INSERT INTO `fbb_config` VALUES ('p_force_guest_email', '1');
 
@@ -219,7 +195,6 @@ CREATE TABLE `fbb_groups` (
   `g_mod_edit_users` tinyint(1) NOT NULL default '0',
   `g_mod_rename_users` tinyint(1) NOT NULL default '0',
   `g_mod_change_passwords` tinyint(1) NOT NULL default '0',
-  `g_mod_ban_users` tinyint(1) NOT NULL default '0',
   `g_read_board` tinyint(1) NOT NULL default '1',
   `g_view_users` tinyint(1) NOT NULL default '1',
   `g_post_replies` tinyint(1) NOT NULL default '1',
@@ -241,10 +216,10 @@ CREATE TABLE `fbb_groups` (
 -- 列出以下資料庫的數據： `fbb_groups`
 -- 
 
-INSERT INTO `fbb_groups` VALUES (1, '管理員', '管理員', 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0);
-INSERT INTO `fbb_groups` VALUES (2, '版主', '版主', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0);
-INSERT INTO `fbb_groups` VALUES (3, '訪客', NULL, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 60, 30, 0);
-INSERT INTO `fbb_groups` VALUES (4, '用戶', NULL, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 60, 30, 60);
+INSERT INTO `fbb_groups` VALUES (1, '管理員', '管理員', 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0);
+INSERT INTO `fbb_groups` VALUES (2, '版主', '版主', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0);
+INSERT INTO `fbb_groups` VALUES (3, '訪客', NULL, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 60, 30, 0);
+INSERT INTO `fbb_groups` VALUES (4, '用戶', NULL, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 60, 30, 60);
 
 -- --------------------------------------------------------
 
@@ -268,7 +243,7 @@ CREATE TABLE `fbb_online` (
 -- 列出以下資料庫的數據： `fbb_online`
 -- 
 
-INSERT INTO `fbb_online` VALUES (2, 'admin', 1310355082, 0, NULL, NULL);
+INSERT INTO `fbb_online` VALUES (2, 'admin', 1310609145, 0, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -434,7 +409,7 @@ CREATE TABLE `fbb_topics` (
 -- 列出以下資料庫的數據： `fbb_topics`
 -- 
 
-INSERT INTO `fbb_topics` VALUES (1, 'admin', '示例帖子', 1310283814, 1, 1310283814, 1, 'admin', 0, 0, 0, 0, NULL, 1);
+INSERT INTO `fbb_topics` VALUES (1, 'admin', '示例帖子', 1310283814, 1, 1310283814, 1, 'admin', 5, 0, 0, 0, NULL, 1);
 
 -- --------------------------------------------------------
 
@@ -492,4 +467,4 @@ CREATE TABLE `fbb_users` (
 -- 
 
 INSERT INTO `fbb_users` VALUES (1, 3, '訪客', '訪客', '訪客', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 'Traditional_Chinese', 'Lithium', 0, NULL, NULL, NULL, 0, '0.0.0.0', 0, NULL, NULL, NULL);
-INSERT INTO `fbb_users` VALUES (2, 1, 'admin', 'c3d873d7fa9ac799e35693d4cc288d4a16ad3f96', 'comus2010mo@hotmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 1, 1, 1, 1, 1, 8, 0, 0, 0, 'Traditional_Chinese', 'Lithium', 1, 1310283814, NULL, NULL, 1310283814, '127.0.0.1', 1310346244, NULL, NULL, NULL);
+INSERT INTO `fbb_users` VALUES (2, 1, 'admin', 'c3d873d7fa9ac799e35693d4cc288d4a16ad3f96', 'comus2010mo@hotmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 1, 1, 1, 1, 1, 8, 0, 0, 0, 'Traditional_Chinese', 'Lithium', 1, 1310283814, NULL, NULL, 1310283814, '127.0.0.1', 1310432870, NULL, NULL, NULL);

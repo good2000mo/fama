@@ -518,150 +518,6 @@ else if (isset($_POST['delete_users']) || isset($_POST['delete_users_comply']))
 }
 
 
-// Ban multiple users
-else if (isset($_POST['ban_users']) || isset($_POST['ban_users_comply']))
-{
-	if ($pun_user['g_id'] != PUN_ADMIN && ($pun_user['g_moderator'] != '1' || $pun_user['g_mod_ban_users'] == '0'))
-		message($lang_common['No permission']);
-
-	confirm_referrer('admin_users.php');
-
-	if (isset($_POST['users']))
-	{
-		$user_ids = is_array($_POST['users']) ? array_keys($_POST['users']) : explode(',', $_POST['users']);
-		$user_ids = array_map('intval', $user_ids);
-
-		// Delete invalid IDs
-		$user_ids = array_diff($user_ids, array(0, 1));
-	}
-	else
-		$user_ids = array();
-
-	if (empty($user_ids))
-		message($lang_admin_users['No users selected']);
-
-	// Are we trying to ban any admins?
-	$result = $db->query('SELECT COUNT(*) FROM '.$db->prefix.'users WHERE id IN ('.implode(',', $user_ids).') AND group_id='.PUN_ADMIN.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch group info', __FILE__, __LINE__, $db->error());
-	if ($db->result($result) > 0)
-		message($lang_admin_users['No ban admins message']);
-
-	// Also, we cannot ban moderators
-	$result = $db->query('SELECT COUNT(*) FROM '.$db->prefix.'users AS u INNER JOIN '.$db->prefix.'groups AS g ON u.group_id=g.g_id WHERE g.g_moderator=1 AND u.id IN ('.implode(',', $user_ids).')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch moderator group info', __FILE__, __LINE__, $db->error());
-	if ($db->result($result) > 0)
-		message($lang_admin_users['No ban mods message']);
-
-	if (isset($_POST['ban_users_comply']))
-	{
-		$ban_message = pun_trim($_POST['ban_message']);
-		$ban_expire = pun_trim($_POST['ban_expire']);
-		$ban_the_ip = isset($_POST['ban_the_ip']) ? intval($_POST['ban_the_ip']) : 0;
-
-		if ($ban_expire != '' && $ban_expire != 'Never')
-		{
-			$ban_expire = strtotime($ban_expire.' GMT');
-
-			if ($ban_expire == -1 || !$ban_expire)
-				message($lang_admin_users['Invalid date message'].' '.$lang_admin_users['Invalid date reasons']);
-
-			$diff = ($pun_user['timezone'] + $pun_user['dst']) * 3600;
-			$ban_expire -= $diff;
-
-			if ($ban_expire <= time())
-				message($lang_admin_users['Invalid date message'].' '.$lang_admin_users['Invalid date reasons']);
-		}
-		else
-			$ban_expire = 'NULL';
-
-		$ban_message = ($ban_message != '') ? '\''.$db->escape($ban_message).'\'' : 'NULL';
-
-		// Fetch user information
-		$user_info = array();
-		$result = $db->query('SELECT id, username, email, registration_ip FROM '.$db->prefix.'users WHERE id IN ('.implode(',', $user_ids).')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
-		while ($cur_user = $db->fetch_assoc($result))
-			$user_info[$cur_user['id']] = array('username' => $cur_user['username'], 'email' => $cur_user['email'], 'ip' => $cur_user['registration_ip']);
-
-		// Overwrite the registration IP with one from the last post (if it exists)
-		if ($ban_the_ip != 0)
-		{
-			$result = $db->query('SELECT p.poster_id, p.poster_ip FROM '.$db->prefix.'posts AS p INNER JOIN (SELECT MAX(id) AS id FROM '.$db->prefix.'posts WHERE poster_id IN ('.implode(',', $user_ids).') GROUP BY poster_id) AS i ON p.id=i.id'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch post info', __FILE__, __LINE__, $db->error());
-			while ($cur_address = $db->fetch_assoc($result))
-				$user_info[$cur_address['poster_id']]['ip'] = $cur_address['poster_ip'];
-		}
-
-		// And insert the bans!
-		foreach ($user_ids as $user_id)
-		{
-			$ban_username = '\''.$db->escape($user_info[$user_id]['username']).'\'';
-			$ban_email = '\''.$db->escape($user_info[$user_id]['email']).'\'';
-			$ban_ip = ($ban_the_ip != 0) ? '\''.$db->escape($user_info[$user_id]['ip']).'\'' : 'NULL';
-
-			$db->query('INSERT INTO '.$db->prefix.'bans (username, ip, email, message, expire, ban_creator) VALUES('.$ban_username.', '.$ban_ip.', '.$ban_email.', '.$ban_message.', '.$ban_expire.', '.$pun_user['id'].')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to add ban', __FILE__, __LINE__, $db->error());
-		}
-
-		// Regenerate the bans cache
-		if (!defined('FORUM_CACHE_FUNCTIONS_LOADED'))
-			require PUN_ROOT.'include/cache.php';
-
-		generate_bans_cache();
-
-		redirect('admin_users.php', $lang_admin_users['Users banned redirect']);
-	}
-
-	$page_title = array(pun_htmlspecialchars($pun_config['o_board_title']), $lang_admin_common['Admin'], $lang_admin_common['Bans']);
-	$focus_element = array('bans2', 'ban_message');
-	define('PUN_ACTIVE_PAGE', 'admin');
-	require PUN_ROOT.'header.php';
-
-	generate_admin_menu('users');
-
-?>
-	<div class="blockform">
-		<h2><span><?php echo $lang_admin_users['Ban users'] ?></span></h2>
-		<div class="box">
-			<form id="bans2" name="confirm_ban_users" method="post" action="admin_users.php">
-				<input type="hidden" name="users" value="<?php echo implode(',', $user_ids) ?>" />
-				<div class="inform">
-					<fieldset>
-						<legend><?php echo $lang_admin_users['Message expiry subhead'] ?></legend>
-						<div class="infldset">
-							<table class="aligntop" cellspacing="0">
-								<tr>
-									<th scope="row"><?php echo $lang_admin_users['Ban message label'] ?></th>
-									<td>
-										<input type="text" name="ban_message" size="50" maxlength="255" tabindex="1" />
-										<span><?php echo $lang_admin_users['Ban message help'] ?></span>
-									</td>
-								</tr>
-								<tr>
-									<th scope="row"><?php echo $lang_admin_users['Expire date label'] ?></th>
-									<td>
-										<input type="text" name="ban_expire" size="17" maxlength="10" tabindex="2" />
-										<span><?php echo $lang_admin_users['Expire date help'] ?></span>
-									</td>
-								</tr>
-								<tr>
-									<th scope="row"><?php echo $lang_admin_users['Ban IP label'] ?></th>
-									<td>
-										<input type="radio" name="ban_the_ip" tabindex="3" value="1" checked="checked" />&#160;<strong><?php echo $lang_admin_common['Yes'] ?></strong>&#160;&#160;&#160;<input type="radio" name="ban_the_ip" tabindex="4" value="0" checked="checked" />&#160;<strong><?php echo $lang_admin_common['No'] ?></strong>
-										<span><?php echo $lang_admin_users['Ban IP help'] ?></span>
-									</td>
-								</tr>
-							</table>
-						</div>
-					</fieldset>
-				</div>
-				<p class="submitend"><input type="submit" name="ban_users_comply" value="<?php echo $lang_admin_common['Save'] ?>" tabindex="3" /></p>
-			</form>
-		</div>
-	</div>
-	<div class="clearer"></div>
-</div>
-<?php
-
-	require PUN_ROOT.'footer.php';
-}
-
-
 else if (isset($_GET['find_user']))
 {
 	$form = isset($_GET['form']) ? $_GET['form'] : array();
@@ -790,8 +646,7 @@ else if (isset($_GET['find_user']))
 
 	// Some helper variables for permissions
 	$can_delete = $can_move = $pun_user['g_id'] == PUN_ADMIN;
-	$can_ban = $pun_user['g_id'] == PUN_ADMIN || ($pun_user['g_moderator'] == '1' && $pun_user['g_mod_ban_users'] == '1');
-	$can_action = ($can_delete || $can_ban || $can_move) && $num_users > 0;
+	$can_action = ($can_delete || $can_move) && $num_users > 0;
 
 	$page_title = array(pun_htmlspecialchars($pun_config['o_board_title']), $lang_admin_common['Admin'], $lang_admin_common['Users'], $lang_admin_users['Results head']);
 	$page_head = array('js' => '<script type="text/javascript" src="common.js"></script>');
@@ -843,7 +698,7 @@ else if (isset($_GET['find_user']))
 			$user_title = get_title($user_data);
 
 			// This script is a special case in that we want to display "Not verified" for non-verified users
-			if (($user_data['g_id'] == '' || $user_data['g_id'] == PUN_UNVERIFIED) && $user_title != $lang_common['Banned'])
+			if ($user_data['g_id'] == '' || $user_data['g_id'] == PUN_UNVERIFIED)
 				$user_title = '<span class="warntext">'.$lang_admin_users['Not verified'].'</span>';
 
 			$actions = '<a href="admin_users.php?ip_stats='.$user_data['id'].'">'.$lang_admin_users['Results view IP link'].'</a> | <a href="search.php?action=show_user_posts&amp;user_id='.$user_data['id'].'">'.$lang_admin_users['Results show posts link'].'</a>';
@@ -877,7 +732,7 @@ else if (isset($_GET['find_user']))
 	<div class="inbox crumbsplus">
 		<div class="pagepost">
 			<p class="pagelink"><?php echo $paging_links ?></p>
-<?php if ($can_action): ?>			<p class="conr modbuttons"><a href="#" onclick="return select_checkboxes('search-users-form', this, '<?php echo $lang_admin_users['Unselect all'] ?>')"><?php echo $lang_admin_users['Select all'] ?></a> <?php if ($can_ban) : ?><input type="submit" name="ban_users" value="<?php echo $lang_admin_users['Ban'] ?>" /><?php endif; if ($can_delete) : ?><input type="submit" name="delete_users" value="<?php echo $lang_admin_users['Delete'] ?>" /><?php endif; if ($can_move) : ?><input type="submit" name="move_users" value="<?php echo $lang_admin_users['Change group'] ?>" /><?php endif; ?></p>
+<?php if ($can_action): ?>			<p class="conr modbuttons"><a href="#" onclick="return select_checkboxes('search-users-form', this, '<?php echo $lang_admin_users['Unselect all'] ?>')"><?php echo $lang_admin_users['Select all'] ?></a> <?php if ($can_delete) : ?><input type="submit" name="delete_users" value="<?php echo $lang_admin_users['Delete'] ?>" /><?php endif; if ($can_move) : ?><input type="submit" name="move_users" value="<?php echo $lang_admin_users['Change group'] ?>" /><?php endif; ?></p>
 <?php endif; ?>
 		</div>
 		<ul class="crumbs">

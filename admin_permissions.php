@@ -149,13 +149,6 @@ generate_admin_menu('permissions');
 						<div class="infldset">
 							<table class="aligntop" cellspacing="0">
 								<tr>
-									<th scope="row"><?php echo $lang_admin_permissions['Banned e-mail label'] ?></th>
-									<td>
-										<input type="radio" name="form[allow_banned_email]" value="1"<?php if ($pun_config['p_allow_banned_email'] == '1') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['Yes'] ?></strong>&#160;&#160;&#160;<input type="radio" name="form[allow_banned_email]" value="0"<?php if ($pun_config['p_allow_banned_email'] == '0') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['No'] ?></strong>
-										<span><?php echo $lang_admin_permissions['Banned e-mail help'] ?></span>
-									</td>
-								</tr>
-								<tr>
 									<th scope="row"><?php echo $lang_admin_permissions['Duplicate e-mail label'] ?></th>
 									<td>
 										<input type="radio" name="form[allow_dupe_email]" value="1"<?php if ($pun_config['p_allow_dupe_email'] == '1') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['Yes'] ?></strong>&#160;&#160;&#160;<input type="radio" name="form[allow_dupe_email]" value="0"<?php if ($pun_config['p_allow_dupe_email'] == '0') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['No'] ?></strong>
