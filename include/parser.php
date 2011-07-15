@@ -721,7 +721,6 @@ function do_bbcode($text)
 		$pattern[] = '%\[img=([^\[]*?)\]((ht|f)tps?://)([^\s<"]*?)\[/img\]%e';
 		$replace[] = 'handle_img_tag(\'$1$3\')';
 		$replace[] = 'handle_img_tag(\'$2$4\', \'$1\')';
-		}
 	}
 
 	$pattern[] = '%\[url\]([^\[]*?)\[/url\]%e';
