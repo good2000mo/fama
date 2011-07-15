@@ -23,9 +23,6 @@ require PUN_ROOT.'lang/'.$pun_user['language'].'/register.php';
 // Load the register.php/profile.php language file
 require PUN_ROOT.'lang/'.$pun_user['language'].'/prof_reg.php';
 
-if ($pun_config['o_regs_allow'] == '0')
-	message($lang_register['No new regs']);
-
 
 // User pressed the cancel button
 if (isset($_GET['cancel']))
@@ -46,19 +43,8 @@ if (isset($_POST['form_sent']))
 
 	$username = pun_trim($_POST['req_user']);
 	$email1 = strtolower(trim($_POST['req_email1']));
-
-	if ($pun_config['o_regs_verify'] == '1')
-	{
-		$email2 = strtolower(trim($_POST['req_email2']));
-
-		$password1 = random_pass(8);
-		$password2 = $password1;
-	}
-	else
-	{
-		$password1 = pun_trim($_POST['req_password1']);
-		$password2 = pun_trim($_POST['req_password2']);
-	}
+	$password1 = pun_trim($_POST['req_password1']);
+	$password2 = pun_trim($_POST['req_password2']);
 
 	// Validate username and passwords
 	check_username($username);
@@ -73,8 +59,6 @@ if (isset($_POST['form_sent']))
 
 	if (!is_valid_email($email1))
 		$errors[] = $lang_common['Invalid email'];
-	else if ($pun_config['o_regs_verify'] == '1' && $email1 != $email2)
-		$errors[] = $lang_register['Email not match'];
 
 	// Check if someone else already has registered with that email address
 	$dupe_list = array();
@@ -109,35 +93,12 @@ if (isset($_POST['form_sent']))
 		// Insert the new user into the database. We do this now to get the last inserted ID for later use
 		$now = time();
 
-		$intial_group_id = ($pun_config['o_regs_verify'] == '0') ? $pun_config['o_default_user_group'] : PUN_UNVERIFIED;
+		$intial_group_id = $pun_config['o_default_user_group'];
 		$password_hash = pun_hash($password1);
 
 		// Add the user
 		$db->query('INSERT INTO '.$db->prefix.'users (username, group_id, password, email, timezone, dst, language, registered, registration_ip, last_visit) VALUES(\''.$db->escape($username).'\', '.$intial_group_id.', \''.$password_hash.'\', \''.$db->escape($email1).'\', '.$timezone.' , '.$dst.', \''.$db->escape($language).'\', '.$now.', \''.get_remote_address().'\', '.$now.')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to create user', __FILE__, __LINE__, $db->error());
 		$new_uid = $db->insert_id();
-
-		// Must the user verify the registration or do we log him/her in right now?
-		if ($pun_config['o_regs_verify'] == '1')
-		{
-			// Load the "welcome" template
-			$mail_tpl = trim(file_get_contents(PUN_ROOT.'lang/'.$pun_user['language'].'/mail_templates/welcome.tpl'));
-
-			// The first row contains the subject
-			$first_crlf = strpos($mail_tpl, "\n");
-			$mail_subject = trim(substr($mail_tpl, 8, $first_crlf-8));
-			$mail_message = trim(substr($mail_tpl, $first_crlf));
-
-			$mail_subject = str_replace('<board_title>', $pun_config['o_board_title'], $mail_subject);
-			$mail_message = str_replace('<base_url>', get_base_url().'/', $mail_message);
-			$mail_message = str_replace('<username>', $username, $mail_message);
-			$mail_message = str_replace('<password>', $password1, $mail_message);
-			$mail_message = str_replace('<login_url>', get_base_url().'/login.php', $mail_message);
-			$mail_message = str_replace('<board_mailer>', $pun_config['o_board_title'].' '.$lang_common['Mailer'], $mail_message);
-
-			pun_mail($email1, $mail_subject, $mail_message);
-
-			message($lang_register['Reg email'].' <a href="mailto:'.$pun_config['o_admin_email'].'">'.$pun_config['o_admin_email'].'</a>.', true);
-		}
 
 		pun_setcookie($new_uid, $password_hash, time() + $pun_config['o_timeout_visit']);
 
@@ -198,7 +159,7 @@ if (!empty($errors))
 					</div>
 				</fieldset>
 			</div>
-<?php if ($pun_config['o_regs_verify'] == '0'): ?>			<div class="inform">
+			<div class="inform">
 				<fieldset>
 					<legend><?php echo $lang_register['Pass legend'] ?></legend>
 					<div class="infldset">
@@ -208,16 +169,13 @@ if (!empty($errors))
 					</div>
 				</fieldset>
 			</div>
-<?php endif; ?>			<div class="inform">
+			<div class="inform">
 				<fieldset>
-					<legend><?php echo ($pun_config['o_regs_verify'] == '1') ? $lang_prof_reg['Email legend 2'] : $lang_prof_reg['Email legend'] ?></legend>
+					<legend><?php echo $lang_prof_reg['Email legend'] ?></legend>
 					<div class="infldset">
-<?php if ($pun_config['o_regs_verify'] == '1'): ?>						<p><?php echo $lang_register['Email info'] ?></p>
-<?php endif; ?>						<label class="required"><strong><?php echo $lang_common['Email'] ?> <span><?php echo $lang_common['Required'] ?></span></strong><br />
+						<label class="required"><strong><?php echo $lang_common['Email'] ?> <span><?php echo $lang_common['Required'] ?></span></strong><br />
 						<input type="text" name="req_email1" value="<?php if (isset($_POST['req_email1'])) echo pun_htmlspecialchars($_POST['req_email1']); ?>" size="50" maxlength="80" /><br /></label>
-<?php if ($pun_config['o_regs_verify'] == '1'): ?>						<label class="required"><strong><?php echo $lang_register['Confirm email'] ?> <span><?php echo $lang_common['Required'] ?></span></strong><br />
-						<input type="text" name="req_email2" value="<?php if (isset($_POST['req_email2'])) echo pun_htmlspecialchars($_POST['req_email2']); ?>" size="50" maxlength="80" /><br /></label>
-<?php endif; ?>					</div>
+					</div>
 				</fieldset>
 			</div>
 			<div class="inform">

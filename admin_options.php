@@ -45,8 +45,6 @@ if (isset($_POST['form_sent']))
 		'smtp_host'				=> pun_trim($_POST['form']['smtp_host']),
 		'smtp_user'				=> pun_trim($_POST['form']['smtp_user']),
 		'smtp_ssl'				=> $_POST['form']['smtp_ssl'] != '1' ? '0' : '1',
-		'regs_allow'			=> $_POST['form']['regs_allow'] != '1' ? '0' : '1',
-		'regs_verify'			=> $_POST['form']['regs_verify'] != '1' ? '0' : '1',
 	);
 
 	if ($form['board_title'] == '')
@@ -383,29 +381,6 @@ generate_admin_menu('options');
 									<td>
 										<input type="radio" name="form[smtp_ssl]" value="1"<?php if ($pun_config['o_smtp_ssl'] == '1') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['Yes'] ?></strong>&#160;&#160;&#160;<input type="radio" name="form[smtp_ssl]" value="0"<?php if ($pun_config['o_smtp_ssl'] == '0') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['No'] ?></strong>
 										<span><?php echo $lang_admin_options['SMTP SSL help'] ?></span>
-									</td>
-								</tr>
-							</table>
-						</div>
-					</fieldset>
-				</div>
-				<div class="inform">
-					<fieldset>
-						<legend><?php echo $lang_admin_options['Registration subhead'] ?></legend>
-						<div class="infldset">
-							<table class="aligntop" cellspacing="0">
-								<tr>
-									<th scope="row"><?php echo $lang_admin_options['Allow new label'] ?></th>
-									<td>
-										<input type="radio" name="form[regs_allow]" value="1"<?php if ($pun_config['o_regs_allow'] == '1') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['Yes'] ?></strong>&#160;&#160;&#160;<input type="radio" name="form[regs_allow]" value="0"<?php if ($pun_config['o_regs_allow'] == '0') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['No'] ?></strong>
-										<span><?php echo $lang_admin_options['Allow new help'] ?></span>
-									</td>
-								</tr>
-								<tr>
-									<th scope="row"><?php echo $lang_admin_options['Verify label'] ?></th>
-									<td>
-										<input type="radio" name="form[regs_verify]" value="1"<?php if ($pun_config['o_regs_verify'] == '1') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['Yes'] ?></strong>&#160;&#160;&#160;<input type="radio" name="form[regs_verify]" value="0"<?php if ($pun_config['o_regs_verify'] == '0') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['No'] ?></strong>
-										<span><?php echo $lang_admin_options['Verify help'] ?></span>
 									</td>
 								</tr>
 							</table>
