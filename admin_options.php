@@ -41,11 +41,6 @@ if (isset($_POST['form_sent']))
 		'quote_depth'			=> intval($_POST['form']['quote_depth']),
 		'gzip'					=> $_POST['form']['gzip'] != '1' ? '0' : '1',
 		'search_all_forums'		=> $_POST['form']['search_all_forums'] != '1' ? '0' : '1',
-		'avatars'				=> $_POST['form']['avatars'] != '1' ? '0' : '1',
-		'avatars_dir'			=> pun_trim($_POST['form']['avatars_dir']),
-		'avatars_width'			=> intval($_POST['form']['avatars_width']),
-		'avatars_height'		=> intval($_POST['form']['avatars_height']),
-		'avatars_size'			=> intval($_POST['form']['avatars_size']),
 		'admin_email'			=> strtolower(pun_trim($_POST['form']['admin_email'])),
 		'webmaster_email'		=> strtolower(pun_trim($_POST['form']['webmaster_email'])),
 		'smtp_host'				=> pun_trim($_POST['form']['smtp_host']),
@@ -76,10 +71,6 @@ if (isset($_POST['form_sent']))
 
 	if (!is_valid_email($form['webmaster_email']))
 		message($lang_admin_options['Invalid webmaster e-mail message']);
-
-	// Make sure avatars_dir doesn't end with a slash
-	if (substr($form['avatars_dir'], -1) == '/')
-		$form['avatars_dir'] = substr($form['avatars_dir'], 0, -1);
 
 	// Change or enter a SMTP password
 	if (isset($_POST['form']['smtp_change_pass']))
@@ -346,50 +337,6 @@ generate_admin_menu('options');
 									<td>
 										<input type="radio" name="form[search_all_forums]" value="1"<?php if ($pun_config['o_search_all_forums'] == '1') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['Yes'] ?></strong>&#160;&#160;&#160;<input type="radio" name="form[search_all_forums]" value="0"<?php if ($pun_config['o_search_all_forums'] == '0') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['No'] ?></strong>
 										<span><?php echo $lang_admin_options['Search all help'] ?></span>
-									</td>
-								</tr>
-							</table>
-						</div>
-					</fieldset>
-				</div>
-				<div class="inform">
-					<fieldset>
-						<legend><?php echo $lang_admin_options['Avatars subhead'] ?></legend>
-						<div class="infldset">
-							<table class="aligntop" cellspacing="0">
-								<tr>
-									<th scope="row"><?php echo $lang_admin_options['Use avatars label'] ?></th>
-									<td>
-										<input type="radio" name="form[avatars]" value="1"<?php if ($pun_config['o_avatars'] == '1') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['Yes'] ?></strong>&#160;&#160;&#160;<input type="radio" name="form[avatars]" value="0"<?php if ($pun_config['o_avatars'] == '0') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['No'] ?></strong>
-										<span><?php echo $lang_admin_options['Use avatars help'] ?></span>
-									</td>
-								</tr>
-								<tr>
-									<th scope="row"><?php echo $lang_admin_options['Upload directory label'] ?></th>
-									<td>
-										<input type="text" name="form[avatars_dir]" size="35" maxlength="50" value="<?php echo pun_htmlspecialchars($pun_config['o_avatars_dir']) ?>" />
-										<span><?php echo $lang_admin_options['Upload directory help'] ?></span>
-									</td>
-								</tr>
-								<tr>
-									<th scope="row"><?php echo $lang_admin_options['Max width label'] ?></th>
-									<td>
-										<input type="text" name="form[avatars_width]" size="5" maxlength="5" value="<?php echo $pun_config['o_avatars_width'] ?>" />
-										<span><?php echo $lang_admin_options['Max width help'] ?></span>
-									</td>
-								</tr>
-								<tr>
-									<th scope="row"><?php echo $lang_admin_options['Max height label'] ?></th>
-									<td>
-										<input type="text" name="form[avatars_height]" size="5" maxlength="5" value="<?php echo $pun_config['o_avatars_height'] ?>" />
-										<span><?php echo $lang_admin_options['Max height help'] ?></span>
-									</td>
-								</tr>
-								<tr>
-									<th scope="row"><?php echo $lang_admin_options['Max size label'] ?></th>
-									<td>
-										<input type="text" name="form[avatars_size]" size="6" maxlength="6" value="<?php echo $pun_config['o_avatars_size'] ?>" />
-										<span><?php echo $lang_admin_options['Max size help'] ?></span>
 									</td>
 								</tr>
 							</table>

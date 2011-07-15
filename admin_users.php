@@ -475,10 +475,6 @@ else if (isset($_POST['delete_users']) || isset($_POST['delete_users_comply']))
 		// Delete the users
 		$db->query('DELETE FROM '.$db->prefix.'users WHERE id IN ('.implode(',', $user_ids).')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to delete users', __FILE__, __LINE__, $db->error());
 
-		// Delete user avatars
-		foreach ($user_ids as $user_id)
-			delete_avatar($user_id);
-
 		redirect('admin_users.php', $lang_admin_users['Users delete redirect']);
 	}
 

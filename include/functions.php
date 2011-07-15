@@ -411,8 +411,7 @@ function generate_profile_menu($page = '')
 					<li<?php if ($page == 'essentials') echo ' class="isactive"'; ?>><a href="profile.php?section=essentials&amp;id=<?php echo $id ?>"><?php echo $lang_profile['Section essentials'] ?></a></li>
 					<li<?php if ($page == 'personal') echo ' class="isactive"'; ?>><a href="profile.php?section=personal&amp;id=<?php echo $id ?>"><?php echo $lang_profile['Section personal'] ?></a></li>
 					<li<?php if ($page == 'messaging') echo ' class="isactive"'; ?>><a href="profile.php?section=messaging&amp;id=<?php echo $id ?>"><?php echo $lang_profile['Section messaging'] ?></a></li>
-<?php if ($pun_config['o_avatars'] == '1'): ?>					<li<?php if ($page == 'personality') echo ' class="isactive"'; ?>><a href="profile.php?section=personality&amp;id=<?php echo $id ?>"><?php echo $lang_profile['Section personality'] ?></a></li>
-<?php endif; ?>					<li<?php if ($page == 'display') echo ' class="isactive"'; ?>><a href="profile.php?section=display&amp;id=<?php echo $id ?>"><?php echo $lang_profile['Section display'] ?></a></li>
+					<li<?php if ($page == 'display') echo ' class="isactive"'; ?>><a href="profile.php?section=display&amp;id=<?php echo $id ?>"><?php echo $lang_profile['Section display'] ?></a></li>
 					<li<?php if ($page == 'privacy') echo ' class="isactive"'; ?>><a href="profile.php?section=privacy&amp;id=<?php echo $id ?>"><?php echo $lang_profile['Section privacy'] ?></a></li>
 <?php if ($pun_user['g_id'] == PUN_ADMIN): ?>					<li<?php if ($page == 'admin') echo ' class="isactive"'; ?>><a href="profile.php?section=admin&amp;id=<?php echo $id ?>"><?php echo $lang_profile['Section admin'] ?></a></li>
 <?php endif; ?>				</ul>
@@ -421,31 +420,6 @@ function generate_profile_menu($page = '')
 	</div>
 <?php
 
-}
-
-
-//
-// Outputs markup to display a user's avatar
-//
-function generate_avatar_markup($user_id)
-{
-	global $pun_config;
-
-	$filetypes = array('jpg', 'gif', 'png');
-	$avatar_markup = '';
-
-	foreach ($filetypes as $cur_type)
-	{
-		$path = $pun_config['o_avatars_dir'].'/'.$user_id.'.'.$cur_type;
-
-		if (file_exists(PUN_ROOT.$path) && $img_size = getimagesize(PUN_ROOT.$path))
-		{
-			$avatar_markup = '<img src="'.pun_htmlspecialchars(get_base_url(true).'/'.$path.'?m='.filemtime(PUN_ROOT.$path)).'" '.$img_size[3].' alt="" />';
-			break;
-		}
-	}
-
-	return $avatar_markup;
 }
 
 
@@ -488,24 +462,6 @@ function update_forum($forum_id)
 	}
 	else // There are no topics
 		$db->query('UPDATE '.$db->prefix.'forums SET num_topics='.$num_topics.', num_posts='.$num_posts.', last_post=NULL, last_post_id=NULL, last_poster=NULL WHERE id='.$forum_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update last_post/last_post_id/last_poster', __FILE__, __LINE__, $db->error());
-}
-
-
-//
-// Deletes any avatars owned by the specified user ID
-//
-function delete_avatar($user_id)
-{
-	global $pun_config;
-
-	$filetypes = array('jpg', 'gif', 'png');
-
-	// Delete user avatar
-	foreach ($filetypes as $cur_type)
-	{
-		if (file_exists(PUN_ROOT.$pun_config['o_avatars_dir'].'/'.$user_id.'.'.$cur_type))
-			@unlink(PUN_ROOT.$pun_config['o_avatars_dir'].'/'.$user_id.'.'.$cur_type);
-	}
 }
 
 

@@ -265,145 +265,6 @@ else if ($action == 'change_email')
 }
 
 
-else if ($action == 'upload_avatar' || $action == 'upload_avatar2')
-{
-	if ($pun_config['o_avatars'] == '0')
-		message($lang_profile['Avatars disabled']);
-
-	if ($pun_user['id'] != $id && !$pun_user['is_admmod'])
-		message($lang_common['No permission']);
-
-	if (isset($_POST['form_sent']))
-	{
-		if (!isset($_FILES['req_file']))
-			message($lang_profile['No file']);
-
-		$uploaded_file = $_FILES['req_file'];
-
-		// Make sure the upload went smooth
-		if (isset($uploaded_file['error']))
-		{
-			switch ($uploaded_file['error'])
-			{
-				case 1: // UPLOAD_ERR_INI_SIZE
-				case 2: // UPLOAD_ERR_FORM_SIZE
-					message($lang_profile['Too large ini']);
-					break;
-
-				case 3: // UPLOAD_ERR_PARTIAL
-					message($lang_profile['Partial upload']);
-					break;
-
-				case 4: // UPLOAD_ERR_NO_FILE
-					message($lang_profile['No file']);
-					break;
-
-				case 6: // UPLOAD_ERR_NO_TMP_DIR
-					message($lang_profile['No tmp directory']);
-					break;
-
-				default:
-					// No error occured, but was something actually uploaded?
-					if ($uploaded_file['size'] == 0)
-						message($lang_profile['No file']);
-					break;
-			}
-		}
-
-		if (is_uploaded_file($uploaded_file['tmp_name']))
-		{
-			// Preliminary file check, adequate in most cases
-			$allowed_types = array('image/gif', 'image/jpeg', 'image/pjpeg', 'image/png', 'image/x-png');
-			if (!in_array($uploaded_file['type'], $allowed_types))
-				message($lang_profile['Bad type']);
-
-			// Make sure the file isn't too big
-			if ($uploaded_file['size'] > $pun_config['o_avatars_size'])
-				message($lang_profile['Too large'].' '.forum_number_format($pun_config['o_avatars_size']).' '.$lang_profile['bytes'].'.');
-
-			// Move the file to the avatar directory. We do this before checking the width/height to circumvent open_basedir restrictions
-			if (!@move_uploaded_file($uploaded_file['tmp_name'], PUN_ROOT.$pun_config['o_avatars_dir'].'/'.$id.'.tmp'))
-				message($lang_profile['Move failed'].' <a href="mailto:'.$pun_config['o_admin_email'].'">'.$pun_config['o_admin_email'].'</a>.');
-
-			list($width, $height, $type,) = @getimagesize(PUN_ROOT.$pun_config['o_avatars_dir'].'/'.$id.'.tmp');
-
-			// Determine type
-			if ($type == IMAGETYPE_GIF)
-				$extension = '.gif';
-			else if ($type == IMAGETYPE_JPEG)
-				$extension = '.jpg';
-			else if ($type == IMAGETYPE_PNG)
-				$extension = '.png';
-			else
-			{
-				// Invalid type
-				@unlink(PUN_ROOT.$pun_config['o_avatars_dir'].'/'.$id.'.tmp');
-				message($lang_profile['Bad type']);
-			}
-
-			// Now check the width/height
-			if (empty($width) || empty($height) || $width > $pun_config['o_avatars_width'] || $height > $pun_config['o_avatars_height'])
-			{
-				@unlink(PUN_ROOT.$pun_config['o_avatars_dir'].'/'.$id.'.tmp');
-				message($lang_profile['Too wide or high'].' '.$pun_config['o_avatars_width'].'x'.$pun_config['o_avatars_height'].' '.$lang_profile['pixels'].'.');
-			}
-
-			// Delete any old avatars and put the new one in place
-			delete_avatar($id);
-			@rename(PUN_ROOT.$pun_config['o_avatars_dir'].'/'.$id.'.tmp', PUN_ROOT.$pun_config['o_avatars_dir'].'/'.$id.$extension);
-			@chmod(PUN_ROOT.$pun_config['o_avatars_dir'].'/'.$id.$extension, 0644);
-		}
-		else
-			message($lang_profile['Unknown failure']);
-
-		redirect('profile.php?section=personality&amp;id='.$id, $lang_profile['Avatar upload redirect']);
-	}
-
-	$page_title = array(pun_htmlspecialchars($pun_config['o_board_title']), $lang_common['Profile'], $lang_profile['Upload avatar']);
-	$required_fields = array('req_file' => $lang_profile['File']);
-	$focus_element = array('upload_avatar', 'req_file');
-	define('PUN_ACTIVE_PAGE', 'profile');
-	require PUN_ROOT.'header.php';
-
-?>
-<div class="blockform">
-	<h2><span><?php echo $lang_profile['Upload avatar'] ?></span></h2>
-	<div class="box">
-		<form id="upload_avatar" method="post" enctype="multipart/form-data" action="profile.php?action=upload_avatar2&amp;id=<?php echo $id ?>" onsubmit="return process_form(this)">
-			<div class="inform">
-				<fieldset>
-					<legend><?php echo $lang_profile['Upload avatar legend'] ?></legend>
-					<div class="infldset">
-						<input type="hidden" name="form_sent" value="1" />
-						<input type="hidden" name="MAX_FILE_SIZE" value="<?php echo $pun_config['o_avatars_size'] ?>" />
-						<label class="required"><strong><?php echo $lang_profile['File'] ?> <span><?php echo $lang_common['Required'] ?></span></strong><br /><input name="req_file" type="file" size="40" /><br /></label>
-						<p><?php echo $lang_profile['Avatar desc'].' '.$pun_config['o_avatars_width'].' x '.$pun_config['o_avatars_height'].' '.$lang_profile['pixels'].' '.$lang_common['and'].' '.forum_number_format($pun_config['o_avatars_size']).' '.$lang_profile['bytes'].' ('.file_size($pun_config['o_avatars_size']).').' ?></p>
-					</div>
-				</fieldset>
-			</div>
-			<p class="buttons"><input type="submit" name="upload" value="<?php echo $lang_profile['Upload'] ?>" /> <a href="javascript:history.go(-1)"><?php echo $lang_common['Go back'] ?></a></p>
-		</form>
-	</div>
-</div>
-<?php
-
-	require PUN_ROOT.'footer.php';
-}
-
-
-else if ($action == 'delete_avatar')
-{
-	if ($pun_user['id'] != $id && !$pun_user['is_admmod'])
-		message($lang_common['No permission']);
-
-	confirm_referrer('profile.php');
-
-	delete_avatar($id);
-
-	redirect('profile.php?section=personality&amp;id='.$id, $lang_profile['Avatar deleted redirect']);
-}
-
-
 else if (isset($_POST['update_group_membership']))
 {
 	if ($pun_user['g_id'] > PUN_ADMIN)
@@ -554,9 +415,6 @@ else if (isset($_POST['delete_user']) || isset($_POST['delete_user_comply']))
 
 		// Delete the user
 		$db->query('DELETE FROM '.$db->prefix.'users WHERE id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to delete user', __FILE__, __LINE__, $db->error());
-
-		// Delete user avatar
-		delete_avatar($id);
 
 		redirect('index.php', $lang_profile['User delete redirect']);
 	}
@@ -736,7 +594,6 @@ else if (isset($_POST['form_sent']))
 		{
 			$form = array(
 				'show_img'			=> isset($_POST['form']['show_img']) ? '1' : '0',
-				'show_avatars'		=> isset($_POST['form']['show_avatars']) ? '1' : '0',
 			);
 
 			break;
@@ -803,7 +660,7 @@ else if (isset($_POST['form_sent']))
 }
 
 
-$result = $db->query('SELECT u.username, u.email, u.title, u.realname, u.url, u.jabber, u.icq, u.msn, u.aim, u.yahoo, u.location, u.show_img, u.show_avatars, u.timezone, u.dst, u.language, u.num_posts, u.last_post, u.registered, u.registration_ip, u.admin_note, u.date_format, u.time_format, u.last_visit, g.g_id, g.g_user_title, g.g_moderator FROM '.$db->prefix.'users AS u LEFT JOIN '.$db->prefix.'groups AS g ON g.g_id=u.group_id WHERE u.id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
+$result = $db->query('SELECT u.username, u.email, u.title, u.realname, u.url, u.jabber, u.icq, u.msn, u.aim, u.yahoo, u.location, u.show_img, u.timezone, u.dst, u.language, u.num_posts, u.last_post, u.registered, u.registration_ip, u.admin_note, u.date_format, u.time_format, u.last_visit, g.g_id, g.g_user_title, g.g_moderator FROM '.$db->prefix.'users AS u LEFT JOIN '.$db->prefix.'groups AS g ON g.g_id=u.group_id WHERE u.id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
 if (!$db->num_rows($result))
 	message($lang_common['Bad request']);
 
@@ -887,18 +744,6 @@ if ($pun_user['id'] != $id &&																	// If we arent the user (i.e. edit
 	{
 		$user_messaging[] = '<dt>'.$lang_profile['Yahoo'].'</dt>';
 		$user_messaging[] = '<dd>'.pun_htmlspecialchars($user['yahoo']).'</dd>';
-	}
-
-	$user_personality = array();
-
-	if ($pun_config['o_avatars'] == '1')
-	{
-		$avatar_field = generate_avatar_markup($id);
-		if ($avatar_field != '')
-		{
-			$user_personality[] = '<dt>'.$lang_profile['Avatar'].'</dt>';
-			$user_personality[] = '<dd>'.$avatar_field.'</dd>';
-		}
 	}
 
 	$user_activity = array();
@@ -1250,49 +1095,6 @@ else
 <?php
 
 	}
-	else if ($section == 'personality')
-	{
-		if ($pun_config['o_avatars'] == '0')
-			message($lang_common['Bad request']);
-
-		$avatar_field = '<span><a href="profile.php?action=upload_avatar&amp;id='.$id.'">'.$lang_profile['Change avatar'].'</a></span>';
-
-		$user_avatar = generate_avatar_markup($id);
-		if ($user_avatar)
-			$avatar_field .= ' <span><a href="profile.php?action=delete_avatar&amp;id='.$id.'">'.$lang_profile['Delete avatar'].'</a></span>';
-		else
-			$avatar_field = '<span><a href="profile.php?action=upload_avatar&amp;id='.$id.'">'.$lang_profile['Upload avatar'].'</a></span>';
-
-		$page_title = array(pun_htmlspecialchars($pun_config['o_board_title']), $lang_common['Profile'], $lang_profile['Section personality']);
-		define('PUN_ACTIVE_PAGE', 'profile');
-		require PUN_ROOT.'header.php';
-
-		generate_profile_menu('personality');
-
-
-?>
-	<div class="blockform">
-		<h2><span><?php echo pun_htmlspecialchars($user['username']).' - '.$lang_profile['Section personality'] ?></span></h2>
-		<div class="box">
-			<form id="profile4" method="post" action="profile.php?section=personality&amp;id=<?php echo $id ?>">
-				<div><input type="hidden" name="form_sent" value="1" /></div>
-<?php if ($pun_config['o_avatars'] == '1'): ?>				<div class="inform">
-					<fieldset id="profileavatar">
-						<legend><?php echo $lang_profile['Avatar legend'] ?></legend>
-						<div class="infldset">
-<?php if ($user_avatar): ?>							<div class="useravatar"><?php echo $user_avatar ?></div>
-<?php endif; ?>							<p><?php echo $lang_profile['Avatar info'] ?></p>
-							<p class="clearb actions"><?php echo $avatar_field ?></p>
-						</div>
-					</fieldset>
-				</div>
-<?php endif; ?>				<p class="buttons"><input type="submit" name="update" value="<?php echo $lang_common['Submit'] ?>" /> <?php echo $lang_profile['Instructions'] ?></p>
-			</form>
-		</div>
-	</div>
-<?php
-
-	}
 	else if ($section == 'display')
 	{
 		$page_title = array(pun_htmlspecialchars($pun_config['o_board_title']), $lang_common['Profile'], $lang_profile['Section display']);
@@ -1307,15 +1109,14 @@ else
 		<div class="box">
 			<form id="profile5" method="post" action="profile.php?section=display&amp;id=<?php echo $id ?>">
 				<div><input type="hidden" name="form_sent" value="1" /></div>
-<?php if ($pun_config['o_avatars'] == '1' || ($pun_config['p_message_bbcode'] == '1' && $pun_config['p_message_img_tag'] == '1')): ?>
+<?php if ($pun_config['p_message_bbcode'] == '1' && $pun_config['p_message_img_tag'] == '1'): ?>
 				<div class="inform">
 					<fieldset>
 						<legend><?php echo $lang_profile['Post display legend'] ?></legend>
 						<div class="infldset">
 							<p><?php echo $lang_profile['Post display info'] ?></p>
 							<div class="rbox">
-<?php if ($pun_config['o_avatars'] == '1'): ?>								<label><input type="checkbox" name="form[show_avatars]" value="1"<?php if ($user['show_avatars'] == '1') echo ' checked="checked"' ?> /><?php echo $lang_profile['Show avatars'] ?><br /></label>
-<?php endif; if ($pun_config['p_message_bbcode'] == '1' && $pun_config['p_message_img_tag'] == '1'): ?>								<label><input type="checkbox" name="form[show_img]" value="1"<?php if ($user['show_img'] == '1') echo ' checked="checked"' ?> /><?php echo $lang_profile['Show images'] ?><br /></label>
+<?php if ($pun_config['p_message_bbcode'] == '1' && $pun_config['p_message_img_tag'] == '1'): ?>								<label><input type="checkbox" name="form[show_img]" value="1"<?php if ($user['show_img'] == '1') echo ' checked="checked"' ?> /><?php echo $lang_profile['Show images'] ?><br /></label>
 <?php endif; ?>
 							</div>
 						</div>

@@ -179,7 +179,6 @@ $result = $db->query('SELECT u.email, u.title, u.url, u.location, u.num_posts, u
 while ($cur_post = $db->fetch_assoc($result))
 {
 	$post_count++;
-	$user_avatar = '';
 	$post_actions = array();
 	$is_online = '';
 
@@ -195,14 +194,6 @@ while ($cur_post = $db->fetch_assoc($result))
 
 		// Format the online indicator
 		$is_online = ($cur_post['is_online'] == $cur_post['poster_id']) ? '<strong>'.$lang_topic['Online'].'</strong>' : '<span>'.$lang_topic['Offline'].'</span>';
-
-		if ($pun_config['o_avatars'] == '1' && $pun_user['show_avatars'] != '0')
-		{
-			if (isset($user_avatar_cache[$cur_post['poster_id']]))
-				$user_avatar = $user_avatar_cache[$cur_post['poster_id']];
-			else
-				$user_avatar = $user_avatar_cache[$cur_post['poster_id']] = generate_avatar_markup($cur_post['poster_id']);
-		}
 	}
 	// If the poster is a guest (or a user that has been deleted)
 	else
@@ -248,7 +239,6 @@ while ($cur_post = $db->fetch_assoc($result))
 					<dl>
 						<dt><strong><?php echo $username ?></strong></dt>
 						<dd class="usertitle"><strong><?php echo $user_title ?></strong></dd>
-<?php if ($user_avatar != '') echo "\t\t\t\t\t\t".'<dd class="postavatar">'.$user_avatar.'</dd>'."\n"; ?>
 					</dl>
 				</div>
 				<div class="postright">
