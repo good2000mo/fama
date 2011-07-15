@@ -715,13 +715,10 @@ function do_bbcode($text)
 	$replace[] = '<span style="color: $1">$2</span>';
 	$replace[] = '</p><h5>$1</h5><p>';
 
-	if ($pun_config['p_message_img_tag'] == '1')
-	{
-		$pattern[] = '%\[img\]((ht|f)tps?://)([^\s<"]*?)\[/img\]%e';
-		$pattern[] = '%\[img=([^\[]*?)\]((ht|f)tps?://)([^\s<"]*?)\[/img\]%e';
-		$replace[] = 'handle_img_tag(\'$1$3\')';
-		$replace[] = 'handle_img_tag(\'$2$4\', \'$1\')';
-	}
+	$pattern[] = '%\[img\]((ht|f)tps?://)([^\s<"]*?)\[/img\]%e';
+	$pattern[] = '%\[img=([^\[]*?)\]((ht|f)tps?://)([^\s<"]*?)\[/img\]%e';
+	$replace[] = 'handle_img_tag(\'$1$3\')';
+	$replace[] = 'handle_img_tag(\'$2$4\', \'$1\')';
 
 	$pattern[] = '%\[url\]([^\[]*?)\[/url\]%e';
 	$pattern[] = '%\[url=([^\[]+?)\](.*?)\[/url\]%e';
@@ -787,7 +784,7 @@ function parse_message($text)
 		$text = implode("\1", $outside);
 	}
 
-	if ($pun_config['p_message_bbcode'] == '1' && strpos($text, '[') !== false && strpos($text, ']') !== false)
+	if (strpos($text, '[') !== false && strpos($text, ']') !== false)
 		$text = do_bbcode($text);
 
 	// Deal with newlines, tabs and multiple spaces

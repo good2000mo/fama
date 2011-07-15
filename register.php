@@ -60,19 +60,6 @@ if (isset($_POST['form_sent']))
 	if (!is_valid_email($email1))
 		$errors[] = $lang_common['Invalid email'];
 
-	// Check if someone else already has registered with that email address
-	$dupe_list = array();
-
-	$result = $db->query('SELECT username FROM '.$db->prefix.'users WHERE email=\''.$db->escape($email1).'\''.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
-	if ($db->num_rows($result))
-	{
-		if ($pun_config['p_allow_dupe_email'] == '0')
-			$errors[] = $lang_prof_reg['Dupe email'];
-
-		while ($cur_dupe = $db->fetch_assoc($result))
-			$dupe_list[] = $cur_dupe['username'];
-	}
-
 	// Make sure we got a valid language string
 	if (isset($_POST['language']))
 	{

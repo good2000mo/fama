@@ -203,14 +203,6 @@ else if ($action == 'change_email')
 		if (!is_valid_email($new_email))
 			message($lang_common['Invalid email']);
 
-		// Check if someone else already has registered with that email address
-		$result = $db->query('SELECT id, username FROM '.$db->prefix.'users WHERE email=\''.$db->escape($new_email).'\''.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
-		if ($db->num_rows($result))
-		{
-			if ($pun_config['p_allow_dupe_email'] == '0')
-				message($lang_prof_reg['Dupe email']);
-		}
-
 		$new_email_key = random_pass(8);
 
 		$db->query('UPDATE '.$db->prefix.'users SET activate_string=\''.$db->escape($new_email).'\', activate_key=\''.$new_email_key.'\' WHERE id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update activation data', __FILE__, __LINE__, $db->error());
@@ -1098,20 +1090,17 @@ else
 		<div class="box">
 			<form id="profile5" method="post" action="profile.php?section=display&amp;id=<?php echo $id ?>">
 				<div><input type="hidden" name="form_sent" value="1" /></div>
-<?php if ($pun_config['p_message_bbcode'] == '1' && $pun_config['p_message_img_tag'] == '1'): ?>
 				<div class="inform">
 					<fieldset>
 						<legend><?php echo $lang_profile['Post display legend'] ?></legend>
 						<div class="infldset">
 							<p><?php echo $lang_profile['Post display info'] ?></p>
 							<div class="rbox">
-<?php if ($pun_config['p_message_bbcode'] == '1' && $pun_config['p_message_img_tag'] == '1'): ?>								<label><input type="checkbox" name="form[show_img]" value="1"<?php if ($user['show_img'] == '1') echo ' checked="checked"' ?> /><?php echo $lang_profile['Show images'] ?><br /></label>
-<?php endif; ?>
+								<label><input type="checkbox" name="form[show_img]" value="1"<?php if ($user['show_img'] == '1') echo ' checked="checked"' ?> /><?php echo $lang_profile['Show images'] ?><br /></label>
 							</div>
 						</div>
 					</fieldset>
 				</div>
-<?php endif; ?>
 				<p class="buttons"><input type="submit" name="update" value="<?php echo $lang_common['Submit'] ?>" /> <?php echo $lang_profile['Instructions'] ?></p>
 			</form>
 		</div>

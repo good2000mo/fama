@@ -68,8 +68,6 @@ if (isset($_POST['form_sent']))
 			$errors[] = $lang_post['No subject'];
 		else if (pun_strlen($subject) > 70)
 			$errors[] = $lang_post['Too long subject'];
-		else if ($pun_config['p_subject_all_caps'] == '0' && is_all_uppercase($subject) && !$pun_user['is_admmod'])
-			$errors[] = $lang_post['All caps subject'];
 	}
 
 	// If the user is logged in we get the username and email from $pun_user
@@ -82,7 +80,7 @@ if (isset($_POST['form_sent']))
 	else
 	{
 		$username = pun_trim($_POST['req_username']);
-		$email = strtolower(trim(($pun_config['p_force_guest_email'] == '1') ? $_POST['req_email'] : $_POST['email']));
+		$email = strtolower(trim($_POST['req_email']));
 
 		// Load the register.php/prof_reg.php language files
 		require PUN_ROOT.'lang/'.$pun_user['language'].'/prof_reg.php';
@@ -91,12 +89,9 @@ if (isset($_POST['form_sent']))
 		// It's a guest, so we have to validate the username
 		check_username($username);
 
-		if ($pun_config['p_force_guest_email'] == '1' || $email != '')
-		{
-			require PUN_ROOT.'include/email.php';
-			if (!is_valid_email($email))
-				$errors[] = $lang_common['Invalid email'];
-		}
+		require PUN_ROOT.'include/email.php';
+		if (!is_valid_email($email))
+			$errors[] = $lang_common['Invalid email'];
 	}
 
 	// Clean up message from POST
@@ -105,15 +100,10 @@ if (isset($_POST['form_sent']))
 	// Here we use strlen() not pun_strlen() as we want to limit the post to PUN_MAX_POSTSIZE bytes, not characters
 	if (strlen($message) > PUN_MAX_POSTSIZE)
 		$errors[] = sprintf($lang_post['Too long message'], forum_number_format(PUN_MAX_POSTSIZE));
-	else if ($pun_config['p_message_all_caps'] == '0' && is_all_uppercase($message) && !$pun_user['is_admmod'])
-		$errors[] = $lang_post['All caps message'];
 
 	// Validate BBCode syntax
-	if ($pun_config['p_message_bbcode'] == '1')
-	{
-		require PUN_ROOT.'include/parser.php';
-		$message = preparse_bbcode($message, $errors);
-	}
+	require PUN_ROOT.'include/parser.php';
+	$message = preparse_bbcode($message, $errors);
 
 	if (empty($errors))
 	{
@@ -144,7 +134,7 @@ if (isset($_POST['form_sent']))
 			else
 			{
 				// It's a guest. Insert the new post
-				$email_sql = ($pun_config['p_force_guest_email'] == '1' || $email != '') ? '\''.$db->escape($email).'\'' : 'NULL';
+				$email_sql = '\''.$db->escape($email).'\'';
 				$db->query('INSERT INTO '.$db->prefix.'posts (poster, poster_ip, poster_email, message, posted, topic_id) VALUES(\''.$db->escape($username).'\', \''.get_remote_address().'\', '.$email_sql.', \''.$db->escape($message).'\', '.$now.', '.$tid.')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to create post', __FILE__, __LINE__, $db->error());
 				$new_pid = $db->insert_id();
 			}
@@ -175,7 +165,7 @@ if (isset($_POST['form_sent']))
 			else
 			{
 				// Create the post ("topic post")
-				$email_sql = ($pun_config['p_force_guest_email'] == '1' || $email != '') ? '\''.$db->escape($email).'\'' : 'NULL';
+				$email_sql = '\''.$db->escape($email).'\'';
 				$db->query('INSERT INTO '.$db->prefix.'posts (poster, poster_ip, poster_email, message, posted, topic_id) VALUES(\''.$db->escape($username).'\', \''.get_remote_address().'\', '.$email_sql.', \''.$db->escape($message).'\', '.$now.', '.$new_tid.')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to create post', __FILE__, __LINE__, $db->error());
 			}
 			$new_pid = $db->insert_id();
@@ -255,33 +245,30 @@ if ($tid)
 
 		$q_message = pun_htmlspecialchars($q_message);
 
-		if ($pun_config['p_message_bbcode'] == '1')
+		// If username contains a square bracket, we add "" or '' around it (so we know when it starts and ends)
+		if (strpos($q_poster, '[') !== false || strpos($q_poster, ']') !== false)
 		{
-			// If username contains a square bracket, we add "" or '' around it (so we know when it starts and ends)
-			if (strpos($q_poster, '[') !== false || strpos($q_poster, ']') !== false)
-			{
-				if (strpos($q_poster, '\'') !== false)
-					$q_poster = '"'.$q_poster.'"';
-				else
-					$q_poster = '\''.$q_poster.'\'';
-			}
+			if (strpos($q_poster, '\'') !== false)
+				$q_poster = '"'.$q_poster.'"';
 			else
-			{
-				// Get the characters at the start and end of $q_poster
-				$ends = substr($q_poster, 0, 1).substr($q_poster, -1, 1);
-
-				// Deal with quoting "Username" or 'Username' (becomes '"Username"' or "'Username'")
-				if ($ends == '\'\'')
-					$q_poster = '"'.$q_poster.'"';
-				else if ($ends == '""')
-					$q_poster = '\''.$q_poster.'\'';
-			}
-
-			$quote = '[quote='.$q_poster.']'.$q_message.'[/quote]'."\n";
+				$q_poster = '\''.$q_poster.'\'';
 		}
 		else
-			$quote = '> '.$q_poster.' '.$lang_common['wrote']."\n\n".'> '.$q_message."\n";
+		{
+			// Get the characters at the start and end of $q_poster
+			$ends = substr($q_poster, 0, 1).substr($q_poster, -1, 1);
+
+			// Deal with quoting "Username" or 'Username' (becomes '"Username"' or "'Username'")
+			if ($ends == '\'\'')
+				$q_poster = '"'.$q_poster.'"';
+			else if ($ends == '""')
+				$q_poster = '\''.$q_poster.'\'';
+		}
+
+		$quote = '[quote='.$q_poster.']'.$q_message.'[/quote]'."\n";
 	}
+	else
+		$quote = '> '.$q_poster.' '.$lang_common['wrote']."\n\n".'> '.$q_message."\n";
 }
 // If a forum ID was specified in the url (new topic)
 else if ($fid)
@@ -388,12 +375,12 @@ $cur_index = 1;
 
 if ($pun_user['is_guest'])
 {
-	$email_label = ($pun_config['p_force_guest_email'] == '1') ? '<strong>'.$lang_common['Email'].' <span>'.$lang_common['Required'].'</span></strong>' : $lang_common['Email'];
-	$email_form_name = ($pun_config['p_force_guest_email'] == '1') ? 'req_email' : 'email';
+	$email_label = '<strong>'.$lang_common['Email'].' <span>'.$lang_common['Required'].'</span></strong>';
+	$email_form_name = 'req_email';
 
 ?>
 						<label class="conl required"><strong><?php echo $lang_post['Guest name'] ?> <span><?php echo $lang_common['Required'] ?></span></strong><br /><input type="text" name="req_username" value="<?php if (isset($_POST['req_username'])) echo pun_htmlspecialchars($username); ?>" size="25" maxlength="25" tabindex="<?php echo $cur_index++ ?>" /><br /></label>
-						<label class="conl<?php echo ($pun_config['p_force_guest_email'] == '1') ? ' required' : '' ?>"><?php echo $email_label ?><br /><input type="text" name="<?php echo $email_form_name ?>" value="<?php if (isset($_POST[$email_form_name])) echo pun_htmlspecialchars($email); ?>" size="50" maxlength="80" tabindex="<?php echo $cur_index++ ?>" /><br /></label>
+						<label class="conl required"><?php echo $email_label ?><br /><input type="text" name="<?php echo $email_form_name ?>" value="<?php if (isset($_POST[$email_form_name])) echo pun_htmlspecialchars($email); ?>" size="50" maxlength="80" tabindex="<?php echo $cur_index++ ?>" /><br /></label>
 						<div class="clearer"></div>
 <?php
 
@@ -404,8 +391,8 @@ if ($fid): ?>
 <?php endif; ?>						<label class="required"><strong><?php echo $lang_common['Message'] ?> <span><?php echo $lang_common['Required'] ?></span></strong><br />
 						<textarea name="req_message" rows="20" cols="95" tabindex="<?php echo $cur_index++ ?>"><?php echo isset($_POST['req_message']) ? pun_htmlspecialchars($orig_message) : (isset($quote) ? $quote : ''); ?></textarea><br /></label>
 						<ul class="bblinks">
-							<li><span><a href="help.php#bbcode" onclick="window.open(this.href); return false;"><?php echo $lang_common['BBCode'] ?></a> <?php echo ($pun_config['p_message_bbcode'] == '1') ? $lang_common['on'] : $lang_common['off']; ?></span></li>
-							<li><span><a href="help.php#img" onclick="window.open(this.href); return false;"><?php echo $lang_common['img tag'] ?></a> <?php echo ($pun_config['p_message_bbcode'] == '1' && $pun_config['p_message_img_tag'] == '1') ? $lang_common['on'] : $lang_common['off']; ?></span></li>
+							<li><span><a href="help.php#bbcode" onclick="window.open(this.href); return false;"><?php echo $lang_common['BBCode'] ?></a> <?php echo $lang_common['on']; ?></span></li>
+							<li><span><a href="help.php#img" onclick="window.open(this.href); return false;"><?php echo $lang_common['img tag'] ?></a> <?php echo $lang_common['on']; ?></span></li>
 						</ul>
 					</div>
 				</fieldset>
