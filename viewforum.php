@@ -22,19 +22,12 @@ if ($id < 1)
 require PUN_ROOT.'lang/'.$pun_user['language'].'/forum.php';
 
 // Fetch some info about the forum
-$result = $db->query('SELECT f.forum_name, f.redirect_url, f.moderators, f.num_topics, f.sort_by, fp.post_topics FROM '.$db->prefix.'forums AS f LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (fp.forum_id=f.id AND fp.group_id='.$pun_user['g_id'].') WHERE (fp.read_forum IS NULL OR fp.read_forum=1) AND f.id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch forum info', __FILE__, __LINE__, $db->error());
+$result = $db->query('SELECT f.forum_name, f.moderators, f.num_topics, f.sort_by, fp.post_topics FROM '.$db->prefix.'forums AS f LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (fp.forum_id=f.id AND fp.group_id='.$pun_user['g_id'].') WHERE (fp.read_forum IS NULL OR fp.read_forum=1) AND f.id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch forum info', __FILE__, __LINE__, $db->error());
 
 if (!$db->num_rows($result))
 	message($lang_common['Bad request']);
 
 $cur_forum = $db->fetch_assoc($result);
-
-// Is this a redirect forum? In that case, redirect!
-if ($cur_forum['redirect_url'] != '')
-{
-	header('Location: '.$cur_forum['redirect_url']);
-	exit;
-}
 
 // Sort out who the moderators are and if we are currently a moderator (or an admin)
 $mods_array = ($cur_forum['moderators'] != '') ? unserialize($cur_forum['moderators']) : array();

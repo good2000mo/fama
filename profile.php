@@ -1180,7 +1180,7 @@ else
 							<p><?php echo $lang_profile['Moderator in info'] ?></p>
 <?php
 
-			$result = $db->query('SELECT f.id AS fid, f.forum_name, f.moderators FROM '.$db->prefix.'forums AS f WHERE f.redirect_url IS NULL ORDER BY f.disp_position'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch forum list', __FILE__, __LINE__, $db->error());
+			$result = $db->query('SELECT f.id AS fid, f.forum_name, f.moderators FROM '.$db->prefix.'forums AS f ORDER BY f.disp_position'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch forum list', __FILE__, __LINE__, $db->error());
 
 			if ($db->num_rows($result) > 0)
 			{

@@ -165,7 +165,7 @@ if (isset($_GET['tid']))
 				message($lang_common['Bad request']);
 
 			// Verify that the move to forum ID is valid
-			$result = $db->query('SELECT 1 FROM '.$db->prefix.'forums AS f LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (fp.group_id='.$pun_user['g_id'].' AND fp.forum_id='.$move_to_forum.') WHERE f.redirect_url IS NULL AND (fp.post_topics IS NULL OR fp.post_topics=1)'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch forum permissions', __FILE__, __LINE__, $db->error());
+			$result = $db->query('SELECT 1 FROM '.$db->prefix.'forums AS f LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (fp.group_id='.$pun_user['g_id'].' AND fp.forum_id='.$move_to_forum.') WHERE fp.post_topics IS NULL OR fp.post_topics=1'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch forum permissions', __FILE__, __LINE__, $db->error());
 			if (!$db->num_rows($result))
 				message($lang_common['Bad request']);
 
@@ -207,7 +207,7 @@ if (isset($_GET['tid']))
 			redirect('viewtopic.php?id='.$new_tid, $lang_misc['Split posts redirect']);
 		}
 
-		$result = $db->query('SELECT f.id AS fid, f.forum_name FROM '.$db->prefix.'forums AS f LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (fp.forum_id=f.id AND fp.group_id='.$pun_user['g_id'].') WHERE (fp.post_topics IS NULL OR fp.post_topics=1) AND f.redirect_url IS NULL ORDER BY f.disp_position'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch forum list', __FILE__, __LINE__, $db->error());
+		$result = $db->query('SELECT f.id AS fid, f.forum_name FROM '.$db->prefix.'forums AS f LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (fp.forum_id=f.id AND fp.group_id='.$pun_user['g_id'].') WHERE fp.post_topics IS NULL OR fp.post_topics=1 ORDER BY f.disp_position'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch forum list', __FILE__, __LINE__, $db->error());
 
 		$page_title = array(pun_htmlspecialchars($pun_config['o_board_title']), $lang_misc['Moderate']);
 		$focus_element = array('subject','new_subject');
@@ -413,7 +413,7 @@ if (isset($_REQUEST['move_topics']) || isset($_POST['move_topics_to']))
 			message($lang_common['Bad request']);
 
 		// Verify that the move to forum ID is valid
-		$result = $db->query('SELECT 1 FROM '.$db->prefix.'forums AS f LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (fp.group_id='.$pun_user['g_id'].' AND fp.forum_id='.$move_to_forum.') WHERE f.redirect_url IS NULL AND (fp.post_topics IS NULL OR fp.post_topics=1)'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch forum permissions', __FILE__, __LINE__, $db->error());
+		$result = $db->query('SELECT 1 FROM '.$db->prefix.'forums AS f LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (fp.group_id='.$pun_user['g_id'].' AND fp.forum_id='.$move_to_forum.') WHERE fp.post_topics IS NULL OR fp.post_topics=1'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch forum permissions', __FILE__, __LINE__, $db->error());
 		if (!$db->num_rows($result))
 			message($lang_common['Bad request']);
 
@@ -462,7 +462,7 @@ if (isset($_REQUEST['move_topics']) || isset($_POST['move_topics_to']))
 		$action = 'single';
 	}
 
-	$result = $db->query('SELECT f.id AS fid, f.forum_name FROM '.$db->prefix.'forums AS f LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (fp.forum_id=f.id AND fp.group_id='.$pun_user['g_id'].') WHERE (fp.post_topics IS NULL OR fp.post_topics=1) AND f.redirect_url IS NULL ORDER BY f.disp_position'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch forum list', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SELECT f.id AS fid, f.forum_name FROM '.$db->prefix.'forums AS f LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (fp.forum_id=f.id AND fp.group_id='.$pun_user['g_id'].') WHERE fp.post_topics IS NULL OR fp.post_topics=1 ORDER BY f.disp_position'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch forum list', __FILE__, __LINE__, $db->error());
 	if ($db->num_rows($result) < 2)
 		message($lang_misc['Nowhere to move']);
 
@@ -742,15 +742,11 @@ else if (isset($_GET['unstick']))
 require PUN_ROOT.'lang/'.$pun_user['language'].'/forum.php';
 
 // Fetch some info about the forum
-$result = $db->query('SELECT f.forum_name, f.redirect_url, f.num_topics, f.sort_by FROM '.$db->prefix.'forums AS f LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (fp.forum_id=f.id AND fp.group_id='.$pun_user['g_id'].') WHERE (fp.read_forum IS NULL OR fp.read_forum=1) AND f.id='.$fid.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch forum info', __FILE__, __LINE__, $db->error());
+$result = $db->query('SELECT f.forum_name, f.num_topics, f.sort_by FROM '.$db->prefix.'forums AS f LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (fp.forum_id=f.id AND fp.group_id='.$pun_user['g_id'].') WHERE (fp.read_forum IS NULL OR fp.read_forum=1) AND f.id='.$fid.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch forum info', __FILE__, __LINE__, $db->error());
 if (!$db->num_rows($result))
 	message($lang_common['Bad request']);
 
 $cur_forum = $db->fetch_assoc($result);
-
-// Is this a redirect forum? In that case, abort!
-if ($cur_forum['redirect_url'] != '')
-	message($lang_common['Bad request']);
 
 switch ($cur_forum['sort_by'])
 {

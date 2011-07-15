@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 -- 
 -- 主機: localhost
--- 建立日期: Jul 15, 2011, 04:00 PM
+-- 建立日期: Jul 15, 2011, 04:27 PM
 -- 伺服器版本: 5.0.51
 -- PHP 版本: 5.2.6
 
@@ -61,7 +61,6 @@ CREATE TABLE `fbb_forums` (
   `id` int(10) unsigned NOT NULL auto_increment,
   `forum_name` varchar(80) NOT NULL default 'New forum',
   `forum_desc` text,
-  `redirect_url` varchar(100) default NULL,
   `moderators` text,
   `num_topics` mediumint(8) unsigned NOT NULL default '0',
   `num_posts` mediumint(8) unsigned NOT NULL default '0',
@@ -77,7 +76,7 @@ CREATE TABLE `fbb_forums` (
 -- 列出以下資料庫的數據： `fbb_forums`
 -- 
 
-INSERT INTO `fbb_forums` VALUES (1, '測試版塊', '這只是一個測試版塊', NULL, NULL, 1, 1, 1310283814, 1, 'admin', 0, 1);
+INSERT INTO `fbb_forums` VALUES (1, '測試版塊', '這只是一個測試版塊', NULL, 1, 1, 1310283814, 1, 'admin', 0, 1);
 
 -- --------------------------------------------------------
 
@@ -161,7 +160,7 @@ CREATE TABLE `fbb_online` (
 -- 列出以下資料庫的數據： `fbb_online`
 -- 
 
-INSERT INTO `fbb_online` VALUES (1, '127.0.0.1', 1310716820, 0, NULL, NULL);
+INSERT INTO `fbb_online` VALUES (2, 'admin', 1310717612, 0, NULL, NULL);
 
 -- --------------------------------------------------------
 
