@@ -1130,24 +1130,6 @@ else
 <?php
 
 	}
-	else if ($section == 'privacy')
-	{
-		$page_title = array(pun_htmlspecialchars($pun_config['o_board_title']), $lang_common['Profile'], $lang_profile['Section privacy']);
-		define('PUN_ACTIVE_PAGE', 'profile');
-		require PUN_ROOT.'header.php';
-
-		generate_profile_menu('privacy');
-
-?>
-	<div class="blockform">
-		<h2><span><?php echo pun_htmlspecialchars($user['username']).' - '.$lang_profile['Section privacy'] ?></span></h2>
-		<div class="box">
-
-		</div>
-	</div>
-<?php
-
-	}
 	else if ($section == 'admin')
 	{
 		if (!$pun_user['is_admmod'])
