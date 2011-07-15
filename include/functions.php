@@ -71,10 +71,6 @@ function check_cookie(&$pun_user)
 		if (!file_exists(PUN_ROOT.'lang/'.$pun_user['language']))
 			$pun_user['language'] = $pun_config['o_default_lang'];
 
-		// Set a default style if the user selected style no longer exists
-		if (!file_exists(PUN_ROOT.'style/'.$pun_user['style'].'.css'))
-			$pun_user['style'] = $pun_config['o_default_style'];
-
 		if (!$pun_user['disp_topics'])
 			$pun_user['disp_topics'] = $pun_config['o_disp_topics_default'];
 		if (!$pun_user['disp_posts'])
@@ -268,7 +264,6 @@ function set_default_user()
 	$pun_user['timezone'] = $pun_config['o_default_timezone'];
 	$pun_user['dst'] = $pun_config['o_default_dst'];
 	$pun_user['language'] = $pun_config['o_default_lang'];
-	$pun_user['style'] = $pun_config['o_default_style'];
 	$pun_user['is_guest'] = true;
 	$pun_user['is_admmod'] = false;
 }
@@ -980,16 +975,8 @@ function redirect($destination_url, $message)
 	// Send the Content-type header in case the web server is setup to send something else
 	header('Content-type: text/html; charset=utf-8');
 
-	if (file_exists(PUN_ROOT.'style/'.$pun_user['style'].'/redirect.tpl'))
-	{
-		$tpl_file = PUN_ROOT.'style/'.$pun_user['style'].'/redirect.tpl';
-		$tpl_inc_dir = PUN_ROOT.'style/'.$pun_user['style'].'/';
-	}
-	else
-	{
-		$tpl_file = PUN_ROOT.'include/template/redirect.tpl';
-		$tpl_inc_dir = PUN_ROOT.'include/user/';
-	}
+	$tpl_file = PUN_ROOT.'include/template/redirect.tpl';
+	$tpl_inc_dir = PUN_ROOT.'include/user/';
 
 	$tpl_redir = file_get_contents($tpl_file);
 
@@ -1033,7 +1020,7 @@ function redirect($destination_url, $message)
 ?>
 <meta http-equiv="refresh" content="<?php echo $pun_config['o_redirect_delay'] ?>;URL=<?php echo str_replace(array('<', '>', '"'), array('&lt;', '&gt;', '&quot;'), $destination_url) ?>" />
 <title><?php echo generate_page_title($page_title) ?></title>
-<link rel="stylesheet" type="text/css" href="style/<?php echo $pun_user['style'].'.css' ?>" />
+<link rel="stylesheet" type="text/css" href="style/base.css" />
 <?php
 
 	$tpl_temp = trim(ob_get_contents());
@@ -1298,30 +1285,6 @@ function file_size($size)
 		$size /= 1024;
 
 	return round($size, 2).' '.$units[$i];
-}
-
-
-//
-// Fetch a list of available styles
-//
-function forum_list_styles()
-{
-	$styles = array();
-
-	$d = dir(PUN_ROOT.'style');
-	while (($entry = $d->read()) !== false)
-	{
-		if ($entry{0} == '.')
-			continue;
-
-		if (substr($entry, -4) == '.css')
-			$styles[] = substr($entry, 0, -4);
-	}
-	$d->close();
-
-	natcasesort($styles);
-
-	return $styles;
 }
 
 

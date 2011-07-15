@@ -30,13 +30,11 @@ if (isset($_POST['form_sent']))
 		'default_timezone'		=> floatval($_POST['form']['default_timezone']),
 		'default_dst'			=> $_POST['form']['default_dst'] != '1' ? '0' : '1',
 		'default_lang'			=> pun_trim($_POST['form']['default_lang']),
-		'default_style'			=> pun_trim($_POST['form']['default_style']),
 		'time_format'			=> pun_trim($_POST['form']['time_format']),
 		'date_format'			=> pun_trim($_POST['form']['date_format']),
 		'timeout_visit'			=> intval($_POST['form']['timeout_visit']),
 		'timeout_online'		=> intval($_POST['form']['timeout_online']),
 		'redirect_delay'		=> intval($_POST['form']['redirect_delay']),
-		'topic_review'			=> intval($_POST['form']['topic_review']),
 		'disp_topics_default'	=> intval($_POST['form']['disp_topics_default']),
 		'disp_posts_default'	=> intval($_POST['form']['disp_posts_default']),
 		'indent_num_spaces'		=> intval($_POST['form']['indent_num_spaces']),
@@ -67,10 +65,6 @@ if (isset($_POST['form_sent']))
 
 	$languages = forum_list_langs();
 	if (!in_array($form['default_lang'], $languages))
-		message($lang_common['Bad request']);
-
-	$styles = forum_list_styles();
-	if (!in_array($form['default_style'], $styles))
 		message($lang_common['Bad request']);
 
 	if ($form['time_format'] == '')
@@ -255,27 +249,6 @@ generate_admin_menu('options');
 										<span><?php echo $lang_admin_options['Language help'] ?></span>
 									</td>
 								</tr>
-								<tr>
-									<th scope="row"><?php echo $lang_admin_options['Default style label'] ?></th>
-									<td>
-										<select name="form[default_style]">
-<?php
-
-		$styles = forum_list_styles();
-
-		foreach ($styles as $temp)
-		{
-			if ($pun_config['o_default_style'] == $temp)
-				echo "\t\t\t\t\t\t\t\t\t\t\t".'<option value="'.$temp.'" selected="selected">'.str_replace('_', ' ', $temp).'</option>'."\n";
-			else
-				echo "\t\t\t\t\t\t\t\t\t\t\t".'<option value="'.$temp.'">'.str_replace('_', ' ', $temp).'</option>'."\n";
-		}
-
-?>
-										</select>
-										<span><?php echo $lang_admin_options['Default style help'] ?></span>
-									</td>
-								</tr>
 							</table>
 						</div>
 					</fieldset>
@@ -335,13 +308,6 @@ generate_admin_menu('options');
 						<legend><?php echo $lang_admin_options['Display subhead'] ?></legend>
 						<div class="infldset">
 							<table class="aligntop" cellspacing="0">
-								<tr>
-									<th scope="row"><?php echo $lang_admin_options['Topic review label'] ?></th>
-									<td>
-										<input type="text" name="form[topic_review]" size="3" maxlength="3" value="<?php echo $pun_config['o_topic_review'] ?>" />
-										<span><?php echo $lang_admin_options['Topic review help'] ?></span>
-									</td>
-								</tr>
 								<tr>
 									<th scope="row"><?php echo $lang_admin_options['Topics per page label'] ?></th>
 									<td>

@@ -759,15 +759,6 @@ else if (isset($_POST['form_sent']))
 					$form['disp_posts'] = 75;
 			}
 
-			// Make sure we got a valid style string
-			if (isset($_POST['form']['style']))
-			{
-				$styles = forum_list_styles();
-				$form['style'] = pun_trim($_POST['form']['style']);
-				if (!in_array($form['style'], $styles))
-					message($lang_common['Bad request']);
-			}
-
 			break;
 		}
 
@@ -844,7 +835,7 @@ else if (isset($_POST['form_sent']))
 }
 
 
-$result = $db->query('SELECT u.username, u.email, u.title, u.realname, u.url, u.jabber, u.icq, u.msn, u.aim, u.yahoo, u.location, u.disp_topics, u.disp_posts, u.email_setting, u.show_img, u.show_avatars, u.timezone, u.dst, u.language, u.style, u.num_posts, u.last_post, u.registered, u.registration_ip, u.admin_note, u.date_format, u.time_format, u.last_visit, g.g_id, g.g_user_title, g.g_moderator FROM '.$db->prefix.'users AS u LEFT JOIN '.$db->prefix.'groups AS g ON g.g_id=u.group_id WHERE u.id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
+$result = $db->query('SELECT u.username, u.email, u.title, u.realname, u.url, u.jabber, u.icq, u.msn, u.aim, u.yahoo, u.location, u.disp_topics, u.disp_posts, u.email_setting, u.show_img, u.show_avatars, u.timezone, u.dst, u.language, u.num_posts, u.last_post, u.registered, u.registration_ip, u.admin_note, u.date_format, u.time_format, u.last_visit, g.g_id, g.g_user_title, g.g_moderator FROM '.$db->prefix.'users AS u LEFT JOIN '.$db->prefix.'groups AS g ON g.g_id=u.group_id WHERE u.id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
 if (!$db->num_rows($result))
 	message($lang_common['Bad request']);
 
@@ -1351,44 +1342,6 @@ else
 		<div class="box">
 			<form id="profile5" method="post" action="profile.php?section=display&amp;id=<?php echo $id ?>">
 				<div><input type="hidden" name="form_sent" value="1" /></div>
-<?php
-
-		$styles = forum_list_styles();
-
-		// Only display the style selection box if there's more than one style available
-		if (count($styles) == 1)
-			echo "\t\t\t".'<div><input type="hidden" name="form[style]" value="'.$styles[0].'" /></div>'."\n";
-		else if (count($styles) > 1)
-		{
-
-?>
-				<div class="inform">
-					<fieldset>
-						<legend><?php echo $lang_profile['Style legend'] ?></legend>
-						<div class="infldset">
-							<label><?php echo $lang_profile['Styles'] ?><br />
-							<select name="form[style]">
-<?php
-
-			foreach ($styles as $temp)
-			{
-				if ($user['style'] == $temp)
-					echo "\t\t\t\t\t\t\t\t".'<option value="'.$temp.'" selected="selected">'.str_replace('_', ' ', $temp).'</option>'."\n";
-				else
-					echo "\t\t\t\t\t\t\t\t".'<option value="'.$temp.'">'.str_replace('_', ' ', $temp).'</option>'."\n";
-			}
-
-?>
-							</select>
-							<br /></label>
-						</div>
-					</fieldset>
-				</div>
-<?php
-
-		}
-
-?>
 <?php if ($pun_config['o_avatars'] == '1' || ($pun_config['p_message_bbcode'] == '1' && $pun_config['p_message_img_tag'] == '1')): ?>
 				<div class="inform">
 					<fieldset>

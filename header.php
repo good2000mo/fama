@@ -27,16 +27,8 @@ else if (defined('PUN_HELP'))
 else
 	$tpl_file = 'main.tpl';
 
-if (file_exists(PUN_ROOT.'style/'.$pun_user['style'].'/'.$tpl_file))
-{
-	$tpl_file = PUN_ROOT.'style/'.$pun_user['style'].'/'.$tpl_file;
-	$tpl_inc_dir = PUN_ROOT.'style/'.$pun_user['style'].'/';
-}
-else
-{
-	$tpl_file = PUN_ROOT.'include/template/'.$tpl_file;
-	$tpl_inc_dir = PUN_ROOT.'include/user/';
-}
+$tpl_file = PUN_ROOT.'include/template/'.$tpl_file;
+$tpl_inc_dir = PUN_ROOT.'include/user/';
 
 $tpl_main = file_get_contents($tpl_file);
 
@@ -84,16 +76,11 @@ if (!defined('PUN_ALLOW_INDEX'))
 
 ?>
 <title><?php echo generate_page_title($page_title, $p) ?></title>
-<link rel="stylesheet" type="text/css" href="style/<?php echo $pun_user['style'].'.css' ?>" />
+<link rel="stylesheet" type="text/css" href="style/base.css" />
 <?php
 
 if (defined('PUN_ADMIN_CONSOLE'))
-{
-	if (file_exists(PUN_ROOT.'style/'.$pun_user['style'].'/base_admin.css'))
-		echo '<link rel="stylesheet" type="text/css" href="style/'.$pun_user['style'].'/base_admin.css" />'."\n";
-	else
-		echo '<link rel="stylesheet" type="text/css" href="style/imports/base_admin.css" />'."\n";
-}
+	echo '<link rel="stylesheet" type="text/css" href="style/imports/base_admin.css" />'."\n";
 
 if (isset($required_fields))
 {
