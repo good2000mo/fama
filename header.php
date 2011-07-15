@@ -80,7 +80,7 @@ if (!defined('PUN_ALLOW_INDEX'))
 <?php
 
 if (defined('PUN_ADMIN_CONSOLE'))
-	echo '<link rel="stylesheet" type="text/css" href="style/imports/base_admin.css" />'."\n";
+	echo '<link rel="stylesheet" type="text/css" href="style/base_admin.css" />'."\n";
 
 if (isset($required_fields))
 {
@@ -127,7 +127,7 @@ function process_form(the_form)
 }
 
 // JavaScript tricks for IE6 and older
-echo '<!--[if lte IE 6]><script type="text/javascript" src="style/imports/minmax.js"></script><![endif]-->'."\n";
+echo '<!--[if lte IE 6]><script type="text/javascript" src="style/minmax.js"></script><![endif]-->'."\n";
 
 if (!isset($page_head))
 	$page_head = array();
