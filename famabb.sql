@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 -- 
 -- 主機: localhost
--- 建立日期: Jul 15, 2011, 10:34 AM
+-- 建立日期: Jul 15, 2011, 10:45 AM
 -- 伺服器版本: 5.0.51
 -- PHP 版本: 5.2.6
 
@@ -43,7 +43,6 @@ INSERT INTO `fbb_config` VALUES ('o_disp_topics_default', '30');
 INSERT INTO `fbb_config` VALUES ('o_disp_posts_default', '25');
 INSERT INTO `fbb_config` VALUES ('o_indent_num_spaces', '4');
 INSERT INTO `fbb_config` VALUES ('o_quote_depth', '3');
-INSERT INTO `fbb_config` VALUES ('o_quickpost', '1');
 INSERT INTO `fbb_config` VALUES ('o_show_dot', '0');
 INSERT INTO `fbb_config` VALUES ('o_topic_views', '1');
 INSERT INTO `fbb_config` VALUES ('o_gzip', '0');
@@ -181,7 +180,7 @@ CREATE TABLE `fbb_online` (
 -- 列出以下資料庫的數據： `fbb_online`
 -- 
 
-INSERT INTO `fbb_online` VALUES (2, 'admin', 1310696456, 0, NULL, NULL);
+INSERT INTO `fbb_online` VALUES (2, 'admin', 1310697861, 0, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -301,7 +300,7 @@ CREATE TABLE `fbb_topics` (
 -- 列出以下資料庫的數據： `fbb_topics`
 -- 
 
-INSERT INTO `fbb_topics` VALUES (1, 'admin', '示例帖子', 1310283814, 1, 1310283814, 1, 'admin', 13, 0, 0, 0, NULL, 1);
+INSERT INTO `fbb_topics` VALUES (1, 'admin', '示例帖子', 1310283814, 1, 1310283814, 1, 'admin', 15, 0, 0, 0, NULL, 1);
 
 -- --------------------------------------------------------
 
