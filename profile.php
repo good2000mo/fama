@@ -742,18 +742,6 @@ else if (isset($_POST['form_sent']))
 			break;
 		}
 
-		case 'privacy':
-		{
-			$form = array(
-				'email_setting'			=> intval($_POST['form']['email_setting']),
-			);
-
-			if ($form['email_setting'] < 0 || $form['email_setting'] > 2)
-				$form['email_setting'] = $pun_config['o_default_email_setting'];
-
-			break;
-		}
-
 		default:
 			message($lang_common['Bad request']);
 	}
@@ -815,7 +803,7 @@ else if (isset($_POST['form_sent']))
 }
 
 
-$result = $db->query('SELECT u.username, u.email, u.title, u.realname, u.url, u.jabber, u.icq, u.msn, u.aim, u.yahoo, u.location, u.email_setting, u.show_img, u.show_avatars, u.timezone, u.dst, u.language, u.num_posts, u.last_post, u.registered, u.registration_ip, u.admin_note, u.date_format, u.time_format, u.last_visit, g.g_id, g.g_user_title, g.g_moderator FROM '.$db->prefix.'users AS u LEFT JOIN '.$db->prefix.'groups AS g ON g.g_id=u.group_id WHERE u.id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
+$result = $db->query('SELECT u.username, u.email, u.title, u.realname, u.url, u.jabber, u.icq, u.msn, u.aim, u.yahoo, u.location, u.show_img, u.show_avatars, u.timezone, u.dst, u.language, u.num_posts, u.last_post, u.registered, u.registration_ip, u.admin_note, u.date_format, u.time_format, u.last_visit, g.g_id, g.g_user_title, g.g_moderator FROM '.$db->prefix.'users AS u LEFT JOIN '.$db->prefix.'groups AS g ON g.g_id=u.group_id WHERE u.id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
 if (!$db->num_rows($result))
 	message($lang_common['Bad request']);
 
@@ -860,12 +848,9 @@ if ($pun_user['id'] != $id &&																	// If we arent the user (i.e. edit
 		$user_personal[] = '<dd><span class="website"><a href="'.$user['url'].'">'.$user['url'].'</a></span></dd>';
 	}
 
-	if ($user['email_setting'] == '0' && !$pun_user['is_guest'] && $pun_user['g_send_email'] == '1')
-		$email_field = '<a href="mailto:'.$user['email'].'">'.$user['email'].'</a>';
-	else if ($user['email_setting'] == '1' && !$pun_user['is_guest'] && $pun_user['g_send_email'] == '1')
+	if (!$pun_user['is_guest'] && $pun_user['g_send_email'] == '1')
 		$email_field = '<a href="misc.php?email='.$id.'">'.$lang_common['Send email'].'</a>';
-	else
-		$email_field = '';
+
 	if ($email_field != '')
 	{
 		$user_personal[] = '<dt>'.$lang_common['Email'].'</dt>';
@@ -1356,23 +1341,7 @@ else
 	<div class="blockform">
 		<h2><span><?php echo pun_htmlspecialchars($user['username']).' - '.$lang_profile['Section privacy'] ?></span></h2>
 		<div class="box">
-			<form id="profile6" method="post" action="profile.php?section=privacy&amp;id=<?php echo $id ?>">
-				<div class="inform">
-					<fieldset>
-						<legend><?php echo $lang_prof_reg['Privacy options legend'] ?></legend>
-						<div class="infldset">
-							<input type="hidden" name="form_sent" value="1" />
-							<p><?php echo $lang_prof_reg['Email setting info'] ?></p>
-							<div class="rbox">
-								<label><input type="radio" name="form[email_setting]" value="0"<?php if ($user['email_setting'] == '0') echo ' checked="checked"' ?> /><?php echo $lang_prof_reg['Email setting 1'] ?><br /></label>
-								<label><input type="radio" name="form[email_setting]" value="1"<?php if ($user['email_setting'] == '1') echo ' checked="checked"' ?> /><?php echo $lang_prof_reg['Email setting 2'] ?><br /></label>
-								<label><input type="radio" name="form[email_setting]" value="2"<?php if ($user['email_setting'] == '2') echo ' checked="checked"' ?> /><?php echo $lang_prof_reg['Email setting 3'] ?><br /></label>
-							</div>
-						</div>
-					</fieldset>
-				</div>
-				<p class="buttons"><input type="submit" name="update" value="<?php echo $lang_common['Submit'] ?>" /> <?php echo $lang_profile['Instructions'] ?></p>
-			</form>
+
 		</div>
 	</div>
 <?php

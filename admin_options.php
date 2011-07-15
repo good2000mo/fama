@@ -41,7 +41,6 @@ if (isset($_POST['form_sent']))
 		'quote_depth'			=> intval($_POST['form']['quote_depth']),
 		'gzip'					=> $_POST['form']['gzip'] != '1' ? '0' : '1',
 		'search_all_forums'		=> $_POST['form']['search_all_forums'] != '1' ? '0' : '1',
-		'additional_navlinks'	=> pun_trim($_POST['form']['additional_navlinks']),
 		'avatars'				=> $_POST['form']['avatars'] != '1' ? '0' : '1',
 		'avatars_dir'			=> pun_trim($_POST['form']['avatars_dir']),
 		'avatars_width'			=> intval($_POST['form']['avatars_width']),
@@ -54,7 +53,6 @@ if (isset($_POST['form_sent']))
 		'smtp_ssl'				=> $_POST['form']['smtp_ssl'] != '1' ? '0' : '1',
 		'regs_allow'			=> $_POST['form']['regs_allow'] != '1' ? '0' : '1',
 		'regs_verify'			=> $_POST['form']['regs_verify'] != '1' ? '0' : '1',
-		'default_email_setting'	=> intval($_POST['form']['default_email_setting']),
 	);
 
 	if ($form['board_title'] == '')
@@ -83,9 +81,6 @@ if (isset($_POST['form_sent']))
 	if (substr($form['avatars_dir'], -1) == '/')
 		$form['avatars_dir'] = substr($form['avatars_dir'], 0, -1);
 
-	if ($form['additional_navlinks'] != '')
-		$form['additional_navlinks'] = pun_trim(pun_linebreaks($form['additional_navlinks']));
-
 	// Change or enter a SMTP password
 	if (isset($_POST['form']['smtp_change_pass']))
 	{
@@ -108,9 +103,6 @@ if (isset($_POST['form_sent']))
 		$form['disp_posts_default'] = 3;
 	else if ($form['disp_posts_default'] > 75)
 		$form['disp_posts_default'] = 75;
-
-	if ($form['default_email_setting'] < 0 || $form['default_email_setting'] > 2)
-		message($lang_common['Bad request']);
 
 	if ($form['timeout_online'] >= $form['timeout_visit'])
 		message($lang_admin_options['Timeout error message']);
@@ -356,13 +348,6 @@ generate_admin_menu('options');
 										<span><?php echo $lang_admin_options['Search all help'] ?></span>
 									</td>
 								</tr>
-								<tr>
-									<th scope="row"><?php echo $lang_admin_options['Menu items label'] ?></th>
-									<td>
-										<textarea name="form[additional_navlinks]" rows="3" cols="55"><?php echo pun_htmlspecialchars($pun_config['o_additional_navlinks']) ?></textarea>
-										<span><?php echo $lang_admin_options['Menu items help'] ?></span>
-									</td>
-								</tr>
 							</table>
 						</div>
 					</fieldset>
@@ -482,15 +467,6 @@ generate_admin_menu('options');
 									<td>
 										<input type="radio" name="form[regs_verify]" value="1"<?php if ($pun_config['o_regs_verify'] == '1') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['Yes'] ?></strong>&#160;&#160;&#160;<input type="radio" name="form[regs_verify]" value="0"<?php if ($pun_config['o_regs_verify'] == '0') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['No'] ?></strong>
 										<span><?php echo $lang_admin_options['Verify help'] ?></span>
-									</td>
-								</tr>
-								<tr>
-									<th scope="row"><?php echo $lang_admin_options['E-mail default label'] ?></th>
-									<td>
-										<span><?php echo $lang_admin_options['E-mail default help'] ?></span>
-										<input type="radio" name="form[default_email_setting]" value="0"<?php if ($pun_config['o_default_email_setting'] == '0') echo ' checked="checked"' ?> />&#160;<?php echo $lang_admin_options['Display e-mail label'] ?><br />
-										<input type="radio" name="form[default_email_setting]" value="1"<?php if ($pun_config['o_default_email_setting'] == '1') echo ' checked="checked"' ?> />&#160;<?php echo $lang_admin_options['Hide allow form label'] ?><br />
-										<input type="radio" name="form[default_email_setting]" value="2"<?php if ($pun_config['o_default_email_setting'] == '2') echo ' checked="checked"' ?> />&#160;<?php echo $lang_admin_options['Hide both label'] ?><br />
 									</td>
 								</tr>
 							</table>

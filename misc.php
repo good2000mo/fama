@@ -28,14 +28,11 @@ if (isset($_GET['email']))
 	if ($recipient_id < 2)
 		message($lang_common['Bad request']);
 
-	$result = $db->query('SELECT username, email, email_setting FROM '.$db->prefix.'users WHERE id='.$recipient_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SELECT username, email FROM '.$db->prefix.'users WHERE id='.$recipient_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
 	if (!$db->num_rows($result))
 		message($lang_common['Bad request']);
 
-	list($recipient, $recipient_email, $email_setting) = $db->fetch_row($result);
-
-	if ($email_setting == 2 && !$pun_user['is_admmod'])
-		message($lang_misc['Form email disabled']);
+	list($recipient, $recipient_email) = $db->fetch_row($result);
 
 
 	if (isset($_POST['form_sent']))

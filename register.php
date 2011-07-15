@@ -103,10 +103,6 @@ if (isset($_POST['form_sent']))
 
 	$dst = isset($_POST['dst']) ? '1' : '0';
 
-	$email_setting = intval($_POST['email_setting']);
-	if ($email_setting < 0 || $email_setting > 2)
-		$email_setting = $pun_config['o_default_email_setting'];
-
 	// Did everything go according to plan?
 	if (empty($errors))
 	{
@@ -117,7 +113,7 @@ if (isset($_POST['form_sent']))
 		$password_hash = pun_hash($password1);
 
 		// Add the user
-		$db->query('INSERT INTO '.$db->prefix.'users (username, group_id, password, email, email_setting, timezone, dst, language, registered, registration_ip, last_visit) VALUES(\''.$db->escape($username).'\', '.$intial_group_id.', \''.$password_hash.'\', \''.$db->escape($email1).'\', '.$email_setting.', '.$timezone.' , '.$dst.', \''.$db->escape($language).'\', '.$now.', \''.get_remote_address().'\', '.$now.')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to create user', __FILE__, __LINE__, $db->error());
+		$db->query('INSERT INTO '.$db->prefix.'users (username, group_id, password, email, timezone, dst, language, registered, registration_ip, last_visit) VALUES(\''.$db->escape($username).'\', '.$intial_group_id.', \''.$password_hash.'\', \''.$db->escape($email1).'\', '.$timezone.' , '.$dst.', \''.$db->escape($language).'\', '.$now.', \''.get_remote_address().'\', '.$now.')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to create user', __FILE__, __LINE__, $db->error());
 		$new_uid = $db->insert_id();
 
 		// Must the user verify the registration or do we log him/her in right now?
@@ -158,7 +154,6 @@ require PUN_ROOT.'header.php';
 
 $timezone = isset($timezone) ? $timezone : $pun_config['o_default_timezone'];
 $dst = isset($dst) ? $dst : $pun_config['o_default_dst'];
-$email_setting = isset($email_setting) ? $email_setting : $pun_config['o_default_email_setting'];
 
 // If there are errors, we display them
 if (!empty($errors))
@@ -305,19 +300,6 @@ if (!empty($errors))
 
 		}
 ?>
-					</div>
-				</fieldset>
-			</div>
-			<div class="inform">
-				<fieldset>
-					<legend><?php echo $lang_prof_reg['Privacy options legend'] ?></legend>
-					<div class="infldset">
-						<p><?php echo $lang_prof_reg['Email setting info'] ?></p>
-						<div class="rbox">
-							<label><input type="radio" name="email_setting" value="0"<?php if ($email_setting == '0') echo ' checked="checked"' ?> /><?php echo $lang_prof_reg['Email setting 1'] ?><br /></label>
-							<label><input type="radio" name="email_setting" value="1"<?php if ($email_setting == '1') echo ' checked="checked"' ?> /><?php echo $lang_prof_reg['Email setting 2'] ?><br /></label>
-							<label><input type="radio" name="email_setting" value="2"<?php if ($email_setting == '2') echo ' checked="checked"' ?> /><?php echo $lang_prof_reg['Email setting 3'] ?><br /></label>
-						</div>
 					</div>
 				</fieldset>
 			</div>
