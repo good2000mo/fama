@@ -255,7 +255,6 @@ function set_default_user()
 		$db->query('UPDATE '.$db->prefix.'online SET logged='.time().' WHERE ident=\''.$db->escape($remote_addr).'\''.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update online list', __FILE__, __LINE__, $db->error());
 
 	$pun_user['timezone'] = $pun_config['o_default_timezone'];
-	$pun_user['dst'] = $pun_config['o_default_dst'];
 	$pun_user['language'] = $pun_config['o_default_lang'];
 	$pun_user['is_guest'] = true;
 	$pun_user['is_admmod'] = false;
@@ -668,7 +667,7 @@ function format_time($timestamp, $date_only = false, $date_format = null, $time_
 	if ($timestamp == '')
 		return $lang_common['Never'];
 
-	$diff = ($pun_user['timezone'] + $pun_user['dst']) * 3600;
+	$diff = $pun_user['timezone'] * 3600;
 	$timestamp += $diff;
 	$now = time();
 

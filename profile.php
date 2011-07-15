@@ -479,7 +479,6 @@ else if (isset($_POST['form_sent']))
 		{
 			$form = array(
 				'timezone'		=> floatval($_POST['form']['timezone']),
-				'dst'			=> isset($_POST['form']['dst']) ? '1' : '0',
 				'time_format'	=> intval($_POST['form']['time_format']),
 				'date_format'	=> intval($_POST['form']['date_format']),
 			);
@@ -657,7 +656,7 @@ else if (isset($_POST['form_sent']))
 }
 
 
-$result = $db->query('SELECT u.username, u.email, u.title, u.realname, u.url, u.jabber, u.icq, u.msn, u.aim, u.yahoo, u.location, u.show_img, u.timezone, u.dst, u.language, u.num_posts, u.last_post, u.registered, u.registration_ip, u.admin_note, u.date_format, u.time_format, u.last_visit, g.g_id, g.g_user_title, g.g_moderator FROM '.$db->prefix.'users AS u LEFT JOIN '.$db->prefix.'groups AS g ON g.g_id=u.group_id WHERE u.id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
+$result = $db->query('SELECT u.username, u.email, u.title, u.realname, u.url, u.jabber, u.icq, u.msn, u.aim, u.yahoo, u.location, u.show_img, u.timezone, u.language, u.num_posts, u.last_post, u.registered, u.registration_ip, u.admin_note, u.date_format, u.time_format, u.last_visit, g.g_id, g.g_user_title, g.g_moderator FROM '.$db->prefix.'users AS u LEFT JOIN '.$db->prefix.'groups AS g ON g.g_id=u.group_id WHERE u.id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
 if (!$db->num_rows($result))
 	message($lang_common['Bad request']);
 
@@ -929,9 +928,6 @@ else
 								<option value="14"<?php if ($user['timezone'] == 14) echo ' selected="selected"' ?>><?php echo $lang_prof_reg['UTC+14:00'] ?></option>
 							</select>
 							<br /></label>
-							<div class="rbox">
-								<label><input type="checkbox" name="form[dst]" value="1"<?php if ($user['dst'] == '1') echo ' checked="checked"' ?> /><?php echo $lang_prof_reg['DST'] ?><br /></label>
-							</div>
 							<label><?php echo $lang_prof_reg['Time format'] ?>
 
 							<br /><select name="form[time_format]">

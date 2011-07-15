@@ -28,7 +28,6 @@ if (isset($_POST['form_sent']))
 		'board_title'			=> pun_trim($_POST['form']['board_title']),
 		'board_desc'			=> pun_trim($_POST['form']['board_desc']),
 		'default_timezone'		=> floatval($_POST['form']['default_timezone']),
-		'default_dst'			=> $_POST['form']['default_dst'] != '1' ? '0' : '1',
 		'default_lang'			=> pun_trim($_POST['form']['default_lang']),
 		'time_format'			=> pun_trim($_POST['form']['time_format']),
 		'date_format'			=> pun_trim($_POST['form']['date_format']),
@@ -199,13 +198,6 @@ generate_admin_menu('options');
 									</td>
 								</tr>
 								<tr>
-									<th scope="row"><?php echo $lang_admin_options['DST label'] ?></th>
-									<td>
-										<input type="radio" name="form[default_dst]" value="1"<?php if ($pun_config['o_default_dst'] == '1') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['Yes'] ?></strong>&#160;&#160;&#160;<input type="radio" name="form[default_dst]" value="0"<?php if ($pun_config['o_default_dst'] == '0') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['No'] ?></strong>
-										<span><?php echo $lang_admin_options['DST help'] ?></span>
-									</td>
-								</tr>
-								<tr>
 									<th scope="row"><?php echo $lang_admin_options['Language label'] ?></th>
 									<td>
 										<select name="form[default_lang]">
@@ -232,7 +224,7 @@ generate_admin_menu('options');
 				</div>
 <?php
 
-	$diff = ($pun_user['timezone'] + $pun_user['dst']) * 3600;
+	$diff = $pun_user['timezone'] * 3600;
 	$timestamp = time() + $diff;
 
 ?>
