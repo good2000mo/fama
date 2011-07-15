@@ -39,8 +39,6 @@ if (isset($_POST['form_sent']))
 		'disp_posts_default'	=> intval($_POST['form']['disp_posts_default']),
 		'indent_num_spaces'		=> intval($_POST['form']['indent_num_spaces']),
 		'quote_depth'			=> intval($_POST['form']['quote_depth']),
-		'show_dot'				=> $_POST['form']['show_dot'] != '1' ? '0' : '1',
-		'topic_views'			=> $_POST['form']['topic_views'] != '1' ? '0' : '1',
 		'gzip'					=> $_POST['form']['gzip'] != '1' ? '0' : '1',
 		'search_all_forums'		=> $_POST['form']['search_all_forums'] != '1' ? '0' : '1',
 		'additional_navlinks'	=> pun_trim($_POST['form']['additional_navlinks']),
@@ -344,20 +342,6 @@ generate_admin_menu('options');
 						<legend><?php echo $lang_admin_options['Features subhead'] ?></legend>
 						<div class="infldset">
 							<table class="aligntop" cellspacing="0">
-								<tr>
-									<th scope="row"><?php echo $lang_admin_options['User has posted label'] ?></th>
-									<td>
-										<input type="radio" name="form[show_dot]" value="1"<?php if ($pun_config['o_show_dot'] == '1') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['Yes'] ?></strong>&#160;&#160;&#160;<input type="radio" name="form[show_dot]" value="0"<?php if ($pun_config['o_show_dot'] == '0') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['No'] ?></strong>
-										<span><?php echo $lang_admin_options['User has posted help'] ?></span>
-									</td>
-								</tr>
-								<tr>
-									<th scope="row"><?php echo $lang_admin_options['Topic views label'] ?></th>
-									<td>
-										<input type="radio" name="form[topic_views]" value="1"<?php if ($pun_config['o_topic_views'] == '1') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['Yes'] ?></strong>&#160;&#160;&#160;<input type="radio" name="form[topic_views]" value="0"<?php if ($pun_config['o_topic_views'] == '0') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['No'] ?></strong>
-										<span><?php echo $lang_admin_options['Topic views help'] ?></span>
-									</td>
-								</tr>
 								<tr>
 									<th scope="row"><?php echo $lang_admin_options['GZip label'] ?></th>
 									<td>

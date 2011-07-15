@@ -119,8 +119,7 @@ require PUN_ROOT.'header.php';
 				<tr>
 					<th class="tcl" scope="col"><?php echo $lang_common['Topic'] ?></th>
 					<th class="tc2" scope="col"><?php echo $lang_common['Replies'] ?></th>
-<?php if ($pun_config['o_topic_views'] == '1'): ?>					<th class="tc3" scope="col"><?php echo $lang_forum['Views'] ?></th>
-<?php endif; ?>					<th class="tcr" scope="col"><?php echo $lang_common['Last post'] ?></th>
+					<th class="tcr" scope="col"><?php echo $lang_common['Last post'] ?></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -140,16 +139,7 @@ if ($db->num_rows($result))
 		error('The topic table and forum table seem to be out of sync!', __FILE__, __LINE__);
 
 	// Fetch list of topics to display on this page
-	if ($pun_user['is_guest'] || $pun_config['o_show_dot'] == '0')
-	{
-		// Without "the dot"
-		$sql = 'SELECT id, poster, subject, posted, last_post, last_post_id, last_poster, num_views, num_replies, closed, sticky, moved_to FROM '.$db->prefix.'topics WHERE id IN('.implode(',', $topic_ids).') ORDER BY sticky DESC, '.$sort_by.', id DESC';
-	}
-	else
-	{
-		// With "the dot"
-		$sql = 'SELECT p.poster_id AS has_posted, t.id, t.subject, t.poster, t.posted, t.last_post, t.last_post_id, t.last_poster, t.num_views, t.num_replies, t.closed, t.sticky, t.moved_to FROM '.$db->prefix.'topics AS t LEFT JOIN '.$db->prefix.'posts AS p ON t.id=p.topic_id AND p.poster_id='.$pun_user['id'].' WHERE t.id IN('.implode(',', $topic_ids).') GROUP BY t.id'.($db_type == 'pgsql' ? ', t.subject, t.poster, t.posted, t.last_post, t.last_post_id, t.last_poster, t.num_views, t.num_replies, t.closed, t.sticky, t.moved_to, p.poster_id' : '').' ORDER BY t.sticky DESC, t.'.$sort_by.', t.id DESC';
-	}
+	$sql = 'SELECT id, poster, subject, posted, last_post, last_post_id, last_poster, num_replies, closed, sticky, moved_to FROM '.$db->prefix.'topics WHERE id IN('.implode(',', $topic_ids).') ORDER BY sticky DESC, '.$sort_by.', id DESC';
 
 	$result = $db->query($sql.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch topic list', __FILE__, __LINE__, $db->error());
 
@@ -190,16 +180,6 @@ if ($db->num_rows($result))
 		// Insert the status text before the subject
 		$subject = implode(' ', $status_text).' '.$subject;
 
-		// Should we display the dot or not? :)
-		if (!$pun_user['is_guest'] && $pun_config['o_show_dot'] == '1')
-		{
-			if ($cur_topic['has_posted'] == $pun_user['id'])
-			{
-				$subject = '<strong class="ipost">·&#160;</strong>'.$subject;
-				$item_status .= ' iposted';
-			}
-		}
-
 		$num_pages_topic = ceil(($cur_topic['num_replies'] + 1) / $pun_config['o_disp_posts_default']);
 
 		if ($num_pages_topic > 1)
@@ -224,8 +204,7 @@ if ($db->num_rows($result))
 						</div>
 					</td>
 					<td class="tc2"><?php echo ($cur_topic['moved_to'] == null) ? forum_number_format($cur_topic['num_replies']) : '-' ?></td>
-<?php if ($pun_config['o_topic_views'] == '1'): ?>					<td class="tc3"><?php echo ($cur_topic['moved_to'] == null) ? forum_number_format($cur_topic['num_views']) : '-' ?></td>
-<?php endif; ?>					<td class="tcr"><?php echo $last_post ?></td>
+					<td class="tcr"><?php echo $last_post ?></td>
 				</tr>
 <?php
 
@@ -233,7 +212,7 @@ if ($db->num_rows($result))
 }
 else
 {
-	$colspan = ($pun_config['o_topic_views'] == '1') ? 4 : 3;
+	$colspan = 3;
 
 ?>
 				<tr class="rowodd inone">

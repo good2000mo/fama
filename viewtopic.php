@@ -291,10 +291,6 @@ while ($cur_post = $db->fetch_assoc($result))
 
 <?php
 
-// Increment "num_views" for topic
-if ($pun_config['o_topic_views'] == '1')
-	$db->query('UPDATE '.$db->prefix.'topics SET num_views=num_views+1 WHERE id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update topic', __FILE__, __LINE__, $db->error());
-
 $forum_id = $cur_topic['forum_id'];
 $footer_style = 'viewtopic';
 require PUN_ROOT.'footer.php';

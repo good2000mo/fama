@@ -806,8 +806,7 @@ require PUN_ROOT.'header.php';
 				<tr>
 					<th class="tcl" scope="col"><?php echo $lang_common['Topic'] ?></th>
 					<th class="tc2" scope="col"><?php echo $lang_common['Replies'] ?></th>
-<?php if ($pun_config['o_topic_views'] == '1'): ?>					<th class="tc3" scope="col"><?php echo $lang_forum['Views'] ?></th>
-<?php endif; ?>					<th class="tcr"><?php echo $lang_common['Last post'] ?></th>
+					<th class="tcr"><?php echo $lang_common['Last post'] ?></th>
 					<th class="tcmod" scope="col"><?php echo $lang_misc['Select'] ?></th>
 				</tr>
 			</thead>
@@ -826,7 +825,7 @@ if ($db->num_rows($result))
 		$topic_ids[] = $cur_topic_id;
 
 	// Select topics
-	$result = $db->query('SELECT id, poster, subject, posted, last_post, last_post_id, last_poster, num_views, num_replies, closed, sticky, moved_to FROM '.$db->prefix.'topics WHERE id IN('.implode(',', $topic_ids).') ORDER BY sticky DESC, '.$sort_by.', id DESC'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch topic list for forum', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SELECT id, poster, subject, posted, last_post, last_post_id, last_poster, num_replies, closed, sticky, moved_to FROM '.$db->prefix.'topics WHERE id IN('.implode(',', $topic_ids).') ORDER BY sticky DESC, '.$sort_by.', id DESC'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch topic list for forum', __FILE__, __LINE__, $db->error());
 
 	$button_status = '';
 	$topic_count = 0;
@@ -897,8 +896,7 @@ if ($db->num_rows($result))
 						</div>
 					</td>
 					<td class="tc2"><?php echo (!$ghost_topic) ? forum_number_format($cur_topic['num_replies']) : '-' ?></td>
-<?php if ($pun_config['o_topic_views'] == '1'): ?>					<td class="tc3"><?php echo (!$ghost_topic) ? forum_number_format($cur_topic['num_views']) : '-' ?></td>
-<?php endif; ?>					<td class="tcr"><?php echo $last_post ?></td>
+					<td class="tcr"><?php echo $last_post ?></td>
 					<td class="tcmod"><input type="checkbox" name="topics[<?php echo $cur_topic['id'] ?>]" value="1" /></td>
 				</tr>
 <?php
@@ -907,7 +905,7 @@ if ($db->num_rows($result))
 }
 else
 {
-	$colspan = ($pun_config['o_topic_views'] == '1') ? 5 : 4;
+	$colspan = 4;
 	$button_status = ' disabled="disabled"';
 	echo "\t\t\t\t\t".'<tr><td class="tcl" colspan="'.$colspan.'">'.$lang_forum['Empty forum'].'</td></tr>'."\n";
 }
