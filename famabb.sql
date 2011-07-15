@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 -- 
 -- 主機: localhost
--- 建立日期: Jul 15, 2011, 11:31 AM
+-- 建立日期: Jul 15, 2011, 11:40 AM
 -- 伺服器版本: 5.0.51
 -- PHP 版本: 5.2.6
 
@@ -44,7 +44,6 @@ INSERT INTO `fbb_config` VALUES ('o_disp_posts_default', '25');
 INSERT INTO `fbb_config` VALUES ('o_indent_num_spaces', '4');
 INSERT INTO `fbb_config` VALUES ('o_quote_depth', '3');
 INSERT INTO `fbb_config` VALUES ('o_gzip', '0');
-INSERT INTO `fbb_config` VALUES ('o_search_all_forums', '1');
 INSERT INTO `fbb_config` VALUES ('o_admin_email', 'comus2010mo@hotmail.com');
 INSERT INTO `fbb_config` VALUES ('o_webmaster_email', 'comus2010mo@hotmail.com');
 INSERT INTO `fbb_config` VALUES ('o_smtp_host', NULL);
@@ -171,7 +170,7 @@ CREATE TABLE `fbb_online` (
 -- 列出以下資料庫的數據： `fbb_online`
 -- 
 
-INSERT INTO `fbb_online` VALUES (2, 'admin', 1310698491, 0, NULL, NULL);
+INSERT INTO `fbb_online` VALUES (2, 'admin', 1310700993, 0, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -339,4 +338,4 @@ CREATE TABLE `fbb_users` (
 -- 
 
 INSERT INTO `fbb_users` VALUES (1, 3, '訪客', '訪客', '訪客', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, 0, 0, 'Traditional_Chinese', 0, NULL, NULL, NULL, 0, '0.0.0.0', 0, NULL, NULL, NULL);
-INSERT INTO `fbb_users` VALUES (2, 1, 'admin', 'c3d873d7fa9ac799e35693d4cc288d4a16ad3f96', 'comus2010mo@hotmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 8, 0, 0, 0, 'Traditional_Chinese', 1, 1310283814, NULL, NULL, 1310283814, '127.0.0.1', 1310690898, NULL, NULL, NULL);
+INSERT INTO `fbb_users` VALUES (2, 1, 'admin', 'c3d873d7fa9ac799e35693d4cc288d4a16ad3f96', 'comus2010mo@hotmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 8, 0, 0, 0, 'Traditional_Chinese', 1, 1310283814, NULL, NULL, 1310283814, '127.0.0.1', 1310698491, NULL, NULL, NULL);

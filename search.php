@@ -111,7 +111,7 @@ if (isset($_GET['action']) || isset($_GET['search_id']))
 		$keyword_results = $author_results = array();
 
 		// Search a specific forum?
-		$forum_sql = ($forum != -1 || ($forum == -1 && $pun_config['o_search_all_forums'] == '0' && !$pun_user['is_admmod'])) ? ' AND t.forum_id = '.$forum : '';
+		$forum_sql = ($forum != -1) ? ' AND t.forum_id = '.$forum : '';
 
 		if (!empty($author) || !empty($keywords))
 		{
@@ -730,8 +730,7 @@ require PUN_ROOT.'header.php';
 						<br /><select id="forum" name="forum">
 <?php
 
-if ($pun_config['o_search_all_forums'] == '1' || $pun_user['is_admmod'])
-	echo "\t\t\t\t\t\t\t".'<option value="-1">'.$lang_search['All forums'].'</option>'."\n";
+echo "\t\t\t\t\t\t\t".'<option value="-1">'.$lang_search['All forums'].'</option>'."\n";
 
 $result = $db->query('SELECT f.id AS fid, f.forum_name, f.redirect_url FROM '.$db->prefix.'forums AS f LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (fp.forum_id=f.id AND fp.group_id='.$pun_user['g_id'].') WHERE (fp.read_forum IS NULL OR fp.read_forum=1) AND f.redirect_url IS NULL ORDER BY f.disp_position'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --', true) or error('Unable to fetch forum list', __FILE__, __LINE__, $db->error());
 

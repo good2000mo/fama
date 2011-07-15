@@ -40,7 +40,6 @@ if (isset($_POST['form_sent']))
 		'indent_num_spaces'		=> intval($_POST['form']['indent_num_spaces']),
 		'quote_depth'			=> intval($_POST['form']['quote_depth']),
 		'gzip'					=> $_POST['form']['gzip'] != '1' ? '0' : '1',
-		'search_all_forums'		=> $_POST['form']['search_all_forums'] != '1' ? '0' : '1',
 		'admin_email'			=> strtolower(pun_trim($_POST['form']['admin_email'])),
 		'webmaster_email'		=> strtolower(pun_trim($_POST['form']['webmaster_email'])),
 		'smtp_host'				=> pun_trim($_POST['form']['smtp_host']),
@@ -330,13 +329,6 @@ generate_admin_menu('options');
 									<td>
 										<input type="radio" name="form[gzip]" value="1"<?php if ($pun_config['o_gzip'] == '1') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['Yes'] ?></strong>&#160;&#160;&#160;<input type="radio" name="form[gzip]" value="0"<?php if ($pun_config['o_gzip'] == '0') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['No'] ?></strong>
 										<span><?php echo $lang_admin_options['GZip help'] ?></span>
-									</td>
-								</tr>
-								<tr>
-									<th scope="row"><?php echo $lang_admin_options['Search all label'] ?></th>
-									<td>
-										<input type="radio" name="form[search_all_forums]" value="1"<?php if ($pun_config['o_search_all_forums'] == '1') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['Yes'] ?></strong>&#160;&#160;&#160;<input type="radio" name="form[search_all_forums]" value="0"<?php if ($pun_config['o_search_all_forums'] == '0') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['No'] ?></strong>
-										<span><?php echo $lang_admin_options['Search all help'] ?></span>
 									</td>
 								</tr>
 							</table>
