@@ -305,7 +305,7 @@ if (isset($_GET['tid']))
 		$post_ids[] = $cur_post_id;
 
 	// Retrieve the posts (and their respective poster)
-	$result = $db->query('SELECT u.title, u.num_posts, g.g_id, g.g_user_title, p.id, p.poster, p.poster_id, p.message, p.hide_smilies, p.posted, p.edited, p.edited_by FROM '.$db->prefix.'posts AS p INNER JOIN '.$db->prefix.'users AS u ON u.id=p.poster_id INNER JOIN '.$db->prefix.'groups AS g ON g.g_id=u.group_id WHERE p.id IN ('.implode(',', $post_ids).') ORDER BY p.id'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --', true) or error('Unable to fetch post info', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SELECT u.title, u.num_posts, g.g_id, g.g_user_title, p.id, p.poster, p.poster_id, p.message, p.posted, p.edited, p.edited_by FROM '.$db->prefix.'posts AS p INNER JOIN '.$db->prefix.'users AS u ON u.id=p.poster_id INNER JOIN '.$db->prefix.'groups AS g ON g.g_id=u.group_id WHERE p.id IN ('.implode(',', $post_ids).') ORDER BY p.id'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --', true) or error('Unable to fetch post info', __FILE__, __LINE__, $db->error());
 
 	while ($cur_post = $db->fetch_assoc($result))
 	{
@@ -330,8 +330,8 @@ if (isset($_GET['tid']))
 			$user_title = $lang_topic['Guest'];
 		}
 
-		// Perform the main parsing of the message (BBCode, smilies etc)
-		$cur_post['message'] = parse_message($cur_post['message'], $cur_post['hide_smilies']);
+		// Perform the main parsing of the message (BBCode etc)
+		$cur_post['message'] = parse_message($cur_post['message']);
 
 ?>
 

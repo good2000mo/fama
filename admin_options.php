@@ -36,8 +36,6 @@ if (isset($_POST['form_sent']))
 		'timeout_visit'			=> intval($_POST['form']['timeout_visit']),
 		'timeout_online'		=> intval($_POST['form']['timeout_online']),
 		'redirect_delay'		=> intval($_POST['form']['redirect_delay']),
-		'smilies'				=> $_POST['form']['smilies'] != '1' ? '0' : '1',
-		'smilies_sig'			=> $_POST['form']['smilies_sig'] != '1' ? '0' : '1',
 		'make_links'			=> $_POST['form']['make_links'] != '1' ? '0' : '1',
 		'topic_review'			=> intval($_POST['form']['topic_review']),
 		'disp_topics_default'	=> intval($_POST['form']['disp_topics_default']),
@@ -45,7 +43,6 @@ if (isset($_POST['form_sent']))
 		'indent_num_spaces'		=> intval($_POST['form']['indent_num_spaces']),
 		'quote_depth'			=> intval($_POST['form']['quote_depth']),
 		'quickpost'				=> $_POST['form']['quickpost'] != '1' ? '0' : '1',
-		'signatures'			=> $_POST['form']['signatures'] != '1' ? '0' : '1',
 		'show_dot'				=> $_POST['form']['show_dot'] != '1' ? '0' : '1',
 		'topic_views'			=> $_POST['form']['topic_views'] != '1' ? '0' : '1',
 		'gzip'					=> $_POST['form']['gzip'] != '1' ? '0' : '1',
@@ -340,20 +337,6 @@ generate_admin_menu('options');
 						<div class="infldset">
 							<table class="aligntop" cellspacing="0">
 								<tr>
-									<th scope="row"><?php echo $lang_admin_options['Smilies label'] ?></th>
-									<td>
-										<input type="radio" name="form[smilies]" value="1"<?php if ($pun_config['o_smilies'] == '1') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['Yes'] ?></strong>&#160;&#160;&#160;<input type="radio" name="form[smilies]" value="0"<?php if ($pun_config['o_smilies'] == '0') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['No'] ?></strong>
-										<span><?php echo $lang_admin_options['Smilies help'] ?></span>
-									</td>
-								</tr>
-								<tr>
-									<th scope="row"><?php echo $lang_admin_options['Smilies sigs label'] ?></th>
-									<td>
-										<input type="radio" name="form[smilies_sig]" value="1"<?php if ($pun_config['o_smilies_sig'] == '1') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['Yes'] ?></strong>&#160;&#160;&#160;<input type="radio" name="form[smilies_sig]" value="0"<?php if ($pun_config['o_smilies_sig'] == '0') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['No'] ?></strong>
-										<span><?php echo $lang_admin_options['Smilies sigs help'] ?></span>
-									</td>
-								</tr>
-								<tr>
 									<th scope="row"><?php echo $lang_admin_options['Clickable links label'] ?></th>
 									<td>
 										<input type="radio" name="form[make_links]" value="1"<?php if ($pun_config['o_make_links'] == '1') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['Yes'] ?></strong>&#160;&#160;&#160;<input type="radio" name="form[make_links]" value="0"<?php if ($pun_config['o_make_links'] == '0') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['No'] ?></strong>
@@ -409,13 +392,6 @@ generate_admin_menu('options');
 									<td>
 										<input type="radio" name="form[quickpost]" value="1"<?php if ($pun_config['o_quickpost'] == '1') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['Yes'] ?></strong>&#160;&#160;&#160;<input type="radio" name="form[quickpost]" value="0"<?php if ($pun_config['o_quickpost'] == '0') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['No'] ?></strong>
 										<span><?php echo $lang_admin_options['Quick post help'] ?></span>
-									</td>
-								</tr>
-								<tr>
-									<th scope="row"><a name="signatures"><?php echo $lang_admin_options['Signatures label'] ?></a></th>
-									<td>
-										<input type="radio" name="form[signatures]" value="1"<?php if ($pun_config['o_signatures'] == '1') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['Yes'] ?></strong>&#160;&#160;&#160;<input type="radio" name="form[signatures]" value="0"<?php if ($pun_config['o_signatures'] == '0') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['No'] ?></strong>
-										<span><?php echo $lang_admin_options['Signatures help'] ?></span>
 									</td>
 								</tr>
 								<tr>

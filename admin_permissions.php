@@ -101,50 +101,6 @@ generate_admin_menu('permissions');
 				</div>
 				<div class="inform">
 					<fieldset>
-						<legend><?php echo $lang_admin_permissions['Signatures subhead'] ?></legend>
-						<div class="infldset">
-							<table class="aligntop" cellspacing="0">
-								<tr>
-									<th scope="row"><?php echo $lang_admin_permissions['BBCode sigs label'] ?></th>
-									<td>
-										<input type="radio" name="form[sig_bbcode]" value="1"<?php if ($pun_config['p_sig_bbcode'] == '1') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['Yes'] ?></strong>&#160;&#160;&#160;<input type="radio" name="form[sig_bbcode]" value="0"<?php if ($pun_config['p_sig_bbcode'] == '0') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['No'] ?></strong>
-										<span><?php echo $lang_admin_permissions['BBCode sigs help'] ?></span>
-									</td>
-								</tr>
-								<tr>
-									<th scope="row"><?php echo $lang_admin_permissions['Image tag sigs label'] ?></th>
-									<td>
-										<input type="radio" name="form[sig_img_tag]" value="1"<?php if ($pun_config['p_sig_img_tag'] == '1') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['Yes'] ?></strong>&#160;&#160;&#160;<input type="radio" name="form[sig_img_tag]" value="0"<?php if ($pun_config['p_sig_img_tag'] == '0') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['No'] ?></strong>
-										<span><?php echo $lang_admin_permissions['Image tag sigs help'] ?></span>
-									</td>
-								</tr>
-								<tr>
-									<th scope="row"><?php echo $lang_admin_permissions['All caps sigs label'] ?></th>
-									<td>
-										<input type="radio" name="form[sig_all_caps]" value="1"<?php if ($pun_config['p_sig_all_caps'] == '1') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['Yes'] ?></strong>&#160;&#160;&#160;<input type="radio" name="form[sig_all_caps]" value="0"<?php if ($pun_config['p_sig_all_caps'] == '0') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['No'] ?></strong>
-										<span><?php echo $lang_admin_permissions['All caps sigs help'] ?></span>
-									</td>
-								</tr>
-								<tr>
-									<th scope="row"><?php echo $lang_admin_permissions['Max sig length label'] ?></th>
-									<td>
-										<input type="text" name="form[sig_length]" size="5" maxlength="5" value="<?php echo $pun_config['p_sig_length'] ?>" />
-										<span><?php echo $lang_admin_permissions['Max sig length help'] ?></span>
-									</td>
-								</tr>
-								<tr>
-									<th scope="row"><?php echo $lang_admin_permissions['Max sig lines label'] ?></th>
-									<td>
-										<input type="text" name="form[sig_lines]" size="3" maxlength="3" value="<?php echo $pun_config['p_sig_lines'] ?>" />
-										<span><?php echo $lang_admin_permissions['Max sig lines help'] ?></span>
-									</td>
-								</tr>
-							</table>
-						</div>
-					</fieldset>
-				</div>
-				<div class="inform">
-					<fieldset>
 						<legend><?php echo $lang_admin_permissions['Registration subhead'] ?></legend>
 						<div class="infldset">
 							<table class="aligntop" cellspacing="0">

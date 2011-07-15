@@ -464,7 +464,7 @@ if (isset($_GET['action']) || isset($_GET['search_id']))
 
 		// Run the query and fetch the results
 		if ($show_as == 'posts')
-			$result = $db->query('SELECT p.id AS pid, p.poster AS pposter, p.posted AS pposted, p.poster_id, p.message, p.hide_smilies, t.id AS tid, t.poster, t.subject, t.first_post_id, t.last_post, t.last_post_id, t.last_poster, t.num_replies, t.forum_id, f.forum_name FROM '.$db->prefix.'posts AS p INNER JOIN '.$db->prefix.'topics AS t ON t.id=p.topic_id INNER JOIN '.$db->prefix.'forums AS f ON f.id=t.forum_id WHERE p.id IN('.implode(',', $search_ids).') ORDER BY '.$sort_by_sql.' '.$sort_dir.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch search results', __FILE__, __LINE__, $db->error());
+			$result = $db->query('SELECT p.id AS pid, p.poster AS pposter, p.posted AS pposted, p.poster_id, p.message, t.id AS tid, t.poster, t.subject, t.first_post_id, t.last_post, t.last_post_id, t.last_poster, t.num_replies, t.forum_id, f.forum_name FROM '.$db->prefix.'posts AS p INNER JOIN '.$db->prefix.'topics AS t ON t.id=p.topic_id INNER JOIN '.$db->prefix.'forums AS f ON f.id=t.forum_id WHERE p.id IN('.implode(',', $search_ids).') ORDER BY '.$sort_by_sql.' '.$sort_dir.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch search results', __FILE__, __LINE__, $db->error());
 		else
 			$result = $db->query('SELECT t.id AS tid, t.poster, t.subject, t.last_post, t.last_post_id, t.last_poster, t.num_replies, t.closed, t.sticky, t.forum_id, f.forum_name FROM '.$db->prefix.'topics AS t INNER JOIN '.$db->prefix.'forums AS f ON f.id=t.forum_id WHERE t.id IN('.implode(',', $search_ids).') ORDER BY '.$sort_by_sql.' '.$sort_dir.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch search results', __FILE__, __LINE__, $db->error());
 
@@ -570,7 +570,7 @@ if (isset($_GET['action']) || isset($_GET['search_id']))
 				$item_status = '';
 				$icon_text = '<!-- -->';
 
-				$message = parse_message($cur_search['message'], $cur_search['hide_smilies']);
+				$message = parse_message($cur_search['message']);
 				$pposter = pun_htmlspecialchars($cur_search['pposter']);
 
 				if ($cur_search['poster_id'] > 1)

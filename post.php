@@ -121,7 +121,6 @@ if (isset($_POST['form_sent']))
 			$errors[] = $lang_post['No message'];
 	}
 
-	$hide_smilies = isset($_POST['hide_smilies']) ? '1' : '0';
 	$stick_topic = isset($_POST['stick_topic']) && $is_admmod ? '1' : '0';
 
 	$now = time();
@@ -139,14 +138,14 @@ if (isset($_POST['form_sent']))
 				$new_tid = $tid;
 
 				// Insert the new post
-				$db->query('INSERT INTO '.$db->prefix.'posts (poster, poster_id, poster_ip, message, hide_smilies, posted, topic_id) VALUES(\''.$db->escape($username).'\', '.$pun_user['id'].', \''.get_remote_address().'\', \''.$db->escape($message).'\', '.$hide_smilies.', '.$now.', '.$tid.')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to create post', __FILE__, __LINE__, $db->error());
+				$db->query('INSERT INTO '.$db->prefix.'posts (poster, poster_id, poster_ip, message, posted, topic_id) VALUES(\''.$db->escape($username).'\', '.$pun_user['id'].', \''.get_remote_address().'\', \''.$db->escape($message).'\', '.$now.', '.$tid.')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to create post', __FILE__, __LINE__, $db->error());
 				$new_pid = $db->insert_id();
 			}
 			else
 			{
 				// It's a guest. Insert the new post
 				$email_sql = ($pun_config['p_force_guest_email'] == '1' || $email != '') ? '\''.$db->escape($email).'\'' : 'NULL';
-				$db->query('INSERT INTO '.$db->prefix.'posts (poster, poster_ip, poster_email, message, hide_smilies, posted, topic_id) VALUES(\''.$db->escape($username).'\', \''.get_remote_address().'\', '.$email_sql.', \''.$db->escape($message).'\', '.$hide_smilies.', '.$now.', '.$tid.')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to create post', __FILE__, __LINE__, $db->error());
+				$db->query('INSERT INTO '.$db->prefix.'posts (poster, poster_ip, poster_email, message, posted, topic_id) VALUES(\''.$db->escape($username).'\', \''.get_remote_address().'\', '.$email_sql.', \''.$db->escape($message).'\', '.$now.', '.$tid.')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to create post', __FILE__, __LINE__, $db->error());
 				$new_pid = $db->insert_id();
 			}
 
@@ -171,13 +170,13 @@ if (isset($_POST['form_sent']))
 			if (!$pun_user['is_guest'])
 			{
 				// Create the post ("topic post")
-				$db->query('INSERT INTO '.$db->prefix.'posts (poster, poster_id, poster_ip, message, hide_smilies, posted, topic_id) VALUES(\''.$db->escape($username).'\', '.$pun_user['id'].', \''.get_remote_address().'\', \''.$db->escape($message).'\', '.$hide_smilies.', '.$now.', '.$new_tid.')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to create post', __FILE__, __LINE__, $db->error());
+				$db->query('INSERT INTO '.$db->prefix.'posts (poster, poster_id, poster_ip, message, posted, topic_id) VALUES(\''.$db->escape($username).'\', '.$pun_user['id'].', \''.get_remote_address().'\', \''.$db->escape($message).'\', '.$now.', '.$new_tid.')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to create post', __FILE__, __LINE__, $db->error());
 			}
 			else
 			{
 				// Create the post ("topic post")
 				$email_sql = ($pun_config['p_force_guest_email'] == '1' || $email != '') ? '\''.$db->escape($email).'\'' : 'NULL';
-				$db->query('INSERT INTO '.$db->prefix.'posts (poster, poster_ip, poster_email, message, hide_smilies, posted, topic_id) VALUES(\''.$db->escape($username).'\', \''.get_remote_address().'\', '.$email_sql.', \''.$db->escape($message).'\', '.$hide_smilies.', '.$now.', '.$new_tid.')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to create post', __FILE__, __LINE__, $db->error());
+				$db->query('INSERT INTO '.$db->prefix.'posts (poster, poster_ip, poster_email, message, posted, topic_id) VALUES(\''.$db->escape($username).'\', \''.get_remote_address().'\', '.$email_sql.', \''.$db->escape($message).'\', '.$now.', '.$new_tid.')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to create post', __FILE__, __LINE__, $db->error());
 			}
 			$new_pid = $db->insert_id();
 
@@ -350,7 +349,7 @@ if (!empty($errors))
 else if (isset($_POST['preview']))
 {
 	require_once PUN_ROOT.'include/parser.php';
-	$preview_message = parse_message($message, $hide_smilies);
+	$preview_message = parse_message($message);
 
 ?>
 <div id="postpreview" class="blockpost">
@@ -407,7 +406,6 @@ if ($fid): ?>
 						<ul class="bblinks">
 							<li><span><a href="help.php#bbcode" onclick="window.open(this.href); return false;"><?php echo $lang_common['BBCode'] ?></a> <?php echo ($pun_config['p_message_bbcode'] == '1') ? $lang_common['on'] : $lang_common['off']; ?></span></li>
 							<li><span><a href="help.php#img" onclick="window.open(this.href); return false;"><?php echo $lang_common['img tag'] ?></a> <?php echo ($pun_config['p_message_bbcode'] == '1' && $pun_config['p_message_img_tag'] == '1') ? $lang_common['on'] : $lang_common['off']; ?></span></li>
-							<li><span><a href="help.php#smilies" onclick="window.open(this.href); return false;"><?php echo $lang_common['Smilies'] ?></a> <?php echo ($pun_config['o_smilies'] == '1') ? $lang_common['on'] : $lang_common['off']; ?></span></li>
 						</ul>
 					</div>
 				</fieldset>
@@ -416,14 +414,6 @@ if ($fid): ?>
 $checkboxes = array();
 if ($is_admmod)
 	$checkboxes[] = '<label><input type="checkbox" name="stick_topic" value="1" tabindex="'.($cur_index++).'"'.(isset($_POST['stick_topic']) ? ' checked="checked"' : '').' />'.$lang_common['Stick topic'].'<br /></label>';
-
-if (!$pun_user['is_guest'])
-{
-	if ($pun_config['o_smilies'] == '1')
-		$checkboxes[] = '<label><input type="checkbox" name="hide_smilies" value="1" tabindex="'.($cur_index++).'"'.(isset($_POST['hide_smilies']) ? ' checked="checked"' : '').' />'.$lang_post['Hide smilies'].'<br /></label>';
-}
-else if ($pun_config['o_smilies'] == '1')
-	$checkboxes[] = '<label><input type="checkbox" name="hide_smilies" value="1" tabindex="'.($cur_index++).'"'.(isset($_POST['hide_smilies']) ? ' checked="checked"' : '').' />'.$lang_post['Hide smilies'].'<br /></label>';
 
 if (!empty($checkboxes))
 {
@@ -457,7 +447,7 @@ if ($tid && $pun_config['o_topic_review'] != '0')
 {
 	require_once PUN_ROOT.'include/parser.php';
 
-	$result = $db->query('SELECT poster, message, hide_smilies, posted FROM '.$db->prefix.'posts WHERE topic_id='.$tid.' ORDER BY id DESC LIMIT '.$pun_config['o_topic_review'].' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch topic review', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SELECT poster, message, posted FROM '.$db->prefix.'posts WHERE topic_id='.$tid.' ORDER BY id DESC LIMIT '.$pun_config['o_topic_review'].' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch topic review', __FILE__, __LINE__, $db->error());
 
 ?>
 
@@ -472,7 +462,7 @@ if ($tid && $pun_config['o_topic_review'] != '0')
 	{
 		$post_count++;
 
-		$cur_post['message'] = parse_message($cur_post['message'], $cur_post['hide_smilies']);
+		$cur_post['message'] = parse_message($cur_post['message']);
 
 ?>
 	<div class="blockpost">
