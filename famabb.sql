@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 -- 
 -- 主機: localhost
--- 建立日期: Jul 15, 2011, 09:27 AM
+-- 建立日期: Jul 15, 2011, 09:36 AM
 -- 伺服器版本: 5.0.51
 -- PHP 版本: 5.2.6
 
@@ -37,7 +37,6 @@ INSERT INTO `fbb_config` VALUES ('o_date_format', 'Y-m-d');
 INSERT INTO `fbb_config` VALUES ('o_timeout_visit', '1800');
 INSERT INTO `fbb_config` VALUES ('o_timeout_online', '300');
 INSERT INTO `fbb_config` VALUES ('o_redirect_delay', '1');
-INSERT INTO `fbb_config` VALUES ('o_make_links', '1');
 INSERT INTO `fbb_config` VALUES ('o_default_lang', 'Traditional_Chinese');
 INSERT INTO `fbb_config` VALUES ('o_default_style', 'Lithium');
 INSERT INTO `fbb_config` VALUES ('o_default_user_group', '4');

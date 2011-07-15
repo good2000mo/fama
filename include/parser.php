@@ -61,8 +61,7 @@ function preparse_bbcode($text, &$errors)
 	else
 		$text = str_replace('*'."\0".']', '*]', $temp);
 
-	if ($pun_config['o_make_links'] == '1')
-		$text = do_clickable($text);
+	$text = do_clickable($text);
 
 	// If we split up the message before we have to concatenate it together again (code tags)
 	if (isset($inside))

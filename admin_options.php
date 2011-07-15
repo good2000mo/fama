@@ -36,7 +36,6 @@ if (isset($_POST['form_sent']))
 		'timeout_visit'			=> intval($_POST['form']['timeout_visit']),
 		'timeout_online'		=> intval($_POST['form']['timeout_online']),
 		'redirect_delay'		=> intval($_POST['form']['redirect_delay']),
-		'make_links'			=> $_POST['form']['make_links'] != '1' ? '0' : '1',
 		'topic_review'			=> intval($_POST['form']['topic_review']),
 		'disp_topics_default'	=> intval($_POST['form']['disp_topics_default']),
 		'disp_posts_default'	=> intval($_POST['form']['disp_posts_default']),
@@ -336,13 +335,6 @@ generate_admin_menu('options');
 						<legend><?php echo $lang_admin_options['Display subhead'] ?></legend>
 						<div class="infldset">
 							<table class="aligntop" cellspacing="0">
-								<tr>
-									<th scope="row"><?php echo $lang_admin_options['Clickable links label'] ?></th>
-									<td>
-										<input type="radio" name="form[make_links]" value="1"<?php if ($pun_config['o_make_links'] == '1') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['Yes'] ?></strong>&#160;&#160;&#160;<input type="radio" name="form[make_links]" value="0"<?php if ($pun_config['o_make_links'] == '0') echo ' checked="checked"' ?> />&#160;<strong><?php echo $lang_admin_common['No'] ?></strong>
-										<span><?php echo $lang_admin_options['Clickable links help'] ?></span>
-									</td>
-								</tr>
 								<tr>
 									<th scope="row"><?php echo $lang_admin_options['Topic review label'] ?></th>
 									<td>
