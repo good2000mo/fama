@@ -450,7 +450,7 @@ if (isset($_GET['action']) || isset($_GET['search_id']))
 		}
 
 		// Determine the topic or post offset (based on $_GET['p'])
-		$per_page = ($show_as == 'posts') ? $pun_user['disp_posts'] : $pun_user['disp_topics'];
+		$per_page = ($show_as == 'posts') ? $pun_config['o_disp_posts_default'] : $pun_config['o_disp_topics_default'];
 		$num_pages = ceil($num_hits / $per_page);
 
 		$p = (!isset($_GET['p']) || $_GET['p'] <= 1 || $_GET['p'] > $num_pages) ? 1 : intval($_GET['p']);
@@ -643,7 +643,7 @@ if (isset($_GET['action']) || isset($_GET['search_id']))
 				// Insert the status text before the subject
 				$subject = implode(' ', $status_text).' '.$subject;
 
-				$num_pages_topic = ceil(($cur_search['num_replies'] + 1) / $pun_user['disp_posts']);
+				$num_pages_topic = ceil(($cur_search['num_replies'] + 1) / $pun_config['o_disp_posts_default']);
 
 				if ($num_pages_topic > 1)
 					$subject_multipage = '<span class="pagestext">[ '.paginate($num_pages_topic, -1, 'viewtopic.php?id='.$cur_search['tid']).' ]</span>';

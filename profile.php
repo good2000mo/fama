@@ -735,29 +735,9 @@ else if (isset($_POST['form_sent']))
 		case 'display':
 		{
 			$form = array(
-				'disp_topics'		=> pun_trim($_POST['form']['disp_topics']),
-				'disp_posts'		=> pun_trim($_POST['form']['disp_posts']),
 				'show_img'			=> isset($_POST['form']['show_img']) ? '1' : '0',
 				'show_avatars'		=> isset($_POST['form']['show_avatars']) ? '1' : '0',
 			);
-
-			if ($form['disp_topics'] != '')
-			{
-				$form['disp_topics'] = intval($form['disp_topics']);
-				if ($form['disp_topics'] < 3)
-					$form['disp_topics'] = 3;
-				else if ($form['disp_topics'] > 75)
-					$form['disp_topics'] = 75;
-			}
-
-			if ($form['disp_posts'] != '')
-			{
-				$form['disp_posts'] = intval($form['disp_posts']);
-				if ($form['disp_posts'] < 3)
-					$form['disp_posts'] = 3;
-				else if ($form['disp_posts'] > 75)
-					$form['disp_posts'] = 75;
-			}
 
 			break;
 		}
@@ -835,7 +815,7 @@ else if (isset($_POST['form_sent']))
 }
 
 
-$result = $db->query('SELECT u.username, u.email, u.title, u.realname, u.url, u.jabber, u.icq, u.msn, u.aim, u.yahoo, u.location, u.disp_topics, u.disp_posts, u.email_setting, u.show_img, u.show_avatars, u.timezone, u.dst, u.language, u.num_posts, u.last_post, u.registered, u.registration_ip, u.admin_note, u.date_format, u.time_format, u.last_visit, g.g_id, g.g_user_title, g.g_moderator FROM '.$db->prefix.'users AS u LEFT JOIN '.$db->prefix.'groups AS g ON g.g_id=u.group_id WHERE u.id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
+$result = $db->query('SELECT u.username, u.email, u.title, u.realname, u.url, u.jabber, u.icq, u.msn, u.aim, u.yahoo, u.location, u.email_setting, u.show_img, u.show_avatars, u.timezone, u.dst, u.language, u.num_posts, u.last_post, u.registered, u.registration_ip, u.admin_note, u.date_format, u.time_format, u.last_visit, g.g_id, g.g_user_title, g.g_moderator FROM '.$db->prefix.'users AS u LEFT JOIN '.$db->prefix.'groups AS g ON g.g_id=u.group_id WHERE u.id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
 if (!$db->num_rows($result))
 	message($lang_common['Bad request']);
 
@@ -1357,16 +1337,6 @@ else
 					</fieldset>
 				</div>
 <?php endif; ?>
-				<div class="inform">
-					<fieldset>
-						<legend><?php echo $lang_profile['Pagination legend'] ?></legend>
-						<div class="infldset">
-							<label class="conl"><?php echo $lang_profile['Topics per page'] ?><br /><input type="text" name="form[disp_topics]" value="<?php echo $user['disp_topics'] ?>" size="6" maxlength="3" /><br /></label>
-							<label class="conl"><?php echo $lang_profile['Posts per page'] ?><br /><input type="text" name="form[disp_posts]" value="<?php echo $user['disp_posts'] ?>" size="6" maxlength="3" /><br /></label>
-							<p class="clearb"><?php echo $lang_profile['Paginate info'] ?> <?php echo $lang_profile['Leave blank'] ?></p>
-						</div>
-					</fieldset>
-				</div>
 				<p class="buttons"><input type="submit" name="update" value="<?php echo $lang_common['Submit'] ?>" /> <?php echo $lang_profile['Instructions'] ?></p>
 			</form>
 		</div>

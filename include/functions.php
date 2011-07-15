@@ -71,11 +71,6 @@ function check_cookie(&$pun_user)
 		if (!file_exists(PUN_ROOT.'lang/'.$pun_user['language']))
 			$pun_user['language'] = $pun_config['o_default_lang'];
 
-		if (!$pun_user['disp_topics'])
-			$pun_user['disp_topics'] = $pun_config['o_disp_topics_default'];
-		if (!$pun_user['disp_posts'])
-			$pun_user['disp_posts'] = $pun_config['o_disp_posts_default'];
-
 		// Define this if you want this visit to affect the online list and the users last visit data
 		if (!defined('PUN_QUIET_VISIT'))
 		{
@@ -259,8 +254,6 @@ function set_default_user()
 	else
 		$db->query('UPDATE '.$db->prefix.'online SET logged='.time().' WHERE ident=\''.$db->escape($remote_addr).'\''.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update online list', __FILE__, __LINE__, $db->error());
 
-	$pun_user['disp_topics'] = $pun_config['o_disp_topics_default'];
-	$pun_user['disp_posts'] = $pun_config['o_disp_posts_default'];
 	$pun_user['timezone'] = $pun_config['o_default_timezone'];
 	$pun_user['dst'] = $pun_config['o_default_dst'];
 	$pun_user['language'] = $pun_config['o_default_lang'];

@@ -33,11 +33,11 @@ if ($pid)
 
 	list($id, $posted) = $db->fetch_row($result);
 
-	// Determine on what page the post is located (depending on $forum_user['disp_posts'])
+	// Determine on what page the post is located (depending on $pun_config['o_disp_posts_default'])
 	$result = $db->query('SELECT COUNT(id) FROM '.$db->prefix.'posts WHERE topic_id='.$id.' AND posted<'.$posted.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to count previous posts', __FILE__, __LINE__, $db->error());
 	$num_posts = $db->result($result) + 1;
 
-	$_GET['p'] = ceil($num_posts / $pun_user['disp_posts']);
+	$_GET['p'] = ceil($num_posts / $pun_config['o_disp_posts_default']);
 }
 
 // If action=new, we redirect to the first new post (if any)
@@ -109,10 +109,10 @@ else
 
 
 // Determine the post offset (based on $_GET['p'])
-$num_pages = ceil(($cur_topic['num_replies'] + 1) / $pun_user['disp_posts']);
+$num_pages = ceil(($cur_topic['num_replies'] + 1) / $pun_config['o_disp_posts_default']);
 
 $p = (!isset($_GET['p']) || $_GET['p'] <= 1 || $_GET['p'] > $num_pages) ? 1 : intval($_GET['p']);
-$start_from = $pun_user['disp_posts'] * ($p - 1);
+$start_from = $pun_config['o_disp_posts_default'] * ($p - 1);
 
 // Generate paging links
 $paging_links = '<span class="pages-label">'.$lang_common['Pages'].' </span>'.paginate($num_pages, $p, 'viewtopic.php?id='.$id);
@@ -184,7 +184,7 @@ require PUN_ROOT.'include/parser.php';
 $post_count = 0; // Keep track of post numbers
 
 // Retrieve a list of post IDs, LIMIT is (really) expensive so we only fetch the IDs here then later fetch the remaining data
-$result = $db->query('SELECT id FROM '.$db->prefix.'posts WHERE topic_id='.$id.' ORDER BY id LIMIT '.$start_from.','.$pun_user['disp_posts'].' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch post IDs', __FILE__, __LINE__, $db->error());
+$result = $db->query('SELECT id FROM '.$db->prefix.'posts WHERE topic_id='.$id.' ORDER BY id LIMIT '.$start_from.','.$pun_config['o_disp_posts_default'].' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch post IDs', __FILE__, __LINE__, $db->error());
 
 $post_ids = array();
 for ($i = 0;$cur_post_id = $db->result($result, $i);$i++)

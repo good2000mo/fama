@@ -261,10 +261,10 @@ if (isset($_GET['tid']))
 
 
 	// Determine the post offset (based on $_GET['p'])
-	$num_pages = ceil(($cur_topic['num_replies'] + 1) / $pun_user['disp_posts']);
+	$num_pages = ceil(($cur_topic['num_replies'] + 1) / $pun_config['o_disp_posts_default']);
 
 	$p = (!isset($_GET['p']) || $_GET['p'] <= 1 || $_GET['p'] > $num_pages) ? 1 : intval($_GET['p']);
-	$start_from = $pun_user['disp_posts'] * ($p - 1);
+	$start_from = $pun_config['o_disp_posts_default'] * ($p - 1);
 
 	// Generate paging links
 	$paging_links = '<span class="pages-label">'.$lang_common['Pages'].' </span>'.paginate($num_pages, $p, 'moderate.php?fid='.$fid.'&amp;tid='.$tid);
@@ -298,7 +298,7 @@ if (isset($_GET['tid']))
 	$post_count = 0; // Keep track of post numbers
 
 	// Retrieve a list of post IDs, LIMIT is (really) expensive so we only fetch the IDs here then later fetch the remaining data
-	$result = $db->query('SELECT id FROM '.$db->prefix.'posts WHERE topic_id='.$tid.' ORDER BY id LIMIT '.$start_from.','.$pun_user['disp_posts'].' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch post IDs', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SELECT id FROM '.$db->prefix.'posts WHERE topic_id='.$tid.' ORDER BY id LIMIT '.$start_from.','.$pun_config['o_disp_posts_default'].' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch post IDs', __FILE__, __LINE__, $db->error());
 
 	$post_ids = array();
 	for ($i = 0;$cur_post_id = $db->result($result, $i);$i++)
@@ -769,10 +769,10 @@ switch ($cur_forum['sort_by'])
 }
 
 // Determine the topic offset (based on $_GET['p'])
-$num_pages = ceil($cur_forum['num_topics'] / $pun_user['disp_topics']);
+$num_pages = ceil($cur_forum['num_topics'] / $pun_config['o_disp_topics_default']);
 
 $p = (!isset($_GET['p']) || $_GET['p'] <= 1 || $_GET['p'] > $num_pages) ? 1 : intval($_GET['p']);
-$start_from = $pun_user['disp_topics'] * ($p - 1);
+$start_from = $pun_config['o_disp_topics_default'] * ($p - 1);
 
 // Generate paging links
 $paging_links = '<span class="pages-label">'.$lang_common['Pages'].' </span>'.paginate($num_pages, $p, 'moderate.php?fid='.$fid);
@@ -816,7 +816,7 @@ require PUN_ROOT.'header.php';
 
 
 // Retrieve a list of topic IDs, LIMIT is (really) expensive so we only fetch the IDs here then later fetch the remaining data
-$result = $db->query('SELECT id FROM '.$db->prefix.'topics WHERE forum_id='.$fid.' ORDER BY sticky DESC, '.$sort_by.', id DESC LIMIT '.$start_from.', '.$pun_user['disp_topics'].' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch topic IDs', __FILE__, __LINE__, $db->error());
+$result = $db->query('SELECT id FROM '.$db->prefix.'topics WHERE forum_id='.$fid.' ORDER BY sticky DESC, '.$sort_by.', id DESC LIMIT '.$start_from.', '.$pun_config['o_disp_topics_default'].' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch topic IDs', __FILE__, __LINE__, $db->error());
 
 // If there are topics in this forum
 if ($db->num_rows($result))
@@ -873,7 +873,7 @@ if ($db->num_rows($result))
 		// Insert the status text before the subject
 		$subject = implode(' ', $status_text).' '.$subject;
 
-		$num_pages_topic = ceil(($cur_topic['num_replies'] + 1) / $pun_user['disp_posts']);
+		$num_pages_topic = ceil(($cur_topic['num_replies'] + 1) / $pun_config['o_disp_posts_default']);
 
 		if ($num_pages_topic > 1)
 			$subject_multipage = '<span class="pagestext">[ '.paginate($num_pages_topic, -1, 'viewtopic.php?id='.$cur_topic['id']).' ]</span>';

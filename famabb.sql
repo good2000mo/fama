@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 -- 
 -- 主機: localhost
--- 建立日期: Jul 15, 2011, 10:15 AM
+-- 建立日期: Jul 15, 2011, 10:34 AM
 -- 伺服器版本: 5.0.51
 -- PHP 版本: 5.2.6
 
@@ -181,7 +181,7 @@ CREATE TABLE `fbb_online` (
 -- 列出以下資料庫的數據： `fbb_online`
 -- 
 
-INSERT INTO `fbb_online` VALUES (2, 'admin', 1310696056, 0, NULL, NULL);
+INSERT INTO `fbb_online` VALUES (2, 'admin', 1310696456, 0, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -324,8 +324,6 @@ CREATE TABLE `fbb_users` (
   `aim` varchar(30) default NULL,
   `yahoo` varchar(30) default NULL,
   `location` varchar(30) default NULL,
-  `disp_topics` tinyint(3) unsigned default NULL,
-  `disp_posts` tinyint(3) unsigned default NULL,
   `email_setting` tinyint(1) NOT NULL default '1',
   `show_img` tinyint(1) NOT NULL default '1',
   `show_avatars` tinyint(1) NOT NULL default '1',
@@ -353,5 +351,5 @@ CREATE TABLE `fbb_users` (
 -- 列出以下資料庫的數據： `fbb_users`
 -- 
 
-INSERT INTO `fbb_users` VALUES (1, 3, '訪客', '訪客', '訪客', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 1, 1, 0, 0, 0, 0, 'Traditional_Chinese', 0, NULL, NULL, NULL, 0, '0.0.0.0', 0, NULL, NULL, NULL);
-INSERT INTO `fbb_users` VALUES (2, 1, 'admin', 'c3d873d7fa9ac799e35693d4cc288d4a16ad3f96', 'comus2010mo@hotmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 1, 1, 8, 0, 0, 0, 'Traditional_Chinese', 1, 1310283814, NULL, NULL, 1310283814, '127.0.0.1', 1310690898, NULL, NULL, NULL);
+INSERT INTO `fbb_users` VALUES (1, 3, '訪客', '訪客', '訪客', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 1, 1, 0, 0, 0, 0, 'Traditional_Chinese', 0, NULL, NULL, NULL, 0, '0.0.0.0', 0, NULL, NULL, NULL);
+INSERT INTO `fbb_users` VALUES (2, 1, 'admin', 'c3d873d7fa9ac799e35693d4cc288d4a16ad3f96', 'comus2010mo@hotmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 1, 1, 8, 0, 0, 0, 'Traditional_Chinese', 1, 1310283814, NULL, NULL, 1310283814, '127.0.0.1', 1310690898, NULL, NULL, NULL);
