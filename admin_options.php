@@ -224,7 +224,7 @@ generate_admin_menu('options');
 				</div>
 <?php
 
-	$diff = $pun_user['timezone'] * 3600;
+	$diff = $pun_config['o_default_timezone'] * 3600;
 	$timestamp = time() + $diff;
 
 ?>

@@ -254,7 +254,6 @@ function set_default_user()
 	else
 		$db->query('UPDATE '.$db->prefix.'online SET logged='.time().' WHERE ident=\''.$db->escape($remote_addr).'\''.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update online list', __FILE__, __LINE__, $db->error());
 
-	$pun_user['timezone'] = $pun_config['o_default_timezone'];
 	$pun_user['language'] = $pun_config['o_default_lang'];
 	$pun_user['is_guest'] = true;
 	$pun_user['is_admmod'] = false;
@@ -408,9 +407,6 @@ function generate_profile_menu($page = '')
 			<div class="inbox">
 				<ul>
 					<li<?php if ($page == 'essentials') echo ' class="isactive"'; ?>><a href="profile.php?section=essentials&amp;id=<?php echo $id ?>"><?php echo $lang_profile['Section essentials'] ?></a></li>
-					<li<?php if ($page == 'personal') echo ' class="isactive"'; ?>><a href="profile.php?section=personal&amp;id=<?php echo $id ?>"><?php echo $lang_profile['Section personal'] ?></a></li>
-					<li<?php if ($page == 'messaging') echo ' class="isactive"'; ?>><a href="profile.php?section=messaging&amp;id=<?php echo $id ?>"><?php echo $lang_profile['Section messaging'] ?></a></li>
-					<li<?php if ($page == 'display') echo ' class="isactive"'; ?>><a href="profile.php?section=display&amp;id=<?php echo $id ?>"><?php echo $lang_profile['Section display'] ?></a></li>
 <?php if ($pun_user['g_id'] == PUN_ADMIN): ?>					<li<?php if ($page == 'admin') echo ' class="isactive"'; ?>><a href="profile.php?section=admin&amp;id=<?php echo $id ?>"><?php echo $lang_profile['Section admin'] ?></a></li>
 <?php endif; ?>				</ul>
 			</div>
@@ -662,20 +658,17 @@ function message($message, $no_back_link = false)
 //
 function format_time($timestamp, $date_only = false, $date_format = null, $time_format = null, $time_only = false, $no_text = false)
 {
-	global $pun_config, $lang_common, $pun_user, $forum_date_formats, $forum_time_formats;
+	global $pun_config, $lang_common, $pun_user;
 
 	if ($timestamp == '')
 		return $lang_common['Never'];
 
-	$diff = $pun_user['timezone'] * 3600;
+	$diff = $pun_config['o_default_timezone'] * 3600;
 	$timestamp += $diff;
 	$now = time();
 
-	if($date_format == null)
-		$date_format = $forum_date_formats[$pun_user['date_format']];
-
-	if($time_format == null)
-		$time_format = $forum_time_formats[$pun_user['time_format']];
+	$date_format = $pun_config['o_date_format'];
+	$time_format = $pun_config['o_time_format'];
 
 	$date = gmdate($date_format, $timestamp);
 	$today = gmdate($date_format, $now+$diff);

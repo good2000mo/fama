@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 -- 
 -- 主機: localhost
--- 建立日期: Jul 15, 2011, 04:27 PM
+-- 建立日期: Jul 18, 2011, 02:47 PM
 -- 伺服器版本: 5.0.51
 -- PHP 版本: 5.2.6
 
@@ -160,7 +160,7 @@ CREATE TABLE `fbb_online` (
 -- 列出以下資料庫的數據： `fbb_online`
 -- 
 
-INSERT INTO `fbb_online` VALUES (2, 'admin', 1310717612, 0, NULL, NULL);
+INSERT INTO `fbb_online` VALUES (2, 'admin', 1310971556, 0, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -294,18 +294,6 @@ CREATE TABLE `fbb_users` (
   `password` varchar(40) NOT NULL default '',
   `email` varchar(80) NOT NULL default '',
   `title` varchar(50) default NULL,
-  `realname` varchar(40) default NULL,
-  `url` varchar(100) default NULL,
-  `jabber` varchar(80) default NULL,
-  `icq` varchar(12) default NULL,
-  `msn` varchar(80) default NULL,
-  `aim` varchar(30) default NULL,
-  `yahoo` varchar(30) default NULL,
-  `location` varchar(30) default NULL,
-  `show_img` tinyint(1) NOT NULL default '1',
-  `timezone` float NOT NULL default '0',
-  `time_format` tinyint(1) NOT NULL default '0',
-  `date_format` tinyint(1) NOT NULL default '0',
   `language` varchar(25) NOT NULL default 'Traditional_Chinese',
   `num_posts` int(10) unsigned NOT NULL default '0',
   `last_post` int(10) unsigned default NULL,
@@ -314,7 +302,6 @@ CREATE TABLE `fbb_users` (
   `registered` int(10) unsigned NOT NULL default '0',
   `registration_ip` varchar(39) NOT NULL default '0.0.0.0',
   `last_visit` int(10) unsigned NOT NULL default '0',
-  `admin_note` varchar(30) default NULL,
   `activate_string` varchar(80) default NULL,
   `activate_key` varchar(8) default NULL,
   PRIMARY KEY  (`id`),
@@ -326,5 +313,5 @@ CREATE TABLE `fbb_users` (
 -- 列出以下資料庫的數據： `fbb_users`
 -- 
 
-INSERT INTO `fbb_users` VALUES (1, 3, '訪客', '訪客', '訪客', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, 0, 'Traditional_Chinese', 0, NULL, NULL, NULL, 0, '0.0.0.0', 0, NULL, NULL, NULL);
-INSERT INTO `fbb_users` VALUES (2, 1, 'admin', 'c3d873d7fa9ac799e35693d4cc288d4a16ad3f96', 'comus2010mo@hotmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 8, 0, 0, 'Traditional_Chinese', 1, 1310283814, NULL, NULL, 1310283814, '127.0.0.1', 1310716812, NULL, NULL, NULL);
+INSERT INTO `fbb_users` VALUES (1, 3, '訪客', '訪客', '訪客', NULL, 'Traditional_Chinese', 0, NULL, NULL, NULL, 0, '0.0.0.0', 0, NULL, NULL);
+INSERT INTO `fbb_users` VALUES (2, 1, 'admin', 'c3d873d7fa9ac799e35693d4cc288d4a16ad3f96', 'comus2010mo@hotmail.com', NULL, 'Traditional_Chinese', 1, 1310283814, NULL, NULL, 1310283814, '127.0.0.1', 1310903718, NULL, NULL);

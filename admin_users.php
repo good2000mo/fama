@@ -171,7 +171,6 @@ if (isset($_GET['show_users']))
 					<th class="tc2" scope="col"><?php echo $lang_admin_users['Results e-mail head'] ?></th>
 					<th class="tc3" scope="col"><?php echo $lang_admin_users['Results title head'] ?></th>
 					<th class="tc4" scope="col"><?php echo $lang_admin_users['Results posts head'] ?></th>
-					<th class="tc5" scope="col"><?php echo $lang_admin_users['Results admin note head'] ?></th>
 					<th class="tcr" scope="col"><?php echo $lang_admin_users['Results actions head'] ?></th>
 				</tr>
 			</thead>
@@ -188,21 +187,18 @@ if (isset($_GET['show_users']))
 		{
 			list($poster_id, $poster) = $db->fetch_row($result);
 
-			$result2 = $db->query('SELECT u.id, u.username, u.email, u.title, u.num_posts, u.admin_note, g.g_id, g.g_user_title FROM '.$db->prefix.'users AS u INNER JOIN '.$db->prefix.'groups AS g ON g.g_id=u.group_id WHERE u.id>1 AND u.id='.$poster_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
+			$result2 = $db->query('SELECT u.id, u.username, u.email, u.num_posts, g.g_id, g.g_user_title FROM '.$db->prefix.'users AS u INNER JOIN '.$db->prefix.'groups AS g ON g.g_id=u.group_id WHERE u.id>1 AND u.id='.$poster_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
 
 			if (($user_data = $db->fetch_assoc($result2)))
 			{
-				$user_title = get_title($user_data);
-
 				$actions = '<a href="admin_users.php?ip_stats='.$user_data['id'].'">'.$lang_admin_users['Results view IP link'].'</a> | <a href="search.php?action=show_user_posts&amp;user_id='.$user_data['id'].'">'.$lang_admin_users['Results show posts link'].'</a>';
 
 ?>
 				<tr>
 					<td class="tcl"><?php echo '<a href="profile.php?id='.$user_data['id'].'">'.pun_htmlspecialchars($user_data['username']).'</a>' ?></td>
 					<td class="tc2"><a href="mailto:<?php echo $user_data['email'] ?>"><?php echo $user_data['email'] ?></a></td>
-					<td class="tc3"><?php echo $user_title ?></td>
+					<td class="tc3"><?php echo $user_data['g_user_title'] ?></td>
 					<td class="tc4"><?php echo forum_number_format($user_data['num_posts']) ?></td>
-					<td class="tc5"><?php echo ($user_data['admin_note'] != '') ? pun_htmlspecialchars($user_data['admin_note']) : '&#160;' ?></td>
 					<td class="tcr"><?php echo $actions ?></td>
 				</tr>
 <?php
@@ -217,7 +213,6 @@ if (isset($_GET['show_users']))
 					<td class="tc2">&#160;</td>
 					<td class="tc3"><?php echo $lang_admin_users['Results guest'] ?></td>
 					<td class="tc4">&#160;</td>
-					<td class="tc5">&#160;</td>
 					<td class="tcr">&#160;</td>
 				</tr>
 <?php
@@ -606,7 +601,7 @@ else if (isset($_GET['find_user']))
 	$like_command = ($db_type == 'pgsql') ? 'ILIKE' : 'LIKE';
 	foreach ($form as $key => $input)
 	{
-		if ($input != '' && in_array($key, array('username', 'email', 'title', 'realname', 'url', 'jabber', 'icq', 'msn', 'aim', 'yahoo', 'location', 'admin_note')))
+		if ($input != '' && in_array($key, array('username', 'email', 'title')))
 		{
 			$conditions[] = 'u.'.$db->escape($key).' '.$like_command.' \''.$db->escape(str_replace('*', '%', $input)).'\'';
 			$query_str[] = 'form%5B'.$key.'%5D='.urlencode($input);
@@ -677,7 +672,6 @@ else if (isset($_GET['find_user']))
 					<th class="tc2" scope="col"><?php echo $lang_admin_users['Results e-mail head'] ?></th>
 					<th class="tc3" scope="col"><?php echo $lang_admin_users['Results title head'] ?></th>
 					<th class="tc4" scope="col"><?php echo $lang_admin_users['Results posts head'] ?></th>
-					<th class="tc5" scope="col"><?php echo $lang_admin_users['Results admin note head'] ?></th>
 					<th class="tcr" scope="col"><?php echo $lang_admin_users['Results actions head'] ?></th>
 <?php if ($can_action): ?>					<th class="tcmod" scope="col"><?php echo $lang_admin_users['Select'] ?></th>
 <?php endif; ?>
@@ -686,12 +680,12 @@ else if (isset($_GET['find_user']))
 			<tbody>
 <?php
 
-	$result = $db->query('SELECT u.id, u.username, u.email, u.title, u.num_posts, u.admin_note, g.g_id, g.g_user_title FROM '.$db->prefix.'users AS u LEFT JOIN '.$db->prefix.'groups AS g ON g.g_id=u.group_id WHERE u.id>1'.(!empty($conditions) ? ' AND '.implode(' AND ', $conditions) : '').' ORDER BY '.$db->escape($order_by).' '.$db->escape($direction).' LIMIT '.$start_from.', 50'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SELECT u.id, u.username, u.email, u.num_posts, g.g_id, g.g_user_title FROM '.$db->prefix.'users AS u LEFT JOIN '.$db->prefix.'groups AS g ON g.g_id=u.group_id WHERE u.id>1'.(!empty($conditions) ? ' AND '.implode(' AND ', $conditions) : '').' ORDER BY '.$db->escape($order_by).' '.$db->escape($direction).' LIMIT '.$start_from.', 50'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
 	if ($db->num_rows($result))
 	{
 		while ($user_data = $db->fetch_assoc($result))
 		{
-			$user_title = get_title($user_data);
+			$user_title = $user_data['g_user_title'];
 
 			// This script is a special case in that we want to display "Not verified" for non-verified users
 			if ($user_data['g_id'] == '' || $user_data['g_id'] == PUN_UNVERIFIED)
@@ -705,7 +699,6 @@ else if (isset($_GET['find_user']))
 					<td class="tc2"><a href="mailto:<?php echo $user_data['email'] ?>"><?php echo $user_data['email'] ?></a></td>
 					<td class="tc3"><?php echo $user_title ?></td>
 					<td class="tc4"><?php echo forum_number_format($user_data['num_posts']) ?></td>
-					<td class="tc5"><?php echo ($user_data['admin_note'] != '') ? pun_htmlspecialchars($user_data['admin_note']) : '&#160;' ?></td>
 					<td class="tcr"><?php echo $actions ?></td>
 <?php if ($can_action): ?>					<td class="tcmod"><input type="checkbox" name="users[<?php echo $user_data['id'] ?>]" value="1" /></td>
 <?php endif; ?>
@@ -778,42 +771,6 @@ else
 								<tr>
 									<th scope="row"><?php echo $lang_admin_users['Title label'] ?></th>
 									<td><input type="text" name="form[title]" size="30" maxlength="50" tabindex="4" /></td>
-								</tr>
-								<tr>
-									<th scope="row"><?php echo $lang_admin_users['Real name label'] ?></th>
-									<td><input type="text" name="form[realname]" size="30" maxlength="40" tabindex="5" /></td>
-								</tr>
-								<tr>
-									<th scope="row"><?php echo $lang_admin_users['Website label'] ?></th>
-									<td><input type="text" name="form[url]" size="35" maxlength="100" tabindex="6" /></td>
-								</tr>
-								<tr>
-									<th scope="row"><?php echo $lang_admin_users['Jabber label'] ?></th>
-									<td><input type="text" name="form[jabber]" size="30" maxlength="75" tabindex="7" /></td>
-								</tr>
-								<tr>
-									<th scope="row"><?php echo $lang_admin_users['ICQ label'] ?></th>
-									<td><input type="text" name="form[icq]" size="12" maxlength="12" tabindex="8" /></td>
-								</tr>
-								<tr>
-									<th scope="row"><?php echo $lang_admin_users['MSN label'] ?></th>
-									<td><input type="text" name="form[msn]" size="30" maxlength="50" tabindex="9" /></td>
-								</tr>
-								<tr>
-									<th scope="row"><?php echo $lang_admin_users['AOL label'] ?></th>
-									<td><input type="text" name="form[aim]" size="20" maxlength="20" tabindex="10" /></td>
-								</tr>
-								<tr>
-									<th scope="row"><?php echo $lang_admin_users['Yahoo label'] ?></th>
-									<td><input type="text" name="form[yahoo]" size="20" maxlength="20" tabindex="11" /></td>
-								</tr>
-								<tr>
-									<th scope="row"><?php echo $lang_admin_users['Location label'] ?></th>
-									<td><input type="text" name="form[location]" size="30" maxlength="30" tabindex="12" /></td>
-								</tr>
-								<tr>
-									<th scope="row"><?php echo $lang_admin_users['Admin note label'] ?></th>
-									<td><input type="text" name="form[admin_note]" size="30" maxlength="30" tabindex="14" /></td>
 								</tr>
 								<tr>
 									<th scope="row"><?php echo $lang_admin_users['Posts more than label'] ?></th>

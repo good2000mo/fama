@@ -640,10 +640,7 @@ function handle_img_tag($url, $alt = null)
 	if ($alt == null)
 		$alt = basename($url);
 
-	$img_tag = '<a href="'.$url.'">&lt;'.$lang_common['Image link'].' - '.$alt.'&gt;</a>';
-
-	if ($pun_user['show_img'] != '0')
-		$img_tag = '<span class="postimg"><img src="'.$url.'" alt="'.$alt.'" /></span>';
+	$img_tag = '<span class="postimg"><img src="'.$url.'" alt="'.$alt.'" /></span>';
 
 	return $img_tag;
 }
