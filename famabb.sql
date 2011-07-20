@@ -188,7 +188,7 @@ CREATE TABLE `fbb_posts` (
 -- 列出以下資料庫的數據： `fbb_posts`
 -- 
 
-INSERT INTO `fbb_posts` VALUES (1, 'admin', 2, '127.0.0.1', NULL, '如果您在閱讀這個帖子(我猜正是如此)，安裝的 FluxBB 已經開始工作！現在您可以登錄，並進入頂部的管理設置面板來配置您的論壇。', 1310283814, NULL, NULL, 1);
+INSERT INTO `fbb_posts` VALUES (1, 'admin', 2, '127.0.0.1', NULL, '如果您在閱讀這個文章(我猜正是如此)，安裝的 FluxBB 已經開始工作！現在您可以登入，並進入頂部的管理設置面板來配置您的公告板。', 1310283814, NULL, NULL, 1);
 
 -- --------------------------------------------------------
 
@@ -279,7 +279,7 @@ CREATE TABLE `fbb_topics` (
 -- 列出以下資料庫的數據： `fbb_topics`
 -- 
 
-INSERT INTO `fbb_topics` VALUES (1, 'admin', '示例帖子', 1310283814, 1, 1310283814, 1, 'admin', 0, 0, 0, NULL, 1);
+INSERT INTO `fbb_topics` VALUES (1, 'admin', '示例文章', 1310283814, 1, 1310283814, 1, 'admin', 0, 0, 0, NULL, 1);
 
 -- --------------------------------------------------------
 

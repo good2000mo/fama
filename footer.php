@@ -1,21 +1,17 @@
 <?php
 
-/**
- * Copyright (C) 2008-2011 FluxBB
- * based on code by Rickard Andersson copyright (C) 2002-2008 PunBB
- * License: http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
- */
-
-// Make sure no one attempts to run this script "directly"
+// 1. 確保沒有人直接運行本檔案
 if (!defined('PUN'))
 	exit;
 
+// 2. 取代pun_main
 $tpl_temp = trim(ob_get_contents());
 $tpl_main = str_replace('<pun_main>', $tpl_temp, $tpl_main);
 ob_end_clean();
 // END SUBST - <pun_main>
 
 
+// 3. 取代pun_footer
 // START SUBST - <pun_footer>
 ob_start();
 
@@ -34,10 +30,10 @@ if (defined('PUN_DEBUG'))
 
 	if (function_exists('memory_get_usage'))
 	{
-		echo ' - '.sprintf($lang_common['Memory usage'], file_size(memory_get_usage()));
+		echo ' - '.sprintf($lang_common['Memory usage'], fama_file_size(memory_get_usage()));
 
 		if (function_exists('memory_get_peak_usage'))
-			echo ' '.sprintf($lang_common['Peak usage'], file_size(memory_get_peak_usage()));
+			echo ' '.sprintf($lang_common['Peak usage'], fama_file_size(memory_get_peak_usage()));
 	}
 
 	echo ' ]</p>'."\n";
@@ -49,7 +45,7 @@ $db->end_transaction();
 
 // Display executed queries (if enabled)
 if (defined('PUN_SHOW_QUERIES'))
-	display_saved_queries();
+	fama_display_saved_queries();
 
 $tpl_temp = trim(ob_get_contents());
 $tpl_main = str_replace('<pun_footer>', $tpl_temp, $tpl_main);

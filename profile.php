@@ -18,14 +18,14 @@ $action = isset($_GET['action']) ? $_GET['action'] : null;
 $section = isset($_GET['section']) ? $_GET['section'] : null;
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 if ($id < 2)
-	message($lang_common['Bad request']);
+	fama_message($lang_common['Bad request']);
 
 if ($action != 'change_pass' || !isset($_GET['key']))
 {
 	if ($pun_user['g_read_board'] == '0')
-		message($lang_common['No view']);
+		fama_message($lang_common['No view']);
 	else if ($pun_user['g_view_users'] == '0' && ($pun_user['is_guest'] || $pun_user['id'] != $id))
-		message($lang_common['No permission']);
+		fama_message($lang_common['No permission']);
 }
 
 // Load the profile.php/register.php language file
@@ -48,16 +48,16 @@ if ($action == 'change_pass')
 
 		$key = $_GET['key'];
 
-		$result = $db->query('SELECT * FROM '.$db->prefix.'users WHERE id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch new password', __FILE__, __LINE__, $db->error());
+		$result = $db->query('SELECT * FROM '.$db->prefix.'users WHERE id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch new password', __FILE__, __LINE__, $db->error());
 		$cur_user = $db->fetch_assoc($result);
 
 		if ($key == '' || $key != $cur_user['activate_key'])
-			message($lang_profile['Pass key bad'].' <a href="mailto:'.$pun_config['o_admin_email'].'">'.$pun_config['o_admin_email'].'</a>.');
+			fama_message($lang_profile['Pass key bad'].' <a href="mailto:'.$pun_config['o_admin_email'].'">'.$pun_config['o_admin_email'].'</a>.');
 		else
 		{
-			$db->query('UPDATE '.$db->prefix.'users SET password=\''.$cur_user['activate_string'].'\', activate_string=NULL, activate_key=NULL'.(!empty($cur_user['salt']) ? ', salt=NULL' : '').' WHERE id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update password', __FILE__, __LINE__, $db->error());
+			$db->query('UPDATE '.$db->prefix.'users SET password=\''.$cur_user['activate_string'].'\', activate_string=NULL, activate_key=NULL'.(!empty($cur_user['salt']) ? ', salt=NULL' : '').' WHERE id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to update password', __FILE__, __LINE__, $db->error());
 
-			message($lang_profile['Pass updated'], true);
+			fama_message($lang_profile['Pass updated'], true);
 		}
 	}
 
@@ -65,17 +65,17 @@ if ($action == 'change_pass')
 	if ($pun_user['id'] != $id)
 	{
 		if (!$pun_user['is_admmod']) // A regular user trying to change another users password?
-			message($lang_common['No permission']);
+			fama_message($lang_common['No permission']);
 		else if ($pun_user['g_moderator'] == '1') // A moderator trying to change a users password?
 		{
-			$result = $db->query('SELECT u.group_id, g.g_moderator FROM '.$db->prefix.'users AS u INNER JOIN '.$db->prefix.'groups AS g ON (g.g_id=u.group_id) WHERE u.id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
+			$result = $db->query('SELECT u.group_id, g.g_moderator FROM '.$db->prefix.'users AS u INNER JOIN '.$db->prefix.'groups AS g ON (g.g_id=u.group_id) WHERE u.id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
 			if (!$db->num_rows($result))
-				message($lang_common['Bad request']);
+				fama_message($lang_common['Bad request']);
 
 			list($group_id, $is_moderator) = $db->fetch_row($result);
 
 			if ($pun_user['g_mod_edit_users'] == '0' || $pun_user['g_mod_change_passwords'] == '0' || $group_id == PUN_ADMIN || $is_moderator == '1')
-				message($lang_common['No permission']);
+				fama_message($lang_common['No permission']);
 		}
 	}
 
@@ -89,11 +89,11 @@ if ($action == 'change_pass')
 		$new_password2 = pun_trim($_POST['req_new_password2']);
 
 		if ($new_password1 != $new_password2)
-			message($lang_prof_reg['Pass not match']);
+			fama_message($lang_prof_reg['Pass not match']);
 		if (pun_strlen($new_password1) < 4)
-			message($lang_prof_reg['Pass too short']);
+			fama_message($lang_prof_reg['Pass too short']);
 
-		$result = $db->query('SELECT * FROM '.$db->prefix.'users WHERE id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch password', __FILE__, __LINE__, $db->error());
+		$result = $db->query('SELECT * FROM '.$db->prefix.'users WHERE id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch password', __FILE__, __LINE__, $db->error());
 		$cur_user = $db->fetch_assoc($result);
 
 		$authorized = false;
@@ -107,11 +107,11 @@ if ($action == 'change_pass')
 		}
 
 		if (!$authorized)
-			message($lang_profile['Wrong pass']);
+			fama_message($lang_profile['Wrong pass']);
 
 		$new_password_hash = pun_hash($new_password1);
 
-		$db->query('UPDATE '.$db->prefix.'users SET password=\''.$new_password_hash.'\''.(!empty($cur_user['salt']) ? ', salt=NULL' : '').' WHERE id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update password', __FILE__, __LINE__, $db->error());
+		$db->query('UPDATE '.$db->prefix.'users SET password=\''.$new_password_hash.'\''.(!empty($cur_user['salt']) ? ', salt=NULL' : '').' WHERE id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to update password', __FILE__, __LINE__, $db->error());
 
 		if ($pun_user['id'] == $id)
 			pun_setcookie($pun_user['id'], $new_password_hash, time() + $pun_config['o_timeout_visit']);
@@ -119,7 +119,7 @@ if ($action == 'change_pass')
 		redirect('profile.php?section=essentials&amp;id='.$id, $lang_profile['Pass updated redirect']);
 	}
 
-	$page_title = array(pun_htmlspecialchars($pun_config['o_board_title']), $lang_common['Profile'], $lang_profile['Change pass']);
+	$page_title = array(fama_htmlspecialchars($pun_config['o_board_title']), $lang_common['Profile'], $lang_profile['Change pass']);
 	$required_fields = array('req_old_password' => $lang_profile['Old pass'], 'req_new_password1' => $lang_profile['New pass'], 'req_new_password2' => $lang_profile['Confirm new pass']);
 	$focus_element = array('change_pass', ((!$pun_user['is_admmod']) ? 'req_old_password' : 'req_new_password1'));
 	define('PUN_ACTIVE_PAGE', 'profile');
@@ -161,17 +161,17 @@ else if ($action == 'change_email')
 	if ($pun_user['id'] != $id)
 	{
 		if (!$pun_user['is_admmod']) // A regular user trying to change another users email?
-			message($lang_common['No permission']);
+			fama_message($lang_common['No permission']);
 		else if ($pun_user['g_moderator'] == '1') // A moderator trying to change a users email?
 		{
-			$result = $db->query('SELECT u.group_id, g.g_moderator FROM '.$db->prefix.'users AS u INNER JOIN '.$db->prefix.'groups AS g ON (g.g_id=u.group_id) WHERE u.id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
+			$result = $db->query('SELECT u.group_id, g.g_moderator FROM '.$db->prefix.'users AS u INNER JOIN '.$db->prefix.'groups AS g ON (g.g_id=u.group_id) WHERE u.id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
 			if (!$db->num_rows($result))
-				message($lang_common['Bad request']);
+				fama_message($lang_common['Bad request']);
 
 			list($group_id, $is_moderator) = $db->fetch_row($result);
 
 			if ($pun_user['g_mod_edit_users'] == '0' || $group_id == PUN_ADMIN || $is_moderator == '1')
-				message($lang_common['No permission']);
+				fama_message($lang_common['No permission']);
 		}
 	}
 
@@ -179,33 +179,33 @@ else if ($action == 'change_email')
 	{
 		$key = $_GET['key'];
 
-		$result = $db->query('SELECT activate_string, activate_key FROM '.$db->prefix.'users WHERE id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch activation data', __FILE__, __LINE__, $db->error());
+		$result = $db->query('SELECT activate_string, activate_key FROM '.$db->prefix.'users WHERE id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch activation data', __FILE__, __LINE__, $db->error());
 		list($new_email, $new_email_key) = $db->fetch_row($result);
 
 		if ($key == '' || $key != $new_email_key)
-			message($lang_profile['Email key bad'].' <a href="mailto:'.$pun_config['o_admin_email'].'">'.$pun_config['o_admin_email'].'</a>.');
+			fama_message($lang_profile['Email key bad'].' <a href="mailto:'.$pun_config['o_admin_email'].'">'.$pun_config['o_admin_email'].'</a>.');
 		else
 		{
-			$db->query('UPDATE '.$db->prefix.'users SET email=activate_string, activate_string=NULL, activate_key=NULL WHERE id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update email address', __FILE__, __LINE__, $db->error());
+			$db->query('UPDATE '.$db->prefix.'users SET email=activate_string, activate_string=NULL, activate_key=NULL WHERE id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to update email address', __FILE__, __LINE__, $db->error());
 
-			message($lang_profile['Email updated'], true);
+			fama_message($lang_profile['Email updated'], true);
 		}
 	}
 	else if (isset($_POST['form_sent']))
 	{
 		if (pun_hash($_POST['req_password']) !== $pun_user['password'])
-			message($lang_profile['Wrong pass']);
+			fama_message($lang_profile['Wrong pass']);
 
 		require PUN_ROOT.'include/email.php';
 
 		// Validate the email address
 		$new_email = strtolower(trim($_POST['req_new_email']));
 		if (!is_valid_email($new_email))
-			message($lang_common['Invalid email']);
+			fama_message($lang_common['Invalid email']);
 
 		$new_email_key = random_pass(8);
 
-		$db->query('UPDATE '.$db->prefix.'users SET activate_string=\''.$db->escape($new_email).'\', activate_key=\''.$new_email_key.'\' WHERE id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update activation data', __FILE__, __LINE__, $db->error());
+		$db->query('UPDATE '.$db->prefix.'users SET activate_string=\''.$db->escape($new_email).'\', activate_key=\''.$new_email_key.'\' WHERE id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to update activation data', __FILE__, __LINE__, $db->error());
 
 		// Load the "activate email" template
 		$mail_tpl = trim(file_get_contents(PUN_ROOT.'lang/'.$pun_user['language'].'/mail_templates/activate_email.tpl'));
@@ -222,10 +222,10 @@ else if ($action == 'change_email')
 
 		pun_mail($new_email, $mail_subject, $mail_message);
 
-		message($lang_profile['Activate email sent'].' <a href="mailto:'.$pun_config['o_admin_email'].'">'.$pun_config['o_admin_email'].'</a>.', true);
+		fama_message($lang_profile['Activate email sent'].' <a href="mailto:'.$pun_config['o_admin_email'].'">'.$pun_config['o_admin_email'].'</a>.', true);
 	}
 
-	$page_title = array(pun_htmlspecialchars($pun_config['o_board_title']), $lang_common['Profile'], $lang_profile['Change email']);
+	$page_title = array(fama_htmlspecialchars($pun_config['o_board_title']), $lang_common['Profile'], $lang_profile['Change email']);
 	$required_fields = array('req_new_email' => $lang_profile['New email'], 'req_password' => $lang_common['Password']);
 	$focus_element = array('change_email', 'req_new_email');
 	define('PUN_ACTIVE_PAGE', 'profile');
@@ -260,21 +260,21 @@ else if ($action == 'change_email')
 else if (isset($_POST['update_group_membership']))
 {
 	if ($pun_user['g_id'] > PUN_ADMIN)
-		message($lang_common['No permission']);
+		fama_message($lang_common['No permission']);
 
 	confirm_referrer('profile.php');
 
 	$new_group_id = intval($_POST['group_id']);
 
-	$db->query('UPDATE '.$db->prefix.'users SET group_id='.$new_group_id.' WHERE id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to change user group', __FILE__, __LINE__, $db->error());
+	$db->query('UPDATE '.$db->prefix.'users SET group_id='.$new_group_id.' WHERE id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to change user group', __FILE__, __LINE__, $db->error());
 
-	$result = $db->query('SELECT g_moderator FROM '.$db->prefix.'groups WHERE g_id='.$new_group_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch group', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SELECT g_moderator FROM '.$db->prefix.'groups WHERE g_id='.$new_group_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch group', __FILE__, __LINE__, $db->error());
 	$new_group_mod = $db->result($result);
 
 	// If the user was a moderator or an administrator, we remove him/her from the moderator list in all forums as well
 	if ($new_group_id != PUN_ADMIN && $new_group_mod != '1')
 	{
-		$result = $db->query('SELECT id, moderators FROM '.$db->prefix.'forums'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch forum list', __FILE__, __LINE__, $db->error());
+		$result = $db->query('SELECT id, moderators FROM '.$db->prefix.'forums'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch forum list', __FILE__, __LINE__, $db->error());
 
 		while ($cur_forum = $db->fetch_assoc($result))
 		{
@@ -286,7 +286,7 @@ else if (isset($_POST['update_group_membership']))
 				unset($cur_moderators[$username]);
 				$cur_moderators = (!empty($cur_moderators)) ? '\''.$db->escape(serialize($cur_moderators)).'\'' : 'NULL';
 
-				$db->query('UPDATE '.$db->prefix.'forums SET moderators='.$cur_moderators.' WHERE id='.$cur_forum['id'].' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update forum', __FILE__, __LINE__, $db->error());
+				$db->query('UPDATE '.$db->prefix.'forums SET moderators='.$cur_moderators.' WHERE id='.$cur_forum['id'].' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to update forum', __FILE__, __LINE__, $db->error());
 			}
 		}
 	}
@@ -298,18 +298,18 @@ else if (isset($_POST['update_group_membership']))
 else if (isset($_POST['update_forums']))
 {
 	if ($pun_user['g_id'] > PUN_ADMIN)
-		message($lang_common['No permission']);
+		fama_message($lang_common['No permission']);
 
 	confirm_referrer('profile.php');
 
 	// Get the username of the user we are processing
-	$result = $db->query('SELECT username FROM '.$db->prefix.'users WHERE id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SELECT username FROM '.$db->prefix.'users WHERE id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
 	$username = $db->result($result);
 
 	$moderator_in = (isset($_POST['moderator_in'])) ? array_keys($_POST['moderator_in']) : array();
 
 	// Loop through all forums
-	$result = $db->query('SELECT id, moderators FROM '.$db->prefix.'forums'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch forum list', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SELECT id, moderators FROM '.$db->prefix.'forums'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch forum list', __FILE__, __LINE__, $db->error());
 
 	while ($cur_forum = $db->fetch_assoc($result))
 	{
@@ -320,7 +320,7 @@ else if (isset($_POST['update_forums']))
 			$cur_moderators[$username] = $id;
 			uksort($cur_moderators, 'utf8_strcasecmp');
 
-			$db->query('UPDATE '.$db->prefix.'forums SET moderators=\''.$db->escape(serialize($cur_moderators)).'\' WHERE id='.$cur_forum['id'].' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update forum', __FILE__, __LINE__, $db->error());
+			$db->query('UPDATE '.$db->prefix.'forums SET moderators=\''.$db->escape(serialize($cur_moderators)).'\' WHERE id='.$cur_forum['id'].' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to update forum', __FILE__, __LINE__, $db->error());
 		}
 		// If the user shouldn't have moderator access (and he/she already has it)
 		else if (!in_array($cur_forum['id'], $moderator_in) && in_array($id, $cur_moderators))
@@ -328,7 +328,7 @@ else if (isset($_POST['update_forums']))
 			unset($cur_moderators[$username]);
 			$cur_moderators = (!empty($cur_moderators)) ? '\''.$db->escape(serialize($cur_moderators)).'\'' : 'NULL';
 
-			$db->query('UPDATE '.$db->prefix.'forums SET moderators='.$cur_moderators.' WHERE id='.$cur_forum['id'].' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update forum', __FILE__, __LINE__, $db->error());
+			$db->query('UPDATE '.$db->prefix.'forums SET moderators='.$cur_moderators.' WHERE id='.$cur_forum['id'].' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to update forum', __FILE__, __LINE__, $db->error());
 		}
 	}
 
@@ -339,26 +339,26 @@ else if (isset($_POST['update_forums']))
 else if (isset($_POST['delete_user']) || isset($_POST['delete_user_comply']))
 {
 	if ($pun_user['g_id'] > PUN_ADMIN)
-		message($lang_common['No permission']);
+		fama_message($lang_common['No permission']);
 
 	confirm_referrer('profile.php');
 
 	// Get the username and group of the user we are deleting
-	$result = $db->query('SELECT group_id, username FROM '.$db->prefix.'users WHERE id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SELECT group_id, username FROM '.$db->prefix.'users WHERE id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
 	list($group_id, $username) = $db->fetch_row($result);
 
 	if ($group_id == PUN_ADMIN)
-		message($lang_profile['No delete admin message']);
+		fama_message($lang_profile['No delete admin message']);
 
 	if (isset($_POST['delete_user_comply']))
 	{
 		// If the user is a moderator or an administrator, we remove him/her from the moderator list in all forums as well
-		$result = $db->query('SELECT g_moderator FROM '.$db->prefix.'groups WHERE g_id='.$group_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch group', __FILE__, __LINE__, $db->error());
+		$result = $db->query('SELECT g_moderator FROM '.$db->prefix.'groups WHERE g_id='.$group_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch group', __FILE__, __LINE__, $db->error());
 		$group_mod = $db->result($result);
 
 		if ($group_id == PUN_ADMIN || $group_mod == '1')
 		{
-			$result = $db->query('SELECT id, moderators FROM '.$db->prefix.'forums'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch forum list', __FILE__, __LINE__, $db->error());
+			$result = $db->query('SELECT id, moderators FROM '.$db->prefix.'forums'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch forum list', __FILE__, __LINE__, $db->error());
 
 			while ($cur_forum = $db->fetch_assoc($result))
 			{
@@ -369,13 +369,13 @@ else if (isset($_POST['delete_user']) || isset($_POST['delete_user_comply']))
 					unset($cur_moderators[$username]);
 					$cur_moderators = (!empty($cur_moderators)) ? '\''.$db->escape(serialize($cur_moderators)).'\'' : 'NULL';
 
-					$db->query('UPDATE '.$db->prefix.'forums SET moderators='.$cur_moderators.' WHERE id='.$cur_forum['id'].' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update forum', __FILE__, __LINE__, $db->error());
+					$db->query('UPDATE '.$db->prefix.'forums SET moderators='.$cur_moderators.' WHERE id='.$cur_forum['id'].' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to update forum', __FILE__, __LINE__, $db->error());
 				}
 			}
 		}
 
 		// Remove him/her from the online list (if they happen to be logged in)
-		$db->query('DELETE FROM '.$db->prefix.'online WHERE user_id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to remove user from online list', __FILE__, __LINE__, $db->error());
+		$db->query('DELETE FROM '.$db->prefix.'online WHERE user_id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to remove user from online list', __FILE__, __LINE__, $db->error());
 
 		// Should we delete all posts made by this user?
 		if (isset($_POST['delete_posts']))
@@ -384,13 +384,13 @@ else if (isset($_POST['delete_user']) || isset($_POST['delete_user_comply']))
 			@set_time_limit(0);
 
 			// Find all posts made by this user
-			$result = $db->query('SELECT p.id, p.topic_id, t.forum_id FROM '.$db->prefix.'posts AS p INNER JOIN '.$db->prefix.'topics AS t ON t.id=p.topic_id INNER JOIN '.$db->prefix.'forums AS f ON f.id=t.forum_id WHERE p.poster_id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch posts', __FILE__, __LINE__, $db->error());
+			$result = $db->query('SELECT p.id, p.topic_id, t.forum_id FROM '.$db->prefix.'posts AS p INNER JOIN '.$db->prefix.'topics AS t ON t.id=p.topic_id INNER JOIN '.$db->prefix.'forums AS f ON f.id=t.forum_id WHERE p.poster_id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch posts', __FILE__, __LINE__, $db->error());
 			if ($db->num_rows($result))
 			{
 				while ($cur_post = $db->fetch_assoc($result))
 				{
 					// Determine whether this post is the "topic post" or not
-					$result2 = $db->query('SELECT id FROM '.$db->prefix.'posts WHERE topic_id='.$cur_post['topic_id'].' ORDER BY posted LIMIT 1'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch post info', __FILE__, __LINE__, $db->error());
+					$result2 = $db->query('SELECT id FROM '.$db->prefix.'posts WHERE topic_id='.$cur_post['topic_id'].' ORDER BY posted LIMIT 1'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch post info', __FILE__, __LINE__, $db->error());
 
 					if ($db->result($result2) == $cur_post['id'])
 						delete_topic($cur_post['topic_id']);
@@ -403,15 +403,15 @@ else if (isset($_POST['delete_user']) || isset($_POST['delete_user_comply']))
 		}
 		else
 			// Set all his/her posts to guest
-			$db->query('UPDATE '.$db->prefix.'posts SET poster_id=1 WHERE poster_id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update posts', __FILE__, __LINE__, $db->error());
+			$db->query('UPDATE '.$db->prefix.'posts SET poster_id=1 WHERE poster_id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to update posts', __FILE__, __LINE__, $db->error());
 
 		// Delete the user
-		$db->query('DELETE FROM '.$db->prefix.'users WHERE id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to delete user', __FILE__, __LINE__, $db->error());
+		$db->query('DELETE FROM '.$db->prefix.'users WHERE id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to delete user', __FILE__, __LINE__, $db->error());
 
 		redirect('index.php', $lang_profile['User delete redirect']);
 	}
 
-	$page_title = array(pun_htmlspecialchars($pun_config['o_board_title']), $lang_common['Profile'], $lang_profile['Confirm delete user']);
+	$page_title = array(fama_htmlspecialchars($pun_config['o_board_title']), $lang_common['Profile'], $lang_profile['Confirm delete user']);
 	define('PUN_ACTIVE_PAGE', 'profile');
 	require PUN_ROOT.'header.php';
 
@@ -424,7 +424,7 @@ else if (isset($_POST['delete_user']) || isset($_POST['delete_user_comply']))
 				<fieldset>
 					<legend><?php echo $lang_profile['Confirm delete legend'] ?></legend>
 					<div class="infldset">
-						<p><?php echo $lang_profile['Confirmation info'].' <strong>'.pun_htmlspecialchars($username).'</strong>.' ?></p>
+						<p><?php echo $lang_profile['Confirmation info'].' <strong>'.fama_htmlspecialchars($username).'</strong>.' ?></p>
 						<div class="rbox">
 							<label><input type="checkbox" name="delete_posts" value="1" checked="checked" /><?php echo $lang_profile['Delete posts'] ?><br /></label>
 						</div>
@@ -445,9 +445,9 @@ else if (isset($_POST['delete_user']) || isset($_POST['delete_user_comply']))
 else if (isset($_POST['form_sent']))
 {
 	// Fetch the user group of the user we are editing
-	$result = $db->query('SELECT u.username, u.group_id, g.g_moderator FROM '.$db->prefix.'users AS u INNER JOIN '.$db->prefix.'groups AS g ON (g.g_id=u.group_id) WHERE u.id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SELECT u.username, u.group_id, g.g_moderator FROM '.$db->prefix.'users AS u INNER JOIN '.$db->prefix.'groups AS g ON (g.g_id=u.group_id) WHERE u.id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
 	if (!$db->num_rows($result))
-		message($lang_common['Bad request']);
+		fama_message($lang_common['Bad request']);
 
 	list($old_username, $group_id, $is_moderator) = $db->fetch_row($result);
 
@@ -457,7 +457,7 @@ else if (isset($_POST['form_sent']))
 		($pun_user['g_mod_edit_users'] == '0' ||													// mods aren't allowed to edit users
 		$group_id == PUN_ADMIN ||																	// or the user is an admin
 		$is_moderator))))																			// or the user is another mod
-		message($lang_common['No permission']);
+		fama_message($lang_common['No permission']);
 
 	if ($pun_user['is_admmod'])
 		confirm_referrer('profile.php');
@@ -475,7 +475,7 @@ else if (isset($_POST['form_sent']))
 				$languages = forum_list_langs();
 				$form['language'] = pun_trim($_POST['form']['language']);
 				if (!in_array($form['language'], $languages))
-					message($lang_common['Bad request']);
+					fama_message($lang_common['Bad request']);
 			}
 
 			if ($pun_user['is_admmod'])
@@ -493,7 +493,7 @@ else if (isset($_POST['form_sent']))
 						$errors = array();
 						check_username($form['username'], $id);
 						if (!empty($errors))
-							message($errors[0]);
+							fama_message($errors[0]);
 
 						$username_updated = true;
 					}
@@ -509,13 +509,13 @@ else if (isset($_POST['form_sent']))
 			// Validate the email address
 			$form['email'] = strtolower(trim($_POST['req_email']));
 			if (!is_valid_email($form['email']))
-				message($lang_common['Invalid email']);
+				fama_message($lang_common['Invalid email']);
 
 			break;
 		}
 
 		default:
-			message($lang_common['Bad request']);
+			fama_message($lang_common['Bad request']);
 	}
 
 
@@ -529,31 +529,31 @@ else if (isset($_POST['form_sent']))
 	}
 
 	if (empty($temp))
-		message($lang_common['Bad request']);
+		fama_message($lang_common['Bad request']);
 
 
-	$db->query('UPDATE '.$db->prefix.'users SET '.implode(',', $temp).' WHERE id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update profile', __FILE__, __LINE__, $db->error());
+	$db->query('UPDATE '.$db->prefix.'users SET '.implode(',', $temp).' WHERE id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to update profile', __FILE__, __LINE__, $db->error());
 
 	// If we changed the username we have to update some stuff
 	if ($username_updated)
 	{
-		$db->query('UPDATE '.$db->prefix.'posts SET poster=\''.$db->escape($form['username']).'\' WHERE poster_id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update posts', __FILE__, __LINE__, $db->error());
-		$db->query('UPDATE '.$db->prefix.'posts SET edited_by=\''.$db->escape($form['username']).'\' WHERE edited_by=\''.$db->escape($old_username).'\''.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update posts', __FILE__, __LINE__, $db->error());
-		$db->query('UPDATE '.$db->prefix.'topics SET poster=\''.$db->escape($form['username']).'\' WHERE poster=\''.$db->escape($old_username).'\''.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update topics', __FILE__, __LINE__, $db->error());
-		$db->query('UPDATE '.$db->prefix.'topics SET last_poster=\''.$db->escape($form['username']).'\' WHERE last_poster=\''.$db->escape($old_username).'\''.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update topics', __FILE__, __LINE__, $db->error());
-		$db->query('UPDATE '.$db->prefix.'forums SET last_poster=\''.$db->escape($form['username']).'\' WHERE last_poster=\''.$db->escape($old_username).'\''.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update forums', __FILE__, __LINE__, $db->error());
-		$db->query('UPDATE '.$db->prefix.'online SET ident=\''.$db->escape($form['username']).'\' WHERE ident=\''.$db->escape($old_username).'\''.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update online list', __FILE__, __LINE__, $db->error());
+		$db->query('UPDATE '.$db->prefix.'posts SET poster=\''.$db->escape($form['username']).'\' WHERE poster_id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to update posts', __FILE__, __LINE__, $db->error());
+		$db->query('UPDATE '.$db->prefix.'posts SET edited_by=\''.$db->escape($form['username']).'\' WHERE edited_by=\''.$db->escape($old_username).'\''.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to update posts', __FILE__, __LINE__, $db->error());
+		$db->query('UPDATE '.$db->prefix.'topics SET poster=\''.$db->escape($form['username']).'\' WHERE poster=\''.$db->escape($old_username).'\''.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to update topics', __FILE__, __LINE__, $db->error());
+		$db->query('UPDATE '.$db->prefix.'topics SET last_poster=\''.$db->escape($form['username']).'\' WHERE last_poster=\''.$db->escape($old_username).'\''.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to update topics', __FILE__, __LINE__, $db->error());
+		$db->query('UPDATE '.$db->prefix.'forums SET last_poster=\''.$db->escape($form['username']).'\' WHERE last_poster=\''.$db->escape($old_username).'\''.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to update forums', __FILE__, __LINE__, $db->error());
+		$db->query('UPDATE '.$db->prefix.'online SET ident=\''.$db->escape($form['username']).'\' WHERE ident=\''.$db->escape($old_username).'\''.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to update online list', __FILE__, __LINE__, $db->error());
 
 		// If the user is a moderator or an administrator we have to update the moderator lists
-		$result = $db->query('SELECT group_id FROM '.$db->prefix.'users WHERE id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
+		$result = $db->query('SELECT group_id FROM '.$db->prefix.'users WHERE id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
 		$group_id = $db->result($result);
 
-		$result = $db->query('SELECT g_moderator FROM '.$db->prefix.'groups WHERE g_id='.$group_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch group', __FILE__, __LINE__, $db->error());
+		$result = $db->query('SELECT g_moderator FROM '.$db->prefix.'groups WHERE g_id='.$group_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch group', __FILE__, __LINE__, $db->error());
 		$group_mod = $db->result($result);
 
 		if ($group_id == PUN_ADMIN || $group_mod == '1')
 		{
-			$result = $db->query('SELECT id, moderators FROM '.$db->prefix.'forums'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch forum list', __FILE__, __LINE__, $db->error());
+			$result = $db->query('SELECT id, moderators FROM '.$db->prefix.'forums'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch forum list', __FILE__, __LINE__, $db->error());
 
 			while ($cur_forum = $db->fetch_assoc($result))
 			{
@@ -565,7 +565,7 @@ else if (isset($_POST['form_sent']))
 					$cur_moderators[$form['username']] = $id;
 					uksort($cur_moderators, 'utf8_strcasecmp');
 
-					$db->query('UPDATE '.$db->prefix.'forums SET moderators=\''.$db->escape(serialize($cur_moderators)).'\' WHERE id='.$cur_forum['id'].' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update forum', __FILE__, __LINE__, $db->error());
+					$db->query('UPDATE '.$db->prefix.'forums SET moderators=\''.$db->escape(serialize($cur_moderators)).'\' WHERE id='.$cur_forum['id'].' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to update forum', __FILE__, __LINE__, $db->error());
 				}
 			}
 		}
@@ -575,9 +575,9 @@ else if (isset($_POST['form_sent']))
 }
 
 
-$result = $db->query('SELECT u.username, u.email, u.language, u.num_posts, u.last_post, u.registered, u.registration_ip, u.last_visit, g.g_id, g.g_user_title, g.g_moderator FROM '.$db->prefix.'users AS u LEFT JOIN '.$db->prefix.'groups AS g ON g.g_id=u.group_id WHERE u.id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
+$result = $db->query('SELECT u.username, u.email, u.language, u.num_posts, u.last_post, u.registered, u.registration_ip, u.last_visit, g.g_id, g.g_user_title, g.g_moderator FROM '.$db->prefix.'users AS u LEFT JOIN '.$db->prefix.'groups AS g ON g.g_id=u.group_id WHERE u.id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
 if (!$db->num_rows($result))
-	message($lang_common['Bad request']);
+	fama_message($lang_common['Bad request']);
 
 $user = $db->fetch_assoc($result);
 
@@ -595,10 +595,10 @@ if ($pun_user['id'] != $id &&																	// If we arent the user (i.e. edit
 	$user_personal = array();
 
 	$user_personal[] = '<dt>'.$lang_common['Username'].'</dt>';
-	$user_personal[] = '<dd>'.pun_htmlspecialchars($user['username']).'</dd>';
+	$user_personal[] = '<dd>'.fama_htmlspecialchars($user['username']).'</dd>';
 
 	$user_personal[] = '<dt>'.$lang_common['Title'].'</dt>';
-	$user_personal[] = '<dd>'.pun_htmlspecialchars($user['g_user_title']).'</dd>';
+	$user_personal[] = '<dd>'.fama_htmlspecialchars($user['g_user_title']).'</dd>';
 
 	if (!$pun_user['is_guest'] && $pun_user['g_send_email'] == '1')
 		$email_field = '<a href="misc.php?email='.$id.'">'.$lang_common['Send email'].'</a>';
@@ -620,7 +620,7 @@ if ($pun_user['id'] != $id &&																	// If we arent the user (i.e. edit
 	$user_activity[] = '<dt>'.$lang_common['Registered'].'</dt>';
 	$user_activity[] = '<dd>'.format_time($user['registered'], true).'</dd>';
 
-	$page_title = array(pun_htmlspecialchars($pun_config['o_board_title']), sprintf($lang_profile['Users profile'], pun_htmlspecialchars($user['username'])));
+	$page_title = array(fama_htmlspecialchars($pun_config['o_board_title']), sprintf($lang_profile['Users profile'], fama_htmlspecialchars($user['username'])));
 	define('PUN_ALLOW_INDEX', 1);
 	define('PUN_ACTIVE_PAGE', 'index');
 	require PUN_ROOT.'header.php';
@@ -667,15 +667,15 @@ else
 		if ($pun_user['is_admmod'])
 		{
 			if ($pun_user['g_id'] == PUN_ADMIN || $pun_user['g_mod_rename_users'] == '1')
-				$username_field = '<label class="required"><strong>'.$lang_common['Username'].' <span>'.$lang_common['Required'].'</span></strong><br /><input type="text" name="req_username" value="'.pun_htmlspecialchars($user['username']).'" size="25" maxlength="25" /><br /></label>'."\n";
+				$username_field = '<label class="required"><strong>'.$lang_common['Username'].' <span>'.$lang_common['Required'].'</span></strong><br /><input type="text" name="req_username" value="'.fama_htmlspecialchars($user['username']).'" size="25" maxlength="25" /><br /></label>'."\n";
 			else
-				$username_field = '<p>'.sprintf($lang_profile['Username info'], pun_htmlspecialchars($user['username'])).'</p>'."\n";
+				$username_field = '<p>'.sprintf($lang_profile['Username info'], fama_htmlspecialchars($user['username'])).'</p>'."\n";
 
 			$email_field = '<label class="required"><strong>'.$lang_common['Email'].' <span>'.$lang_common['Required'].'</span></strong><br /><input type="text" name="req_email" value="'.$user['email'].'" size="40" maxlength="80" /><br /></label><p><span class="email"><a href="misc.php?email='.$id.'">'.$lang_common['Send email'].'</a></span></p>'."\n";
 		}
 		else
 		{
-			$username_field = '<p>'.$lang_common['Username'].': '.pun_htmlspecialchars($user['username']).'</p>'."\n";
+			$username_field = '<p>'.$lang_common['Username'].': '.fama_htmlspecialchars($user['username']).'</p>'."\n";
 			$email_field = '<label class="required"><strong>'.$lang_common['Email'].' <span>'.$lang_common['Required'].'</span></strong><br /><input type="text" name="req_email" value="'.$user['email'].'" size="40" maxlength="80" /><br /></label>'."\n";
 		}
 
@@ -694,7 +694,7 @@ else
 		$posts_field .= (!empty($posts_actions) ? '<p class="actions">'.implode(' - ', $posts_actions).'</p>' : '')."\n";
 
 
-		$page_title = array(pun_htmlspecialchars($pun_config['o_board_title']), $lang_common['Profile'], $lang_profile['Section essentials']);
+		$page_title = array(fama_htmlspecialchars($pun_config['o_board_title']), $lang_common['Profile'], $lang_profile['Section essentials']);
 		$required_fields = array('req_username' => $lang_common['Username'], 'req_email' => $lang_common['Email']);
 		define('PUN_ACTIVE_PAGE', 'profile');
 		require PUN_ROOT.'header.php';
@@ -703,7 +703,7 @@ else
 
 ?>
 	<div class="blockform">
-		<h2><span><?php echo pun_htmlspecialchars($user['username']).' - '.$lang_profile['Section essentials'] ?></span></h2>
+		<h2><span><?php echo fama_htmlspecialchars($user['username']).' - '.$lang_profile['Section essentials'] ?></span></h2>
 		<div class="box">
 			<form id="profile1" method="post" action="profile.php?section=essentials&amp;id=<?php echo $id ?>" onsubmit="return process_form(this)">
 				<div class="inform">
@@ -764,7 +764,7 @@ else
 					<fieldset>
 						<legend><?php echo $lang_profile['User activity'] ?></legend>
 						<div class="infldset">
-							<p><?php printf($lang_profile['Registered info'], format_time($user['registered'], true).(($pun_user['is_admmod']) ? ' (<a href="moderate.php?get_host='.pun_htmlspecialchars($user['registration_ip']).'">'.pun_htmlspecialchars($user['registration_ip']).'</a>)' : '')) ?></p>
+							<p><?php printf($lang_profile['Registered info'], format_time($user['registered'], true).(($pun_user['is_admmod']) ? ' (<a href="moderate.php?get_host='.fama_htmlspecialchars($user['registration_ip']).'">'.fama_htmlspecialchars($user['registration_ip']).'</a>)' : '')) ?></p>
 							<p><?php printf($lang_profile['Last post info'], $last_post) ?></p>
 							<p><?php printf($lang_profile['Last visit info'], format_time($user['last_visit'])) ?></p>
 							<?php echo $posts_field ?>
@@ -781,9 +781,9 @@ else
 	else if ($section == 'admin')
 	{
 		if (!$pun_user['is_admmod'])
-			message($lang_common['Bad request']);
+			fama_message($lang_common['Bad request']);
 
-		$page_title = array(pun_htmlspecialchars($pun_config['o_board_title']), $lang_common['Profile'], $lang_profile['Section admin']);
+		$page_title = array(fama_htmlspecialchars($pun_config['o_board_title']), $lang_common['Profile'], $lang_profile['Section admin']);
 		define('PUN_ACTIVE_PAGE', 'profile');
 		require PUN_ROOT.'header.php';
 
@@ -791,7 +791,7 @@ else
 
 ?>
 	<div class="blockform">
-		<h2><span><?php echo pun_htmlspecialchars($user['username']).' - '.$lang_profile['Section admin'] ?></span></h2>
+		<h2><span><?php echo fama_htmlspecialchars($user['username']).' - '.$lang_profile['Section admin'] ?></span></h2>
 		<div class="box">
 			<form id="profile7" method="post" action="profile.php?section=admin&amp;id=<?php echo $id ?>">
 				<div class="inform">
@@ -808,14 +808,14 @@ else
 							<select id="group_id" name="group_id">
 <?php
 
-			$result = $db->query('SELECT g_id, g_title FROM '.$db->prefix.'groups WHERE g_id!='.PUN_GUEST.' ORDER BY g_title'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user group list', __FILE__, __LINE__, $db->error());
+			$result = $db->query('SELECT g_id, g_title FROM '.$db->prefix.'groups WHERE g_id!='.PUN_GUEST.' ORDER BY g_title'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch user group list', __FILE__, __LINE__, $db->error());
 
 			while ($cur_group = $db->fetch_assoc($result))
 			{
 				if ($cur_group['g_id'] == $user['g_id'] || ($cur_group['g_id'] == $pun_config['o_default_user_group'] && $user['g_id'] == ''))
-					echo "\t\t\t\t\t\t\t\t".'<option value="'.$cur_group['g_id'].'" selected="selected">'.pun_htmlspecialchars($cur_group['g_title']).'</option>'."\n";
+					echo "\t\t\t\t\t\t\t\t".'<option value="'.$cur_group['g_id'].'" selected="selected">'.fama_htmlspecialchars($cur_group['g_title']).'</option>'."\n";
 				else
-					echo "\t\t\t\t\t\t\t\t".'<option value="'.$cur_group['g_id'].'">'.pun_htmlspecialchars($cur_group['g_title']).'</option>'."\n";
+					echo "\t\t\t\t\t\t\t\t".'<option value="'.$cur_group['g_id'].'">'.fama_htmlspecialchars($cur_group['g_title']).'</option>'."\n";
 			}
 
 ?>
@@ -850,7 +850,7 @@ else
 							<p><?php echo $lang_profile['Moderator in info'] ?></p>
 <?php
 
-			$result = $db->query('SELECT f.id AS fid, f.forum_name, f.moderators FROM '.$db->prefix.'forums AS f ORDER BY f.disp_position'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch forum list', __FILE__, __LINE__, $db->error());
+			$result = $db->query('SELECT f.id AS fid, f.forum_name, f.moderators FROM '.$db->prefix.'forums AS f ORDER BY f.disp_position'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch forum list', __FILE__, __LINE__, $db->error());
 
 			if ($db->num_rows($result) > 0)
 			{
@@ -859,7 +859,7 @@ else
 				while ($cur_forum = $db->fetch_assoc($result))
 				{
 					$moderators = ($cur_forum['moderators'] != '') ? unserialize($cur_forum['moderators']) : array();
-					echo "\n\t\t\t\t\t\t\t\t\t".'<label><input type="checkbox" name="moderator_in['.$cur_forum['fid'].']" value="1"'.((in_array($id, $moderators)) ? ' checked="checked"' : '').' />'.pun_htmlspecialchars($cur_forum['forum_name']).'<br /></label>'."\n";
+					echo "\n\t\t\t\t\t\t\t\t\t".'<label><input type="checkbox" name="moderator_in['.$cur_forum['fid'].']" value="1"'.((in_array($id, $moderators)) ? ' checked="checked"' : '').' />'.fama_htmlspecialchars($cur_forum['forum_name']).'<br /></label>'."\n";
 				}
 				
 				echo "\n\t\t\t\t\t\t\t\t".'</div>';
@@ -883,7 +883,7 @@ else
 
 	}
 	else
-		message($lang_common['Bad request']);
+		fama_message($lang_common['Bad request']);
 
 ?>
 	<div class="clearer"></div>

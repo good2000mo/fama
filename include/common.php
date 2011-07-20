@@ -129,14 +129,14 @@ check_cookie($pun_user);
 if (file_exists(PUN_ROOT.'lang/'.$pun_user['language'].'/common.php'))
 	include PUN_ROOT.'lang/'.$pun_user['language'].'/common.php';
 else
-	error('There is no valid language pack \''.pun_htmlspecialchars($pun_user['language']).'\' installed. Please reinstall a language of that name');
+	error('There is no valid language pack \''.fama_htmlspecialchars($pun_user['language']).'\' installed. Please reinstall a language of that name');
 
 // Update online list
 update_users_online();
 
 // Check to see if we logged in without a cookie being set
 if ($pun_user['is_guest'] && isset($_GET['login']))
-	message($lang_common['No cookie']);
+	fama_message($lang_common['No cookie']);
 
 // The maximum size of a post, in bytes, since the field is now MEDIUMTEXT this allows ~16MB but lets cap at 1MB...
 if (!defined('PUN_MAX_POSTSIZE'))

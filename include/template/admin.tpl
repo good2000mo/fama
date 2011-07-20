@@ -18,7 +18,6 @@
 			<pun_desc>
 		</div>
 		<pun_navlinks>
-		<pun_status>
 	</div>
 </div>
 

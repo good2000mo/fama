@@ -35,10 +35,10 @@ $errors = array();
 if (isset($_POST['form_sent']))
 {
 	// Check that someone from this IP didn't register a user within the last hour (DoS prevention)
-	$result = $db->query('SELECT 1 FROM '.$db->prefix.'users WHERE registration_ip=\''.get_remote_address().'\' AND registered>'.(time() - 3600).' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SELECT 1 FROM '.$db->prefix.'users WHERE registration_ip=\''.get_remote_address().'\' AND registered>'.(time() - 3600).' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
 
 	if ($db->num_rows($result))
-		message($lang_register['Registration flood']);
+		fama_message($lang_register['Registration flood']);
 
 
 	$username = pun_trim($_POST['req_user']);
@@ -65,7 +65,7 @@ if (isset($_POST['form_sent']))
 	{
 		$language = preg_replace('%[\.\\\/]%', '', $_POST['language']);
 		if (!file_exists(PUN_ROOT.'lang/'.$language.'/common.php'))
-			message($lang_common['Bad request']);
+			fama_message($lang_common['Bad request']);
 	}
 	else
 		$language = $pun_config['o_default_lang'];
@@ -80,7 +80,7 @@ if (isset($_POST['form_sent']))
 		$password_hash = pun_hash($password1);
 
 		// Add the user
-		$db->query('INSERT INTO '.$db->prefix.'users (username, group_id, password, email, language, registered, registration_ip, last_visit) VALUES(\''.$db->escape($username).'\', '.$intial_group_id.', \''.$password_hash.'\', \''.$db->escape($email1).'\', \''.$db->escape($language).'\', '.$now.', \''.get_remote_address().'\', '.$now.')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to create user', __FILE__, __LINE__, $db->error());
+		$db->query('INSERT INTO '.$db->prefix.'users (username, group_id, password, email, language, registered, registration_ip, last_visit) VALUES(\''.$db->escape($username).'\', '.$intial_group_id.', \''.$password_hash.'\', \''.$db->escape($email1).'\', \''.$db->escape($language).'\', '.$now.', \''.get_remote_address().'\', '.$now.')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to create user', __FILE__, __LINE__, $db->error());
 		$new_uid = $db->insert_id();
 
 		pun_setcookie($new_uid, $password_hash, time() + $pun_config['o_timeout_visit']);
@@ -90,7 +90,7 @@ if (isset($_POST['form_sent']))
 }
 
 
-$page_title = array(pun_htmlspecialchars($pun_config['o_board_title']), $lang_register['Register']);
+$page_title = array(fama_htmlspecialchars($pun_config['o_board_title']), $lang_register['Register']);
 $required_fields = array('req_user' => $lang_common['Username'], 'req_password1' => $lang_common['Password'], 'req_password2' => $lang_prof_reg['Confirm pass'], 'req_email1' => $lang_common['Email'], 'req_email2' => $lang_common['Email'].' 2');
 $focus_element = array('register', 'req_user');
 define('PUN_ACTIVE_PAGE', 'register');
@@ -137,7 +137,7 @@ if (!empty($errors))
 					<legend><?php echo $lang_register['Username legend'] ?></legend>
 					<div class="infldset">
 						<input type="hidden" name="form_sent" value="1" />
-						<label class="required"><strong><?php echo $lang_common['Username'] ?> <span><?php echo $lang_common['Required'] ?></span></strong><br /><input type="text" name="req_user" value="<?php if (isset($_POST['req_user'])) echo pun_htmlspecialchars($_POST['req_user']); ?>" size="25" maxlength="25" /><br /></label>
+						<label class="required"><strong><?php echo $lang_common['Username'] ?> <span><?php echo $lang_common['Required'] ?></span></strong><br /><input type="text" name="req_user" value="<?php if (isset($_POST['req_user'])) echo fama_htmlspecialchars($_POST['req_user']); ?>" size="25" maxlength="25" /><br /></label>
 					</div>
 				</fieldset>
 			</div>
@@ -145,8 +145,8 @@ if (!empty($errors))
 				<fieldset>
 					<legend><?php echo $lang_register['Pass legend'] ?></legend>
 					<div class="infldset">
-						<label class="conl required"><strong><?php echo $lang_common['Password'] ?> <span><?php echo $lang_common['Required'] ?></span></strong><br /><input type="password" name="req_password1" value="<?php if (isset($_POST['req_password1'])) echo pun_htmlspecialchars($_POST['req_password1']); ?>" size="16" /><br /></label>
-						<label class="conl required"><strong><?php echo $lang_prof_reg['Confirm pass'] ?> <span><?php echo $lang_common['Required'] ?></span></strong><br /><input type="password" name="req_password2" value="<?php if (isset($_POST['req_password2'])) echo pun_htmlspecialchars($_POST['req_password2']); ?>" size="16" /><br /></label>
+						<label class="conl required"><strong><?php echo $lang_common['Password'] ?> <span><?php echo $lang_common['Required'] ?></span></strong><br /><input type="password" name="req_password1" value="<?php if (isset($_POST['req_password1'])) echo fama_htmlspecialchars($_POST['req_password1']); ?>" size="16" /><br /></label>
+						<label class="conl required"><strong><?php echo $lang_prof_reg['Confirm pass'] ?> <span><?php echo $lang_common['Required'] ?></span></strong><br /><input type="password" name="req_password2" value="<?php if (isset($_POST['req_password2'])) echo fama_htmlspecialchars($_POST['req_password2']); ?>" size="16" /><br /></label>
 						<p class="clearb"><?php echo $lang_register['Pass info'] ?></p>
 					</div>
 				</fieldset>
@@ -156,7 +156,7 @@ if (!empty($errors))
 					<legend><?php echo $lang_prof_reg['Email legend'] ?></legend>
 					<div class="infldset">
 						<label class="required"><strong><?php echo $lang_common['Email'] ?> <span><?php echo $lang_common['Required'] ?></span></strong><br />
-						<input type="text" name="req_email1" value="<?php if (isset($_POST['req_email1'])) echo pun_htmlspecialchars($_POST['req_email1']); ?>" size="50" maxlength="80" /><br /></label>
+						<input type="text" name="req_email1" value="<?php if (isset($_POST['req_email1'])) echo fama_htmlspecialchars($_POST['req_email1']); ?>" size="50" maxlength="80" /><br /></label>
 					</div>
 				</fieldset>
 			</div>

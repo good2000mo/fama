@@ -15,7 +15,7 @@ require PUN_ROOT.'include/common_admin.php';
 
 
 if (!$pun_user['is_admmod'])
-	message($lang_common['No permission']);
+	fama_message($lang_common['No permission']);
 
 // Load the admin_users.php language file
 require PUN_ROOT.'lang/'.$admin_language.'/admin_users.php';
@@ -25,10 +25,10 @@ if (isset($_GET['ip_stats']))
 {
 	$ip_stats = intval($_GET['ip_stats']);
 	if ($ip_stats < 1)
-		message($lang_common['Bad request']);
+		fama_message($lang_common['Bad request']);
 
 	// Fetch ip count
-	$result = $db->query('SELECT poster_ip, MAX(posted) AS last_used FROM '.$db->prefix.'posts WHERE poster_id='.$ip_stats.' GROUP BY poster_ip'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch post info', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SELECT poster_ip, MAX(posted) AS last_used FROM '.$db->prefix.'posts WHERE poster_id='.$ip_stats.' GROUP BY poster_ip'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch post info', __FILE__, __LINE__, $db->error());
 	$num_ips = $db->num_rows($result);
 
 	// Determine the ip offset (based on $_GET['p'])
@@ -40,7 +40,7 @@ if (isset($_GET['ip_stats']))
 	// Generate paging links
 	$paging_links = '<span class="pages-label">'.$lang_common['Pages'].' </span>'.paginate($num_pages, $p, 'admin_users.php?ip_stats='.$ip_stats );
 
-	$page_title = array(pun_htmlspecialchars($pun_config['o_board_title']), $lang_admin_common['Admin'], $lang_admin_common['Users'], $lang_admin_users['Results head']);
+	$page_title = array(fama_htmlspecialchars($pun_config['o_board_title']), $lang_admin_common['Admin'], $lang_admin_common['Users'], $lang_admin_users['Results head']);
 	define('PUN_ACTIVE_PAGE', 'admin');
 	require PUN_ROOT.'header.php';
 
@@ -75,7 +75,7 @@ if (isset($_GET['ip_stats']))
 			<tbody>
 <?php
 
-	$result = $db->query('SELECT poster_ip, MAX(posted) AS last_used, COUNT(id) AS used_times FROM '.$db->prefix.'posts WHERE poster_id='.$ip_stats.' GROUP BY poster_ip ORDER BY last_used DESC LIMIT '.$start_from.', 50'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch post info', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SELECT poster_ip, MAX(posted) AS last_used, COUNT(id) AS used_times FROM '.$db->prefix.'posts WHERE poster_id='.$ip_stats.' GROUP BY poster_ip ORDER BY last_used DESC LIMIT '.$start_from.', 50'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch post info', __FILE__, __LINE__, $db->error());
 	if ($db->num_rows($result))
 	{
 		while ($cur_ip = $db->fetch_assoc($result))
@@ -126,10 +126,10 @@ if (isset($_GET['show_users']))
 	$ip = trim($_GET['show_users']);
 
 	if (!@preg_match('%^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$%', $ip) && !@preg_match('%^((([0-9A-Fa-f]{1,4}:){7}[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){6}:[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){5}:([0-9A-Fa-f]{1,4}:)?[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){4}:([0-9A-Fa-f]{1,4}:){0,2}[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){3}:([0-9A-Fa-f]{1,4}:){0,3}[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){2}:([0-9A-Fa-f]{1,4}:){0,4}[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){6}((\b((25[0-5])|(1\d{2})|(2[0-4]\d)|(\d{1,2}))\b)\.){3}(\b((25[0-5])|(1\d{2})|(2[0-4]\d)|(\d{1,2}))\b))|(([0-9A-Fa-f]{1,4}:){0,5}:((\b((25[0-5])|(1\d{2})|(2[0-4]\d)|(\d{1,2}))\b)\.){3}(\b((25[0-5])|(1\d{2})|(2[0-4]\d)|(\d{1,2}))\b))|(::([0-9A-Fa-f]{1,4}:){0,5}((\b((25[0-5])|(1\d{2})|(2[0-4]\d)|(\d{1,2}))\b)\.){3}(\b((25[0-5])|(1\d{2})|(2[0-4]\d)|(\d{1,2}))\b))|([0-9A-Fa-f]{1,4}::([0-9A-Fa-f]{1,4}:){0,5}[0-9A-Fa-f]{1,4})|(::([0-9A-Fa-f]{1,4}:){0,6}[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){1,7}:))$%', $ip))
-		message($lang_admin_users['Bad IP message']);
+		fama_message($lang_admin_users['Bad IP message']);
 
 	// Fetch user count
-	$result = $db->query('SELECT DISTINCT poster_id, poster FROM '.$db->prefix.'posts WHERE poster_ip=\''.$db->escape($ip).'\''.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch post info', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SELECT DISTINCT poster_id, poster FROM '.$db->prefix.'posts WHERE poster_ip=\''.$db->escape($ip).'\''.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch post info', __FILE__, __LINE__, $db->error());
 	$num_users = $db->num_rows($result);
 
 	// Determine the user offset (based on $_GET['p'])
@@ -141,7 +141,7 @@ if (isset($_GET['show_users']))
 	// Generate paging links
 	$paging_links = '<span class="pages-label">'.$lang_common['Pages'].' </span>'.paginate($num_pages, $p, 'admin_users.php?show_users='.$ip);
 
-	$page_title = array(pun_htmlspecialchars($pun_config['o_board_title']), $lang_admin_common['Admin'], $lang_admin_common['Users'], $lang_admin_users['Results head']);
+	$page_title = array(fama_htmlspecialchars($pun_config['o_board_title']), $lang_admin_common['Admin'], $lang_admin_common['Users'], $lang_admin_users['Results head']);
 	define('PUN_ACTIVE_PAGE', 'admin');
 	require PUN_ROOT.'header.php';
 
@@ -177,7 +177,7 @@ if (isset($_GET['show_users']))
 			<tbody>
 <?php
 
-	$result = $db->query('SELECT DISTINCT poster_id, poster FROM '.$db->prefix.'posts WHERE poster_ip=\''.$db->escape($ip).'\' ORDER BY poster DESC'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch post info', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SELECT DISTINCT poster_id, poster FROM '.$db->prefix.'posts WHERE poster_ip=\''.$db->escape($ip).'\' ORDER BY poster DESC'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch post info', __FILE__, __LINE__, $db->error());
 	$num_posts = $db->num_rows($result);
 
 	if ($num_posts)
@@ -187,7 +187,7 @@ if (isset($_GET['show_users']))
 		{
 			list($poster_id, $poster) = $db->fetch_row($result);
 
-			$result2 = $db->query('SELECT u.id, u.username, u.email, u.num_posts, g.g_id, g.g_user_title FROM '.$db->prefix.'users AS u INNER JOIN '.$db->prefix.'groups AS g ON g.g_id=u.group_id WHERE u.id>1 AND u.id='.$poster_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
+			$result2 = $db->query('SELECT u.id, u.username, u.email, u.num_posts, g.g_id, g.g_user_title FROM '.$db->prefix.'users AS u INNER JOIN '.$db->prefix.'groups AS g ON g.g_id=u.group_id WHERE u.id>1 AND u.id='.$poster_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
 
 			if (($user_data = $db->fetch_assoc($result2)))
 			{
@@ -195,7 +195,7 @@ if (isset($_GET['show_users']))
 
 ?>
 				<tr>
-					<td class="tcl"><?php echo '<a href="profile.php?id='.$user_data['id'].'">'.pun_htmlspecialchars($user_data['username']).'</a>' ?></td>
+					<td class="tcl"><?php echo '<a href="profile.php?id='.$user_data['id'].'">'.fama_htmlspecialchars($user_data['username']).'</a>' ?></td>
 					<td class="tc2"><a href="mailto:<?php echo $user_data['email'] ?>"><?php echo $user_data['email'] ?></a></td>
 					<td class="tc3"><?php echo $user_data['g_user_title'] ?></td>
 					<td class="tc4"><?php echo forum_number_format($user_data['num_posts']) ?></td>
@@ -209,7 +209,7 @@ if (isset($_GET['show_users']))
 
 ?>
 				<tr>
-					<td class="tcl"><?php echo pun_htmlspecialchars($poster) ?></td>
+					<td class="tcl"><?php echo fama_htmlspecialchars($poster) ?></td>
 					<td class="tc2">&#160;</td>
 					<td class="tc3"><?php echo $lang_admin_users['Results guest'] ?></td>
 					<td class="tc4">&#160;</td>
@@ -252,7 +252,7 @@ if (isset($_GET['show_users']))
 else if (isset($_POST['move_users']) || isset($_POST['move_users_comply']))
 {
 	if ($pun_user['g_id'] > PUN_ADMIN)
-		message($lang_common['No permission']);
+		fama_message($lang_common['No permission']);
 
 	confirm_referrer('admin_users.php');
 
@@ -268,30 +268,30 @@ else if (isset($_POST['move_users']) || isset($_POST['move_users_comply']))
 		$user_ids = array();
 
 	if (empty($user_ids))
-		message($lang_admin_users['No users selected']);
+		fama_message($lang_admin_users['No users selected']);
 
 	// Are we trying to batch move any admins?
-	$result = $db->query('SELECT COUNT(*) FROM '.$db->prefix.'users WHERE id IN ('.implode(',', $user_ids).') AND group_id='.PUN_ADMIN.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SELECT COUNT(*) FROM '.$db->prefix.'users WHERE id IN ('.implode(',', $user_ids).') AND group_id='.PUN_ADMIN.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
 	if ($db->result($result) > 0)
-		message($lang_admin_users['No move admins message']);
+		fama_message($lang_admin_users['No move admins message']);
 
 	// Fetch all user groups
 	$all_groups = array();
-	$result = $db->query('SELECT g_id, g_title FROM '.$db->prefix.'groups WHERE g_id NOT IN ('.PUN_GUEST.','.PUN_ADMIN.') ORDER BY g_title ASC'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch groups', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SELECT g_id, g_title FROM '.$db->prefix.'groups WHERE g_id NOT IN ('.PUN_GUEST.','.PUN_ADMIN.') ORDER BY g_title ASC'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch groups', __FILE__, __LINE__, $db->error());
 	while ($row = $db->fetch_row($result))
 		$all_groups[$row[0]] = $row[1];
 
 	if (isset($_POST['move_users_comply']))
 	{
-		$new_group = isset($_POST['new_group']) && isset($all_groups[$_POST['new_group']]) ? $_POST['new_group'] : message($lang_admin_users['Invalid group message']);
+		$new_group = isset($_POST['new_group']) && isset($all_groups[$_POST['new_group']]) ? $_POST['new_group'] : fama_message($lang_admin_users['Invalid group message']);
 
 		// Is the new group a moderator group?
-		$result = $db->query('SELECT g_moderator FROM '.$db->prefix.'groups WHERE g_id='.$new_group.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch group info', __FILE__, __LINE__, $db->error());
+		$result = $db->query('SELECT g_moderator FROM '.$db->prefix.'groups WHERE g_id='.$new_group.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch group info', __FILE__, __LINE__, $db->error());
 		$new_group_mod = $db->result($result);
 
 		// Fetch user groups
 		$user_groups = array();
-		$result = $db->query('SELECT id, group_id FROM '.$db->prefix.'users WHERE id IN ('.implode(',', $user_ids).')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user groups', __FILE__, __LINE__, $db->error());
+		$result = $db->query('SELECT id, group_id FROM '.$db->prefix.'users WHERE id IN ('.implode(',', $user_ids).')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch user groups', __FILE__, __LINE__, $db->error());
 		while ($cur_user = $db->fetch_assoc($result))
 		{
 			if (!isset($user_groups[$cur_user['group_id']]))
@@ -302,7 +302,7 @@ else if (isset($_POST['move_users']) || isset($_POST['move_users_comply']))
 
 		// Are any users moderators?
 		$group_ids = array_keys($user_groups);
-		$result = $db->query('SELECT g_id, g_moderator FROM '.$db->prefix.'groups WHERE g_id IN ('.implode(',', $group_ids).')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch group moderators', __FILE__, __LINE__, $db->error());
+		$result = $db->query('SELECT g_id, g_moderator FROM '.$db->prefix.'groups WHERE g_id IN ('.implode(',', $group_ids).')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch group moderators', __FILE__, __LINE__, $db->error());
 		while ($cur_group = $db->fetch_assoc($result))
 		{
 			if ($cur_group['g_moderator'] == '0')
@@ -312,7 +312,7 @@ else if (isset($_POST['move_users']) || isset($_POST['move_users_comply']))
 		if (!empty($user_groups) && $new_group != PUN_ADMIN && $new_group_mod != '1')
 		{
 			// Fetch forum list and clean up their moderator list
-			$result = $db->query('SELECT id, moderators FROM '.$db->prefix.'forums'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch forum list', __FILE__, __LINE__, $db->error());
+			$result = $db->query('SELECT id, moderators FROM '.$db->prefix.'forums'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch forum list', __FILE__, __LINE__, $db->error());
 			while ($cur_forum = $db->fetch_assoc($result))
 			{
 				$cur_moderators = ($cur_forum['moderators'] != '') ? unserialize($cur_forum['moderators']) : array();
@@ -321,17 +321,17 @@ else if (isset($_POST['move_users']) || isset($_POST['move_users_comply']))
 					$cur_moderators = array_diff($cur_moderators, $group_users);
 
 				$cur_moderators = (!empty($cur_moderators)) ? '\''.$db->escape(serialize($cur_moderators)).'\'' : 'NULL';
-				$db->query('UPDATE '.$db->prefix.'forums SET moderators='.$cur_moderators.' WHERE id='.$cur_forum['id'].' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update forum', __FILE__, __LINE__, $db->error());
+				$db->query('UPDATE '.$db->prefix.'forums SET moderators='.$cur_moderators.' WHERE id='.$cur_forum['id'].' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to update forum', __FILE__, __LINE__, $db->error());
 			}
 		}
 
 		// Change user group
-		$db->query('UPDATE '.$db->prefix.'users SET group_id='.$new_group.' WHERE id IN ('.implode(',', $user_ids).')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to change user group', __FILE__, __LINE__, $db->error());
+		$db->query('UPDATE '.$db->prefix.'users SET group_id='.$new_group.' WHERE id IN ('.implode(',', $user_ids).')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to change user group', __FILE__, __LINE__, $db->error());
 
 		redirect('admin_users.php', $lang_admin_users['Users move redirect']);
 	}
 
-	$page_title = array(pun_htmlspecialchars($pun_config['o_board_title']), $lang_admin_common['Admin'], $lang_admin_common['Users'], $lang_admin_users['Move users']);
+	$page_title = array(fama_htmlspecialchars($pun_config['o_board_title']), $lang_admin_common['Admin'], $lang_admin_common['Users'], $lang_admin_users['Move users']);
 	define('PUN_ACTIVE_PAGE', 'admin');
 	require PUN_ROOT.'header.php';
 
@@ -352,7 +352,7 @@ else if (isset($_POST['move_users']) || isset($_POST['move_users_comply']))
 									<th scope="row"><?php echo $lang_admin_users['New group label'] ?></th>
 									<td>
 										<select name="new_group" tabindex="1">
-<?php foreach ($all_groups as $gid => $group) : ?>											<option value="<?php echo $gid ?>"><?php echo pun_htmlspecialchars($group) ?></option>
+<?php foreach ($all_groups as $gid => $group) : ?>											<option value="<?php echo $gid ?>"><?php echo fama_htmlspecialchars($group) ?></option>
 <?php endforeach; ?>
 										</select>
 										<span><?php echo $lang_admin_users['New group help'] ?></span>
@@ -378,7 +378,7 @@ else if (isset($_POST['move_users']) || isset($_POST['move_users_comply']))
 else if (isset($_POST['delete_users']) || isset($_POST['delete_users_comply']))
 {
 	if ($pun_user['g_id'] > PUN_ADMIN)
-		message($lang_common['No permission']);
+		fama_message($lang_common['No permission']);
 
 	confirm_referrer('admin_users.php');
 
@@ -394,18 +394,18 @@ else if (isset($_POST['delete_users']) || isset($_POST['delete_users_comply']))
 		$user_ids = array();
 
 	if (empty($user_ids))
-		message($lang_admin_users['No users selected']);
+		fama_message($lang_admin_users['No users selected']);
 
 	// Are we trying to delete any admins?
-	$result = $db->query('SELECT COUNT(*) FROM '.$db->prefix.'users WHERE id IN ('.implode(',', $user_ids).') AND group_id='.PUN_ADMIN.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SELECT COUNT(*) FROM '.$db->prefix.'users WHERE id IN ('.implode(',', $user_ids).') AND group_id='.PUN_ADMIN.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
 	if ($db->result($result) > 0)
-		message($lang_admin_users['No delete admins message']);
+		fama_message($lang_admin_users['No delete admins message']);
 
 	if (isset($_POST['delete_users_comply']))
 	{
 		// Fetch user groups
 		$user_groups = array();
-		$result = $db->query('SELECT id, group_id FROM '.$db->prefix.'users WHERE id IN ('.implode(',', $user_ids).')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user groups', __FILE__, __LINE__, $db->error());
+		$result = $db->query('SELECT id, group_id FROM '.$db->prefix.'users WHERE id IN ('.implode(',', $user_ids).')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch user groups', __FILE__, __LINE__, $db->error());
 		while ($cur_user = $db->fetch_assoc($result))
 		{
 			if (!isset($user_groups[$cur_user['group_id']]))
@@ -416,7 +416,7 @@ else if (isset($_POST['delete_users']) || isset($_POST['delete_users_comply']))
 
 		// Are any users moderators?
 		$group_ids = array_keys($user_groups);
-		$result = $db->query('SELECT g_id, g_moderator FROM '.$db->prefix.'groups WHERE g_id IN ('.implode(',', $group_ids).')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch group moderators', __FILE__, __LINE__, $db->error());
+		$result = $db->query('SELECT g_id, g_moderator FROM '.$db->prefix.'groups WHERE g_id IN ('.implode(',', $group_ids).')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch group moderators', __FILE__, __LINE__, $db->error());
 		while ($cur_group = $db->fetch_assoc($result))
 		{
 			if ($cur_group['g_moderator'] == '0')
@@ -424,7 +424,7 @@ else if (isset($_POST['delete_users']) || isset($_POST['delete_users_comply']))
 		}
 
 		// Fetch forum list and clean up their moderator list
-		$result = $db->query('SELECT id, moderators FROM '.$db->prefix.'forums'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch forum list', __FILE__, __LINE__, $db->error());
+		$result = $db->query('SELECT id, moderators FROM '.$db->prefix.'forums'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch forum list', __FILE__, __LINE__, $db->error());
 		while ($cur_forum = $db->fetch_assoc($result))
 		{
 			$cur_moderators = ($cur_forum['moderators'] != '') ? unserialize($cur_forum['moderators']) : array();
@@ -433,11 +433,11 @@ else if (isset($_POST['delete_users']) || isset($_POST['delete_users_comply']))
 				$cur_moderators = array_diff($cur_moderators, $group_users);
 
 			$cur_moderators = (!empty($cur_moderators)) ? '\''.$db->escape(serialize($cur_moderators)).'\'' : 'NULL';
-			$db->query('UPDATE '.$db->prefix.'forums SET moderators='.$cur_moderators.' WHERE id='.$cur_forum['id'].' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update forum', __FILE__, __LINE__, $db->error());
+			$db->query('UPDATE '.$db->prefix.'forums SET moderators='.$cur_moderators.' WHERE id='.$cur_forum['id'].' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to update forum', __FILE__, __LINE__, $db->error());
 		}
 
 		// Remove them from the online list (if they happen to be logged in)
-		$db->query('DELETE FROM '.$db->prefix.'online WHERE user_id IN ('.implode(',', $user_ids).')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to remove users from online list', __FILE__, __LINE__, $db->error());
+		$db->query('DELETE FROM '.$db->prefix.'online WHERE user_id IN ('.implode(',', $user_ids).')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to remove users from online list', __FILE__, __LINE__, $db->error());
 
 		// Should we delete all posts made by these users?
 		if (isset($_POST['delete_posts']))
@@ -446,13 +446,13 @@ else if (isset($_POST['delete_users']) || isset($_POST['delete_users_comply']))
 			@set_time_limit(0);
 
 			// Find all posts made by this user
-			$result = $db->query('SELECT p.id, p.topic_id, t.forum_id FROM '.$db->prefix.'posts AS p INNER JOIN '.$db->prefix.'topics AS t ON t.id=p.topic_id INNER JOIN '.$db->prefix.'forums AS f ON f.id=t.forum_id WHERE p.poster_id IN ('.implode(',', $user_ids).')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch posts', __FILE__, __LINE__, $db->error());
+			$result = $db->query('SELECT p.id, p.topic_id, t.forum_id FROM '.$db->prefix.'posts AS p INNER JOIN '.$db->prefix.'topics AS t ON t.id=p.topic_id INNER JOIN '.$db->prefix.'forums AS f ON f.id=t.forum_id WHERE p.poster_id IN ('.implode(',', $user_ids).')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch posts', __FILE__, __LINE__, $db->error());
 			if ($db->num_rows($result))
 			{
 				while ($cur_post = $db->fetch_assoc($result))
 				{
 					// Determine whether this post is the "topic post" or not
-					$result2 = $db->query('SELECT id FROM '.$db->prefix.'posts WHERE topic_id='.$cur_post['topic_id'].' ORDER BY posted LIMIT 1'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch post info', __FILE__, __LINE__, $db->error());
+					$result2 = $db->query('SELECT id FROM '.$db->prefix.'posts WHERE topic_id='.$cur_post['topic_id'].' ORDER BY posted LIMIT 1'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch post info', __FILE__, __LINE__, $db->error());
 
 					if ($db->result($result2) == $cur_post['id'])
 						delete_topic($cur_post['topic_id']);
@@ -465,15 +465,15 @@ else if (isset($_POST['delete_users']) || isset($_POST['delete_users_comply']))
 		}
 		else
 			// Set all their posts to guest
-			$db->query('UPDATE '.$db->prefix.'posts SET poster_id=1 WHERE poster_id IN ('.implode(',', $user_ids).')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update posts', __FILE__, __LINE__, $db->error());
+			$db->query('UPDATE '.$db->prefix.'posts SET poster_id=1 WHERE poster_id IN ('.implode(',', $user_ids).')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to update posts', __FILE__, __LINE__, $db->error());
 
 		// Delete the users
-		$db->query('DELETE FROM '.$db->prefix.'users WHERE id IN ('.implode(',', $user_ids).')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to delete users', __FILE__, __LINE__, $db->error());
+		$db->query('DELETE FROM '.$db->prefix.'users WHERE id IN ('.implode(',', $user_ids).')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to delete users', __FILE__, __LINE__, $db->error());
 
 		redirect('admin_users.php', $lang_admin_users['Users delete redirect']);
 	}
 
-	$page_title = array(pun_htmlspecialchars($pun_config['o_board_title']), $lang_admin_common['Admin'], $lang_admin_common['Users'], $lang_admin_users['Delete users']);
+	$page_title = array(fama_htmlspecialchars($pun_config['o_board_title']), $lang_admin_common['Admin'], $lang_admin_common['Users'], $lang_admin_users['Delete users']);
 	define('PUN_ACTIVE_PAGE', 'admin');
 	require PUN_ROOT.'header.php';
 
@@ -534,7 +534,7 @@ else if (isset($_GET['find_user']))
 	$query_str[] = 'user_group='.$user_group;
 
 	if (preg_match('%[^0-9]%', $posts_greater.$posts_less))
-		message($lang_admin_users['Non numeric message']);
+		fama_message($lang_admin_users['Non numeric message']);
 
 	// Try to convert date/time to timestamps
 	if ($last_post_after != '')
@@ -543,7 +543,7 @@ else if (isset($_GET['find_user']))
 
 		$last_post_after = strtotime($last_post_after);
 		if ($last_post_after === false || $last_post_after == -1)
-			message($lang_admin_users['Invalid date time message']);
+			fama_message($lang_admin_users['Invalid date time message']);
 
 		$conditions[] = 'u.last_post>'.$last_post_after;
 	}
@@ -553,7 +553,7 @@ else if (isset($_GET['find_user']))
 
 		$last_post_before = strtotime($last_post_before);
 		if ($last_post_before === false || $last_post_before == -1)
-			message($lang_admin_users['Invalid date time message']);
+			fama_message($lang_admin_users['Invalid date time message']);
 
 		$conditions[] = 'u.last_post<'.$last_post_before;
 	}
@@ -563,7 +563,7 @@ else if (isset($_GET['find_user']))
 
 		$last_visit_after = strtotime($last_visit_after);
 		if ($last_visit_after === false || $last_visit_after == -1)
-			message($lang_admin_users['Invalid date time message']);
+			fama_message($lang_admin_users['Invalid date time message']);
 
 		$conditions[] = 'u.last_visit>'.$last_visit_after;
 	}
@@ -573,7 +573,7 @@ else if (isset($_GET['find_user']))
 
 		$last_visit_before = strtotime($last_visit_before);
 		if ($last_visit_before === false || $last_visit_before == -1)
-			message($lang_admin_users['Invalid date time message']);
+			fama_message($lang_admin_users['Invalid date time message']);
 
 		$conditions[] = 'u.last_visit<'.$last_visit_before;
 	}
@@ -583,7 +583,7 @@ else if (isset($_GET['find_user']))
 
 		$registered_after = strtotime($registered_after);
 		if ($registered_after === false || $registered_after == -1)
-			message($lang_admin_users['Invalid date time message']);
+			fama_message($lang_admin_users['Invalid date time message']);
 
 		$conditions[] = 'u.registered>'.$registered_after;
 	}
@@ -593,7 +593,7 @@ else if (isset($_GET['find_user']))
 
 		$registered_before = strtotime($registered_before);
 		if ($registered_before === false || $registered_before == -1)
-			message($lang_admin_users['Invalid date time message']);
+			fama_message($lang_admin_users['Invalid date time message']);
 
 		$conditions[] = 'u.registered<'.$registered_before;
 	}
@@ -623,7 +623,7 @@ else if (isset($_GET['find_user']))
 		$conditions[] = 'u.group_id='.$user_group;
 
 	// Fetch user count
-	$result = $db->query('SELECT COUNT(id) FROM '.$db->prefix.'users AS u LEFT JOIN '.$db->prefix.'groups AS g ON g.g_id=u.group_id WHERE u.id>1'.(!empty($conditions) ? ' AND '.implode(' AND ', $conditions) : '').' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SELECT COUNT(id) FROM '.$db->prefix.'users AS u LEFT JOIN '.$db->prefix.'groups AS g ON g.g_id=u.group_id WHERE u.id>1'.(!empty($conditions) ? ' AND '.implode(' AND ', $conditions) : '').' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
 	$num_users = $db->result($result);
 
 	// Determine the user offset (based on $_GET['p'])
@@ -639,8 +639,7 @@ else if (isset($_GET['find_user']))
 	$can_delete = $can_move = $pun_user['g_id'] == PUN_ADMIN;
 	$can_action = ($can_delete || $can_move) && $num_users > 0;
 
-	$page_title = array(pun_htmlspecialchars($pun_config['o_board_title']), $lang_admin_common['Admin'], $lang_admin_common['Users'], $lang_admin_users['Results head']);
-	$page_head = array('js' => '<script type="text/javascript" src="common.js"></script>');
+	$page_title = array(fama_htmlspecialchars($pun_config['o_board_title']), $lang_admin_common['Admin'], $lang_admin_common['Users'], $lang_admin_users['Results head']);
 	define('PUN_ACTIVE_PAGE', 'admin');
 	require PUN_ROOT.'header.php';
 
@@ -680,7 +679,7 @@ else if (isset($_GET['find_user']))
 			<tbody>
 <?php
 
-	$result = $db->query('SELECT u.id, u.username, u.email, u.num_posts, g.g_id, g.g_user_title FROM '.$db->prefix.'users AS u LEFT JOIN '.$db->prefix.'groups AS g ON g.g_id=u.group_id WHERE u.id>1'.(!empty($conditions) ? ' AND '.implode(' AND ', $conditions) : '').' ORDER BY '.$db->escape($order_by).' '.$db->escape($direction).' LIMIT '.$start_from.', 50'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SELECT u.id, u.username, u.email, u.num_posts, g.g_id, g.g_user_title FROM '.$db->prefix.'users AS u LEFT JOIN '.$db->prefix.'groups AS g ON g.g_id=u.group_id WHERE u.id>1'.(!empty($conditions) ? ' AND '.implode(' AND ', $conditions) : '').' ORDER BY '.$db->escape($order_by).' '.$db->escape($direction).' LIMIT '.$start_from.', 50'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
 	if ($db->num_rows($result))
 	{
 		while ($user_data = $db->fetch_assoc($result))
@@ -695,7 +694,7 @@ else if (isset($_GET['find_user']))
 
 ?>
 				<tr>
-					<td class="tcl"><?php echo '<a href="profile.php?id='.$user_data['id'].'">'.pun_htmlspecialchars($user_data['username']).'</a>' ?></td>
+					<td class="tcl"><?php echo '<a href="profile.php?id='.$user_data['id'].'">'.fama_htmlspecialchars($user_data['username']).'</a>' ?></td>
 					<td class="tc2"><a href="mailto:<?php echo $user_data['email'] ?>"><?php echo $user_data['email'] ?></a></td>
 					<td class="tc3"><?php echo $user_title ?></td>
 					<td class="tc4"><?php echo forum_number_format($user_data['num_posts']) ?></td>
@@ -721,7 +720,7 @@ else if (isset($_GET['find_user']))
 	<div class="inbox crumbsplus">
 		<div class="pagepost">
 			<p class="pagelink"><?php echo $paging_links ?></p>
-<?php if ($can_action): ?>			<p class="conr modbuttons"><a href="#" onclick="return select_checkboxes('search-users-form', this, '<?php echo $lang_admin_users['Unselect all'] ?>')"><?php echo $lang_admin_users['Select all'] ?></a> <?php if ($can_delete) : ?><input type="submit" name="delete_users" value="<?php echo $lang_admin_users['Delete'] ?>" /><?php endif; if ($can_move) : ?><input type="submit" name="move_users" value="<?php echo $lang_admin_users['Change group'] ?>" /><?php endif; ?></p>
+<?php if ($can_action): ?>			<p class="conr modbuttons"><?php if ($can_delete) : ?><input type="submit" name="delete_users" value="<?php echo $lang_admin_users['Delete'] ?>" /><?php endif; if ($can_move) : ?><input type="submit" name="move_users" value="<?php echo $lang_admin_users['Change group'] ?>" /><?php endif; ?></p>
 <?php endif; ?>
 		</div>
 		<ul class="crumbs">
@@ -741,7 +740,7 @@ else if (isset($_GET['find_user']))
 
 else
 {
-	$page_title = array(pun_htmlspecialchars($pun_config['o_board_title']), $lang_admin_common['Admin'], $lang_admin_common['Users']);
+	$page_title = array(fama_htmlspecialchars($pun_config['o_board_title']), $lang_admin_common['Admin'], $lang_admin_common['Users']);
 	$focus_element = array('find_user', 'form[username]');
 	define('PUN_ACTIVE_PAGE', 'admin');
 	require PUN_ROOT.'header.php';
@@ -834,10 +833,10 @@ else
 											<option value="0"><?php echo $lang_admin_users['Unverified users'] ?></option>
 <?php
 
-	$result = $db->query('SELECT g_id, g_title FROM '.$db->prefix.'groups WHERE g_id!='.PUN_GUEST.' ORDER BY g_title'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user group list', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SELECT g_id, g_title FROM '.$db->prefix.'groups WHERE g_id!='.PUN_GUEST.' ORDER BY g_title'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch user group list', __FILE__, __LINE__, $db->error());
 
 	while ($cur_group = $db->fetch_assoc($result))
-		echo "\t\t\t\t\t\t\t\t\t\t\t".'<option value="'.$cur_group['g_id'].'">'.pun_htmlspecialchars($cur_group['g_title']).'</option>'."\n";
+		echo "\t\t\t\t\t\t\t\t\t\t\t".'<option value="'.$cur_group['g_id'].'">'.fama_htmlspecialchars($cur_group['g_title']).'</option>'."\n";
 
 ?>
 										</select>

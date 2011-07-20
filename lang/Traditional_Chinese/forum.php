@@ -3,7 +3,7 @@
 // Language definitions used in viewforum.php
 $lang_forum = array(
 
-'Post topic'	=>	'發表主題',
+'Post topic'	=>	'發表通告',
 'Views'			=>	'瀏覽',
 'Moved'			=>	'轉移：',
 'Sticky'		=>	'置頂：',

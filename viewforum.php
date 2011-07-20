@@ -11,21 +11,21 @@ require PUN_ROOT.'include/common.php';
 
 
 if ($pun_user['g_read_board'] == '0')
-	message($lang_common['No view']);
+	fama_message($lang_common['No view']);
 
 
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 if ($id < 1)
-	message($lang_common['Bad request']);
+	fama_message($lang_common['Bad request']);
 
 // Load the viewforum.php language file
 require PUN_ROOT.'lang/'.$pun_user['language'].'/forum.php';
 
 // Fetch some info about the forum
-$result = $db->query('SELECT f.forum_name, f.moderators, f.num_topics, f.sort_by, fp.post_topics FROM '.$db->prefix.'forums AS f LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (fp.forum_id=f.id AND fp.group_id='.$pun_user['g_id'].') WHERE (fp.read_forum IS NULL OR fp.read_forum=1) AND f.id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch forum info', __FILE__, __LINE__, $db->error());
+$result = $db->query('SELECT f.forum_name, f.moderators, f.num_topics, f.sort_by, fp.post_topics FROM '.$db->prefix.'forums AS f LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (fp.forum_id=f.id AND fp.group_id='.$pun_user['g_id'].') WHERE (fp.read_forum IS NULL OR fp.read_forum=1) AND f.id='.$id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch forum info', __FILE__, __LINE__, $db->error());
 
 if (!$db->num_rows($result))
-	message($lang_common['Bad request']);
+	fama_message($lang_common['Bad request']);
 
 $cur_forum = $db->fetch_assoc($result);
 
@@ -65,25 +65,7 @@ $start_from = $pun_config['o_disp_topics_default'] * ($p - 1);
 $paging_links = '<span class="pages-label">'.$lang_common['Pages'].' </span>'.paginate($num_pages, $p, 'viewforum.php?id='.$id);
 
 
-// Add relationship meta tags
-$page_head = array();
-$page_head['up'] = '<link rel="up" href="index.php" title="'.$lang_common['Forum index'].'" />';
-
-if ($num_pages > 1)
-{
-	if ($p > 1)
-	{
-		$page_head['first'] = '<link rel="first" href="viewforum.php?id='.$id.'&amp;p=1" title="'.sprintf($lang_common['Page'], 1).'" />';
-		$page_head['prev'] = '<link rel="prev" href="viewforum.php?id='.$id.'&amp;p='.($p-1).'" title="'.sprintf($lang_common['Page'], $p-1).'" />';
-	}
-	if ($p < $num_pages)
-	{
-		$page_head['next'] = '<link rel="next" href="viewforum.php?id='.$id.'&amp;p='.($p+1).'" title="'.sprintf($lang_common['Page'], $p+1).'" />';
-		$page_head['last'] = '<link rel="last" href="viewforum.php?id='.$id.'&amp;p='.$num_pages.'" title="'.sprintf($lang_common['Page'], $num_pages).'" />';
-	}
-}
-
-$page_title = array(pun_htmlspecialchars($pun_config['o_board_title']), pun_htmlspecialchars($cur_forum['forum_name']));
+$page_title = array(fama_htmlspecialchars($pun_config['o_board_title']), fama_htmlspecialchars($cur_forum['forum_name']));
 define('PUN_ALLOW_INDEX', 1);
 define('PUN_ACTIVE_PAGE', 'index');
 require PUN_ROOT.'header.php';
@@ -93,7 +75,7 @@ require PUN_ROOT.'header.php';
 	<div class="inbox crumbsplus">
 		<ul class="crumbs">
 			<li><a href="index.php"><?php echo $lang_common['Index'] ?></a></li>
-			<li><span>»&#160;</span><a href="viewforum.php?id=<?php echo $id ?>"><strong><?php echo pun_htmlspecialchars($cur_forum['forum_name']) ?></strong></a></li>
+			<li><span>»&#160;</span><a href="viewforum.php?id=<?php echo $id ?>"><strong><?php echo fama_htmlspecialchars($cur_forum['forum_name']) ?></strong></a></li>
 		</ul>
 		<div class="pagepost">
 			<p class="pagelink conl"><?php echo $paging_links ?></p>
@@ -104,7 +86,7 @@ require PUN_ROOT.'header.php';
 </div>
 
 <div id="vf" class="blocktable">
-	<h2><span><?php echo pun_htmlspecialchars($cur_forum['forum_name']) ?></span></h2>
+	<h2><span><?php echo fama_htmlspecialchars($cur_forum['forum_name']) ?></span></h2>
 	<div class="box">
 		<div class="inbox">
 			<table cellspacing="0">
@@ -119,7 +101,7 @@ require PUN_ROOT.'header.php';
 <?php
 
 // Retrieve a list of topic IDs, LIMIT is (really) expensive so we only fetch the IDs here then later fetch the remaining data
-$result = $db->query('SELECT id FROM '.$db->prefix.'topics WHERE forum_id='.$id.' ORDER BY sticky DESC, '.$sort_by.', id DESC LIMIT '.$start_from.', '.$pun_config['o_disp_topics_default'].' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch topic IDs', __FILE__, __LINE__, $db->error());
+$result = $db->query('SELECT id FROM '.$db->prefix.'topics WHERE forum_id='.$id.' ORDER BY sticky DESC, '.$sort_by.', id DESC LIMIT '.$start_from.', '.$pun_config['o_disp_topics_default'].' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch topic IDs', __FILE__, __LINE__, $db->error());
 
 // If there are topics in this forum
 if ($db->num_rows($result))
@@ -134,7 +116,7 @@ if ($db->num_rows($result))
 	// Fetch list of topics to display on this page
 	$sql = 'SELECT id, poster, subject, posted, last_post, last_post_id, last_poster, num_replies, closed, sticky, moved_to FROM '.$db->prefix.'topics WHERE id IN('.implode(',', $topic_ids).') ORDER BY sticky DESC, '.$sort_by.', id DESC';
 
-	$result = $db->query($sql.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch topic list', __FILE__, __LINE__, $db->error());
+	$result = $db->query($sql.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch topic list', __FILE__, __LINE__, $db->error());
 
 	$topic_count = 0;
 	while ($cur_topic = $db->fetch_assoc($result))
@@ -145,7 +127,7 @@ if ($db->num_rows($result))
 		$icon_type = 'icon';
 
 		if ($cur_topic['moved_to'] == null)
-			$last_post = '<a href="viewtopic.php?pid='.$cur_topic['last_post_id'].'#p'.$cur_topic['last_post_id'].'">'.format_time($cur_topic['last_post']).'</a> <span class="byuser">'.$lang_common['by'].' '.pun_htmlspecialchars($cur_topic['last_poster']).'</span>';
+			$last_post = '<a href="viewtopic.php?pid='.$cur_topic['last_post_id'].'#p'.$cur_topic['last_post_id'].'">'.format_time($cur_topic['last_post']).'</a> <span class="byuser">'.$lang_common['by'].' '.fama_htmlspecialchars($cur_topic['last_poster']).'</span>';
 		else
 			$last_post = '- - -';
 
@@ -157,15 +139,15 @@ if ($db->num_rows($result))
 
 		if ($cur_topic['moved_to'] != 0)
 		{
-			$subject = '<a href="viewtopic.php?id='.$cur_topic['moved_to'].'">'.pun_htmlspecialchars($cur_topic['subject']).'</a> <span class="byuser">'.$lang_common['by'].' '.pun_htmlspecialchars($cur_topic['poster']).'</span>';
+			$subject = '<a href="viewtopic.php?id='.$cur_topic['moved_to'].'">'.fama_htmlspecialchars($cur_topic['subject']).'</a> <span class="byuser">'.$lang_common['by'].' '.fama_htmlspecialchars($cur_topic['poster']).'</span>';
 			$status_text[] = '<span class="movedtext">'.$lang_forum['Moved'].'</span>';
 			$item_status .= ' imoved';
 		}
 		else if ($cur_topic['closed'] == '0')
-			$subject = '<a href="viewtopic.php?id='.$cur_topic['id'].'">'.pun_htmlspecialchars($cur_topic['subject']).'</a> <span class="byuser">'.$lang_common['by'].' '.pun_htmlspecialchars($cur_topic['poster']).'</span>';
+			$subject = '<a href="viewtopic.php?id='.$cur_topic['id'].'">'.fama_htmlspecialchars($cur_topic['subject']).'</a> <span class="byuser">'.$lang_common['by'].' '.fama_htmlspecialchars($cur_topic['poster']).'</span>';
 		else
 		{
-			$subject = '<a href="viewtopic.php?id='.$cur_topic['id'].'">'.pun_htmlspecialchars($cur_topic['subject']).'</a> <span class="byuser">'.$lang_common['by'].' '.pun_htmlspecialchars($cur_topic['poster']).'</span>';
+			$subject = '<a href="viewtopic.php?id='.$cur_topic['id'].'">'.fama_htmlspecialchars($cur_topic['subject']).'</a> <span class="byuser">'.$lang_common['by'].' '.fama_htmlspecialchars($cur_topic['poster']).'</span>';
 			$status_text[] = '<span class="closedtext">'.$lang_forum['Closed'].'</span>';
 			$item_status .= ' iclosed';
 		}
@@ -237,7 +219,7 @@ else
 		</div>
 		<ul class="crumbs">
 			<li><a href="index.php"><?php echo $lang_common['Index'] ?></a></li>
-			<li><span>»&#160;</span><a href="viewforum.php?id=<?php echo $id ?>"><strong><?php echo pun_htmlspecialchars($cur_forum['forum_name']) ?></strong></a></li>
+			<li><span>»&#160;</span><a href="viewforum.php?id=<?php echo $id ?>"><strong><?php echo fama_htmlspecialchars($cur_forum['forum_name']) ?></strong></a></li>
 		</ul>
 		<div class="clearer"></div>
 	</div>

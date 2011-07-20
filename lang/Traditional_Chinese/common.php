@@ -13,20 +13,20 @@ $lang_common = array(
 
 // Notices
 'Bad request'						=>	'錯誤請求。您所打開的鏈接不存在或已失效。',
-'No view'							=>	'您沒有權限查看這些論壇。',
+'No view'							=>	'您沒有權限查看這些公告板。',
 'No permission'						=>	'您沒有權限訪問該頁面。',
-'Bad referrer'						=>	'HTTP_REFERER 錯誤。您從一個未經授權的地址接入本頁。如果該問題再次發生，請檢查設置 管理設置/配置選項 中的 \'根目錄網址\' 填寫是否正確，並確認您訪問論壇的鏈接正是指向該網址。要獲得關於此問題的更多信息請訪問FluxBB官方論壇。',
-'No cookie'							=>	'您似乎已經登錄成功，但是cookie未能正確設置。請檢查您的相關設置，如果該功能可用，請對本站啟用cookies。',
+'Bad referrer'						=>	'HTTP_REFERER 錯誤。您從一個未經授權的地址接入本頁。如果該問題再次發生，請檢查設置 管理設置/配置選項 中的 \'根目錄網址\' 填寫是否正確，並確認您訪問公告板的鏈接正是指向該網址。要獲得關於此問題的更多信息請訪問FluxBB官方公告板。',
+'No cookie'							=>	'您似乎已經登入成功，但是cookie未能正確設置。請檢查您的相關設置，如果該功能可用，請對本站啟用cookies。',
 'Pun include error'					=>	'Unable to process user include %s from template %s. There is no such file in neither the template directory nor in the user include directory.',
 
 // Miscellaneous
 'Announcement'						=>	'公告',
 'Options'							=>	'選項',
 'Submit'							=>	'提交', // "Name" of submit buttons
-'Ban message'						=>	'您的賬號已被論壇封禁。',
+'Ban message'						=>	'您的賬號已被公告板封禁。',
 'Ban message 2'						=>	'該封禁會持續至',
-'Ban message 3'						=>	'以下是論壇管理人員給您的封禁通知：',
-'Ban message 4'						=>	'任何疑問，請直接聯繫論壇管理員',
+'Ban message 3'						=>	'以下是公告板管理人員給您的封禁通知：',
+'Ban message 4'						=>	'任何疑問，請直接聯繫公告板管理員',
 'Never'								=>	'從未',
 'Today'								=>	'今天',
 'Yesterday'							=>	'昨天',
@@ -43,7 +43,7 @@ $lang_common = array(
 'Last post'							=>	'最後發表',
 'by'								=>	'by', // As in last post by someuser
 'New posts'							=>	'查看更新', // The link that leads to the first new post
-'New posts info'					=>	'查看該主題中新增的帖子。', // The popup text for new posts links
+'New posts info'					=>	'查看該通告中新增的文章。', // The popup text for new posts links
 'Username'							=>	'用戶名',
 'Password'							=>	'密碼',
 'Email'								=>	'電子信箱',
@@ -52,9 +52,9 @@ $lang_common = array(
 'Registered'						=>	'註冊時間',
 'Subject'							=>	'標題',
 'Message'							=>	'內容',
-'Topic'								=>	'主題',
-'Forum'								=>	'論壇',
-'Posts'								=>	'帖子',
+'Topic'								=>	'通告',
+'Forum'								=>	'公告板',
+'Posts'								=>	'文章',
 'Replies'							=>	'回復',
 'Pages'								=>	'頁次：',
 'Page'								=>	'頁 %s',
@@ -69,7 +69,7 @@ $lang_common = array(
 'Write message legend'				=>	'填寫內容後點擊按鈕提交',
 'Previous'							=>	'上一頁',
 'Next'								=>	'下一頁',
-'Forum index'						=>	'論壇首頁',
+'Forum index'						=>	'公告板首頁',
 'Spacer'							=>	'…', // Ellipsis for paginate
 
 // Title
@@ -95,36 +95,36 @@ $lang_common = array(
 'Rules'								=>	'服務條款',
 'Search'							=>	'搜索',
 'Register'							=>	'註冊',
-'Login'								=>	'登錄',
-'Not logged in'						=>	'您尚未登錄。',
+'Login'								=>	'登入',
+'Not logged in'						=>	'您尚未登入。',
 'Profile'							=>	'個人資料',
 'Logout'							=>	'登出',
 'Logged in as'						=>	'歡迎回來：',
 'Admin'								=>	'管理設置',
-'Last visit'						=>	'上次登錄： %s',
-'Topic searches'					=>	'主題:',
+'Last visit'						=>	'上次登入： %s',
+'Topic searches'					=>	'通告:',
 'New posts header'					=>	'已更新',
 'Active topics'						=>	'活躍中',
 'Unanswered topics'					=>	'無回復',
 'Posted topics'						=>	'已參與',
-'Show new posts'					=>	'查看您上次登錄後出現的新帖子。',
-'Show active topics'				=>	'查看包含最近回復的主題。',
-'Show unanswered topics'			=>	'查看還未被回復過的主題。',
-'Show posted topics'				=>	'查看您參與過的主題。',
-'Mark all as read'					=>	'標記所有帖子為已讀',
+'Show new posts'					=>	'查看您上次登入後出現的新文章。',
+'Show active topics'				=>	'查看包含最近回復的通告。',
+'Show unanswered topics'			=>	'查看還未被回復過的通告。',
+'Show posted topics'				=>	'查看您參與過的通告。',
+'Mark all as read'					=>	'標記所有文章為已讀',
 'Mark forum read'					=>	'標記該版塊為已讀',
 'Title separator'					=>	' / ',
 
 // Stuff for the page footer
 'Board footer'						=>	'頁腳',
-'Jump to'							=>	'論壇跳轉',
+'Jump to'							=>	'公告板跳轉',
 'Go'								=>	'前往', // Submit button in forum jump
-'Moderate topic'					=>	'管理主題',
-'Move topic'						=>	'移動主題',
-'Open topic'						=>	'開放主題',
-'Close topic'						=>	'關閉主題',
+'Moderate topic'					=>	'管理通告',
+'Move topic'						=>	'移動通告',
+'Open topic'						=>	'開放通告',
+'Close topic'						=>	'關閉通告',
 'Unstick topic'						=>	'解除置頂',
-'Stick topic'						=>	'置頂主題',
+'Stick topic'						=>	'置頂通告',
 'Moderate forum'					=>	'管理該版',
 'Powered by'						=>	'Powered by %s',
 
@@ -138,15 +138,15 @@ $lang_common = array(
 'Total query time'					=>	'Total query time: %s',
 
 // For extern.php RSS feed
-'RSS description'					=>	'%s 最近發表的主題。',
-'RSS description topic'				=>	'%s 最近發表的帖子。',
+'RSS description'					=>	'%s 最近發表的通告。',
+'RSS description topic'				=>	'%s 最近發表的文章。',
 'RSS reply'							=>	'Re: ', // The topic subject will be appended to this string (to signify a reply)
 'RSS active topics feed'			=>	'RSS訂閱',
 'Atom active topics feed'			=>	'Atom訂閱',
 'RSS forum feed'					=>	'RSS訂閱該版',
 'Atom forum feed'					=>	'Atom訂閱該版',
-'RSS topic feed'					=>	'RSS訂閱該主題',
-'Atom topic feed'					=>	'Atom訂閱該主題',
+'RSS topic feed'					=>	'RSS訂閱該通告',
+'Atom topic feed'					=>	'Atom訂閱該通告',
 
 // Admin related stuff in the header
 'New reports'						=>	'有新的舉報',

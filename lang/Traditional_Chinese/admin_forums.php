@@ -29,7 +29,7 @@ $lang_admin_forums = array(
 'Confirm delete head'		=>	'確認刪除版塊',
 'Confirm delete subhead'	=>	'重要！刪除前請務必閱讀',
 'Confirm delete info'		=>	'您確認要刪除 <strong>%s</strong> 版塊？',
-'Confirm delete warn'		=>	'警告！刪除一個版塊將同時刪除該版塊下的所有帖子(如果存在)！',
+'Confirm delete warn'		=>	'警告！刪除一個版塊將同時刪除該版塊下的所有文章(如果存在)！',
 
 // Detailed edit page
 'Edit forum head'			=>	'編輯版塊',
@@ -37,17 +37,17 @@ $lang_admin_forums = array(
 'Forum name label'			=>	'版塊名稱',
 'Forum description label'	=>	'描述 (HTML)',
 'Category label'			=>	'分類',
-'Sort by label'				=>	'帖子排序方式',
+'Sort by label'				=>	'文章排序方式',
 'Last post'					=>	'最後發表',
-'Topic start'				=>	'主題起始',
+'Topic start'				=>	'通告起始',
 'Subject'					=>	'標題',
 'Redirect label'			=>	'轉向 URL',
 'Redirect help'				=>	'僅對空版塊有效',
-'Group permissions subhead'	=>	'編輯該論壇各用戶組的權限',
-'Group permissions info'	=>	'該表格允許您為不同的用戶組設置在該版塊的不同權限。如果您未在此作任何變動，下表所列出的權限是%s中相關設置的默認值。管理員組(Administrators)總是對所有版塊擁有全權，因此無須設置。當某用戶組的權限設置結果與其默認值不一致時，將會標示為紅色。如果某用戶組被拒絕「閱讀論壇」，此處的「閱讀版塊」權限設置將不可用。轉向出去的版塊僅可編輯「閱讀版塊」的權限。',
+'Group permissions subhead'	=>	'編輯該公告板各用戶組的權限',
+'Group permissions info'	=>	'該表格允許您為不同的用戶組設置在該版塊的不同權限。如果您未在此作任何變動，下表所列出的權限是%s中相關設置的默認值。管理員組(Administrators)總是對所有版塊擁有全權，因此無須設置。當某用戶組的權限設置結果與其默認值不一致時，將會標示為紅色。如果某用戶組被拒絕「閱讀公告板」，此處的「閱讀版塊」權限設置將不可用。轉向出去的版塊僅可編輯「閱讀版塊」的權限。',
 'Read forum label'			=>	'閱讀版塊',
 'Post replies label'		=>	'發表回復',
-'Post topics label'			=>	'發表主題',
+'Post topics label'			=>	'發表通告',
 'Revert to default'			=>	'恢復為默認值',
 
 );

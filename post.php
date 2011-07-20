@@ -11,22 +11,22 @@ require PUN_ROOT.'include/common.php';
 
 
 if ($pun_user['g_read_board'] == '0')
-	message($lang_common['No view']);
+	fama_message($lang_common['No view']);
 
 
 $tid = isset($_GET['tid']) ? intval($_GET['tid']) : 0;
 $fid = isset($_GET['fid']) ? intval($_GET['fid']) : 0;
 if ($tid < 1 && $fid < 1 || $tid > 0 && $fid > 0)
-	message($lang_common['Bad request']);
+	fama_message($lang_common['Bad request']);
 
 // Fetch some info about the topic and/or the forum
 if ($tid)
-	$result = $db->query('SELECT f.id, f.forum_name, f.moderators, fp.post_replies, fp.post_topics, t.subject, t.closed FROM '.$db->prefix.'topics AS t INNER JOIN '.$db->prefix.'forums AS f ON f.id=t.forum_id LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (fp.forum_id=f.id AND fp.group_id='.$pun_user['g_id'].') WHERE (fp.read_forum IS NULL OR fp.read_forum=1) AND t.id='.$tid.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch forum info', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SELECT f.id, f.forum_name, f.moderators, fp.post_replies, fp.post_topics, t.subject, t.closed FROM '.$db->prefix.'topics AS t INNER JOIN '.$db->prefix.'forums AS f ON f.id=t.forum_id LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (fp.forum_id=f.id AND fp.group_id='.$pun_user['g_id'].') WHERE (fp.read_forum IS NULL OR fp.read_forum=1) AND t.id='.$tid.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch forum info', __FILE__, __LINE__, $db->error());
 else
-	$result = $db->query('SELECT f.id, f.forum_name, f.moderators, fp.post_replies, fp.post_topics FROM '.$db->prefix.'forums AS f LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (fp.forum_id=f.id AND fp.group_id='.$pun_user['g_id'].') WHERE (fp.read_forum IS NULL OR fp.read_forum=1) AND f.id='.$fid.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch forum info', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SELECT f.id, f.forum_name, f.moderators, fp.post_replies, fp.post_topics FROM '.$db->prefix.'forums AS f LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (fp.forum_id=f.id AND fp.group_id='.$pun_user['g_id'].') WHERE (fp.read_forum IS NULL OR fp.read_forum=1) AND f.id='.$fid.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch forum info', __FILE__, __LINE__, $db->error());
 
 if (!$db->num_rows($result))
-	message($lang_common['Bad request']);
+	fama_message($lang_common['Bad request']);
 
 $cur_posting = $db->fetch_assoc($result);
 
@@ -39,7 +39,7 @@ if ((($tid && (($cur_posting['post_replies'] == '' && $pun_user['g_post_replies'
 	($fid && (($cur_posting['post_topics'] == '' && $pun_user['g_post_topics'] == '0') || $cur_posting['post_topics'] == '0')) ||
 	(isset($cur_posting['closed']) && $cur_posting['closed'] == '1')) &&
 	!$is_admmod)
-	message($lang_common['No permission']);
+	fama_message($lang_common['No permission']);
 
 // Load the post.php language file
 require PUN_ROOT.'lang/'.$pun_user['language'].'/post.php';
@@ -124,23 +124,23 @@ if (isset($_POST['form_sent']))
 				$new_tid = $tid;
 
 				// Insert the new post
-				$db->query('INSERT INTO '.$db->prefix.'posts (poster, poster_id, poster_ip, message, posted, topic_id) VALUES(\''.$db->escape($username).'\', '.$pun_user['id'].', \''.get_remote_address().'\', \''.$db->escape($message).'\', '.$now.', '.$tid.')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to create post', __FILE__, __LINE__, $db->error());
+				$db->query('INSERT INTO '.$db->prefix.'posts (poster, poster_id, poster_ip, message, posted, topic_id) VALUES(\''.$db->escape($username).'\', '.$pun_user['id'].', \''.get_remote_address().'\', \''.$db->escape($message).'\', '.$now.', '.$tid.')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to create post', __FILE__, __LINE__, $db->error());
 				$new_pid = $db->insert_id();
 			}
 			else
 			{
 				// It's a guest. Insert the new post
 				$email_sql = '\''.$db->escape($email).'\'';
-				$db->query('INSERT INTO '.$db->prefix.'posts (poster, poster_ip, poster_email, message, posted, topic_id) VALUES(\''.$db->escape($username).'\', \''.get_remote_address().'\', '.$email_sql.', \''.$db->escape($message).'\', '.$now.', '.$tid.')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to create post', __FILE__, __LINE__, $db->error());
+				$db->query('INSERT INTO '.$db->prefix.'posts (poster, poster_ip, poster_email, message, posted, topic_id) VALUES(\''.$db->escape($username).'\', \''.get_remote_address().'\', '.$email_sql.', \''.$db->escape($message).'\', '.$now.', '.$tid.')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to create post', __FILE__, __LINE__, $db->error());
 				$new_pid = $db->insert_id();
 			}
 
 			// Count number of replies in the topic
-			$result = $db->query('SELECT COUNT(id) FROM '.$db->prefix.'posts WHERE topic_id='.$tid.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch post count for topic', __FILE__, __LINE__, $db->error());
+			$result = $db->query('SELECT COUNT(id) FROM '.$db->prefix.'posts WHERE topic_id='.$tid.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch post count for topic', __FILE__, __LINE__, $db->error());
 			$num_replies = $db->result($result, 0) - 1;
 
 			// Update topic
-			$db->query('UPDATE '.$db->prefix.'topics SET num_replies='.$num_replies.', last_post='.$now.', last_post_id='.$new_pid.', last_poster=\''.$db->escape($username).'\' WHERE id='.$tid.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update topic', __FILE__, __LINE__, $db->error());
+			$db->query('UPDATE '.$db->prefix.'topics SET num_replies='.$num_replies.', last_post='.$now.', last_post_id='.$new_pid.', last_poster=\''.$db->escape($username).'\' WHERE id='.$tid.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to update topic', __FILE__, __LINE__, $db->error());
 
 			update_search_index('post', $new_pid, $message);
 
@@ -150,24 +150,24 @@ if (isset($_POST['form_sent']))
 		else if ($fid)
 		{
 			// Create the topic
-			$db->query('INSERT INTO '.$db->prefix.'topics (poster, subject, posted, last_post, last_poster, sticky, forum_id) VALUES(\''.$db->escape($username).'\', \''.$db->escape($subject).'\', '.$now.', '.$now.', \''.$db->escape($username).'\', '.$stick_topic.', '.$fid.')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to create topic', __FILE__, __LINE__, $db->error());
+			$db->query('INSERT INTO '.$db->prefix.'topics (poster, subject, posted, last_post, last_poster, sticky, forum_id) VALUES(\''.$db->escape($username).'\', \''.$db->escape($subject).'\', '.$now.', '.$now.', \''.$db->escape($username).'\', '.$stick_topic.', '.$fid.')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to create topic', __FILE__, __LINE__, $db->error());
 			$new_tid = $db->insert_id();
 
 			if (!$pun_user['is_guest'])
 			{
 				// Create the post ("topic post")
-				$db->query('INSERT INTO '.$db->prefix.'posts (poster, poster_id, poster_ip, message, posted, topic_id) VALUES(\''.$db->escape($username).'\', '.$pun_user['id'].', \''.get_remote_address().'\', \''.$db->escape($message).'\', '.$now.', '.$new_tid.')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to create post', __FILE__, __LINE__, $db->error());
+				$db->query('INSERT INTO '.$db->prefix.'posts (poster, poster_id, poster_ip, message, posted, topic_id) VALUES(\''.$db->escape($username).'\', '.$pun_user['id'].', \''.get_remote_address().'\', \''.$db->escape($message).'\', '.$now.', '.$new_tid.')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to create post', __FILE__, __LINE__, $db->error());
 			}
 			else
 			{
 				// Create the post ("topic post")
 				$email_sql = '\''.$db->escape($email).'\'';
-				$db->query('INSERT INTO '.$db->prefix.'posts (poster, poster_ip, poster_email, message, posted, topic_id) VALUES(\''.$db->escape($username).'\', \''.get_remote_address().'\', '.$email_sql.', \''.$db->escape($message).'\', '.$now.', '.$new_tid.')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to create post', __FILE__, __LINE__, $db->error());
+				$db->query('INSERT INTO '.$db->prefix.'posts (poster, poster_ip, poster_email, message, posted, topic_id) VALUES(\''.$db->escape($username).'\', \''.get_remote_address().'\', '.$email_sql.', \''.$db->escape($message).'\', '.$now.', '.$new_tid.')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to create post', __FILE__, __LINE__, $db->error());
 			}
 			$new_pid = $db->insert_id();
 
 			// Update the topic with last_post_id
-			$db->query('UPDATE '.$db->prefix.'topics SET last_post_id='.$new_pid.', first_post_id='.$new_pid.' WHERE id='.$new_tid.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update topic', __FILE__, __LINE__, $db->error());
+			$db->query('UPDATE '.$db->prefix.'topics SET last_post_id='.$new_pid.', first_post_id='.$new_pid.' WHERE id='.$new_tid.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to update topic', __FILE__, __LINE__, $db->error());
 
 			update_search_index('post', $new_pid, $message, $subject);
 
@@ -177,11 +177,11 @@ if (isset($_POST['form_sent']))
 		// If the posting user is logged in, increment his/her post count
 		if (!$pun_user['is_guest'])
 		{
-			$db->query('UPDATE '.$db->prefix.'users SET num_posts=num_posts+1, last_post='.$now.' WHERE id='.$pun_user['id'].' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update user', __FILE__, __LINE__, $db->error());
+			$db->query('UPDATE '.$db->prefix.'users SET num_posts=num_posts+1, last_post='.$now.' WHERE id='.$pun_user['id'].' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to update user', __FILE__, __LINE__, $db->error());
 		}
 		else
 		{
-			$db->query('UPDATE '.$db->prefix.'online SET last_post='.$now.' WHERE ident=\''.$db->escape(get_remote_address()).'\'' .' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update user', __FILE__, __LINE__, $db->error());
+			$db->query('UPDATE '.$db->prefix.'online SET last_post='.$now.' WHERE ident=\''.$db->escape(get_remote_address()).'\'' .' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to update user', __FILE__, __LINE__, $db->error());
 		}
 
 		redirect('viewtopic.php?pid='.$new_pid.'#p'.$new_pid, $lang_post['Post redirect']);
@@ -200,11 +200,11 @@ if ($tid)
 	{
 		$qid = intval($_GET['qid']);
 		if ($qid < 1)
-			message($lang_common['Bad request']);
+			fama_message($lang_common['Bad request']);
 
-		$result = $db->query('SELECT poster, message FROM '.$db->prefix.'posts WHERE id='.$qid.' AND topic_id='.$tid.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch quote info', __FILE__, __LINE__, $db->error());
+		$result = $db->query('SELECT poster, message FROM '.$db->prefix.'posts WHERE id='.$qid.' AND topic_id='.$tid.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch quote info', __FILE__, __LINE__, $db->error());
 		if (!$db->num_rows($result))
-			message($lang_common['Bad request']);
+			fama_message($lang_common['Bad request']);
 
 		list($q_poster, $q_message) = $db->fetch_row($result);
 
@@ -214,7 +214,7 @@ if ($tid)
 			$errors = array();
 			list($inside, $outside) = split_text($q_message, '[code]', '[/code]', $errors);
 			if (!empty($errors)) // Technically this shouldn't happen, since $q_message is an existing post it should only exist if it previously passed validation
-				message($errors[0]);
+				fama_message($errors[0]);
 
 			$q_message = implode("\1", $outside);
 		}
@@ -239,7 +239,7 @@ if ($tid)
 			unset($inside);
 		}
 
-		$q_message = pun_htmlspecialchars($q_message);
+		$q_message = fama_htmlspecialchars($q_message);
 
 		// If username contains a square bracket, we add "" or '' around it (so we know when it starts and ends)
 		if (strpos($q_poster, '[') !== false || strpos($q_poster, ']') !== false)
@@ -263,8 +263,6 @@ if ($tid)
 
 		$quote = '[quote='.$q_poster.']'.$q_message.'[/quote]'."\n";
 	}
-	else
-		$quote = '> '.$q_poster.' '.$lang_common['wrote']."\n\n".'> '.$q_message."\n";
 }
 // If a forum ID was specified in the url (new topic)
 else if ($fid)
@@ -273,10 +271,10 @@ else if ($fid)
 	$form = '<form id="post" method="post" action="post.php?action=post&amp;fid='.$fid.'" onsubmit="return process_form(this)">';
 }
 else
-	message($lang_common['Bad request']);
+	fama_message($lang_common['Bad request']);
 
 
-$page_title = array(pun_htmlspecialchars($pun_config['o_board_title']), $action);
+$page_title = array(fama_htmlspecialchars($pun_config['o_board_title']), $action);
 $required_fields = array('req_email' => $lang_common['Email'], 'req_subject' => $lang_common['Subject'], 'req_message' => $lang_common['Message']);
 $focus_element = array('post');
 
@@ -296,8 +294,8 @@ require PUN_ROOT.'header.php';
 	<div class="inbox">
 		<ul class="crumbs">
 			<li><a href="index.php"><?php echo $lang_common['Index'] ?></a></li>
-			<li><span>»&#160;</span><a href="viewforum.php?id=<?php echo $cur_posting['id'] ?>"><?php echo pun_htmlspecialchars($cur_posting['forum_name']) ?></a></li>
-<?php if (isset($cur_posting['subject'])): ?>			<li><span>»&#160;</span><a href="viewtopic.php?id=<?php echo $tid ?>"><?php echo pun_htmlspecialchars($cur_posting['subject']) ?></a></li>
+			<li><span>»&#160;</span><a href="viewforum.php?id=<?php echo $cur_posting['id'] ?>"><?php echo fama_htmlspecialchars($cur_posting['forum_name']) ?></a></li>
+<?php if (isset($cur_posting['subject'])): ?>			<li><span>»&#160;</span><a href="viewtopic.php?id=<?php echo $tid ?>"><?php echo fama_htmlspecialchars($cur_posting['subject']) ?></a></li>
 <?php endif; ?>			<li><span>»&#160;</span><strong><?php echo $action ?></strong></li>
 		</ul>
 	</div>
@@ -375,17 +373,17 @@ if ($pun_user['is_guest'])
 	$email_form_name = 'req_email';
 
 ?>
-						<label class="conl required"><strong><?php echo $lang_post['Guest name'] ?> <span><?php echo $lang_common['Required'] ?></span></strong><br /><input type="text" name="req_username" value="<?php if (isset($_POST['req_username'])) echo pun_htmlspecialchars($username); ?>" size="25" maxlength="25" tabindex="<?php echo $cur_index++ ?>" /><br /></label>
-						<label class="conl required"><?php echo $email_label ?><br /><input type="text" name="<?php echo $email_form_name ?>" value="<?php if (isset($_POST[$email_form_name])) echo pun_htmlspecialchars($email); ?>" size="50" maxlength="80" tabindex="<?php echo $cur_index++ ?>" /><br /></label>
+						<label class="conl required"><strong><?php echo $lang_post['Guest name'] ?> <span><?php echo $lang_common['Required'] ?></span></strong><br /><input type="text" name="req_username" value="<?php if (isset($_POST['req_username'])) echo fama_htmlspecialchars($username); ?>" size="25" maxlength="25" tabindex="<?php echo $cur_index++ ?>" /><br /></label>
+						<label class="conl required"><?php echo $email_label ?><br /><input type="text" name="<?php echo $email_form_name ?>" value="<?php if (isset($_POST[$email_form_name])) echo fama_htmlspecialchars($email); ?>" size="50" maxlength="80" tabindex="<?php echo $cur_index++ ?>" /><br /></label>
 						<div class="clearer"></div>
 <?php
 
 }
 
 if ($fid): ?>
-						<label class="required"><strong><?php echo $lang_common['Subject'] ?> <span><?php echo $lang_common['Required'] ?></span></strong><br /><input class="longinput" type="text" name="req_subject" value="<?php if (isset($_POST['req_subject'])) echo pun_htmlspecialchars($subject); ?>" size="80" maxlength="70" tabindex="<?php echo $cur_index++ ?>" /><br /></label>
+						<label class="required"><strong><?php echo $lang_common['Subject'] ?> <span><?php echo $lang_common['Required'] ?></span></strong><br /><input class="longinput" type="text" name="req_subject" value="<?php if (isset($_POST['req_subject'])) echo fama_htmlspecialchars($subject); ?>" size="80" maxlength="70" tabindex="<?php echo $cur_index++ ?>" /><br /></label>
 <?php endif; ?>						<label class="required"><strong><?php echo $lang_common['Message'] ?> <span><?php echo $lang_common['Required'] ?></span></strong><br />
-						<textarea name="req_message" rows="20" cols="95" tabindex="<?php echo $cur_index++ ?>"><?php echo isset($_POST['req_message']) ? pun_htmlspecialchars($orig_message) : (isset($quote) ? $quote : ''); ?></textarea><br /></label>
+						<textarea name="req_message" rows="20" cols="95" tabindex="<?php echo $cur_index++ ?>"><?php echo isset($_POST['req_message']) ? fama_htmlspecialchars($orig_message) : (isset($quote) ? $quote : ''); ?></textarea><br /></label>
 						<ul class="bblinks">
 							<li><span><a href="help.php#bbcode" onclick="window.open(this.href); return false;"><?php echo $lang_common['BBCode'] ?></a> <?php echo $lang_common['on']; ?></span></li>
 							<li><span><a href="help.php#img" onclick="window.open(this.href); return false;"><?php echo $lang_common['img tag'] ?></a> <?php echo $lang_common['on']; ?></span></li>
@@ -395,7 +393,7 @@ if ($fid): ?>
 <?php
 
 $checkboxes = array();
-if ($is_admmod)
+if ($is_admmod && $fid)
 	$checkboxes[] = '<label><input type="checkbox" name="stick_topic" value="1" tabindex="'.($cur_index++).'"'.(isset($_POST['stick_topic']) ? ' checked="checked"' : '').' />'.$lang_common['Stick topic'].'<br /></label>';
 
 if (!empty($checkboxes))

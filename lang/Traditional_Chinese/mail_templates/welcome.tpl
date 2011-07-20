@@ -5,7 +5,7 @@
 用戶名: <username>
 密碼: <password>
 
-請通過頁面 <login_url> 登錄以激活您的賬號。
+請通過頁面 <login_url> 登入以激活您的賬號。
 
 --
 <board_mailer>

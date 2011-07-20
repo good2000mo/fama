@@ -620,7 +620,7 @@ function handle_url_tag($url, $link = '', $bbcode = false)
 		{
 			$url = pun_htmlspecialchars_decode($url);
 			$link = utf8_strlen($url) > 55 ? utf8_substr($url, 0 , 39).' … '.utf8_substr($url, -10) : $url;
-			$link = pun_htmlspecialchars($link);
+			$link = fama_htmlspecialchars($link);
 		}
 		else
 			$link = stripslashes($link);
@@ -772,7 +772,7 @@ function parse_message($text)
 	global $pun_config, $lang_common, $pun_user;
 
 	// Convert applicable characters to HTML entities
-	$text = pun_htmlspecialchars($text);
+	$text = fama_htmlspecialchars($text);
 
 	// If the message contains a code tag we have to split it up (text within [code][/code] shouldn't be touched)
 	if (strpos($text, '[code]') !== false && strpos($text, '[/code]') !== false)

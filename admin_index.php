@@ -15,7 +15,7 @@ require PUN_ROOT.'include/common_admin.php';
 
 
 if (!$pun_user['is_admmod'])
-	message($lang_common['No permission']);
+	fama_message($lang_common['No permission']);
 
 // Load the admin_index.php language file
 require PUN_ROOT.'lang/'.$admin_language.'/admin_index.php';
@@ -26,16 +26,16 @@ $action = isset($_GET['action']) ? $_GET['action'] : null;
 if ($action == 'check_upgrade')
 {
 	if (!ini_get('allow_url_fopen'))
-		message($lang_admin_index['fopen disabled message']);
+		fama_message($lang_admin_index['fopen disabled message']);
 
 	$latest_version = trim(@file_get_contents('http://fluxbb.org/latest_version'));
 	if (empty($latest_version))
-		message($lang_admin_index['Upgrade check failed message']);
+		fama_message($lang_admin_index['Upgrade check failed message']);
 
 	if (version_compare(FORUM_VERSION, $latest_version, '>='))
-		message($lang_admin_index['Running latest version message']);
+		fama_message($lang_admin_index['Running latest version message']);
 	else
-		message(sprintf($lang_admin_index['New version available message'], '<a href="http://fluxbb.org/">FluxBB.org</a>'));
+		fama_message(sprintf($lang_admin_index['New version available message'], '<a href="http://fluxbb.org/">FluxBB.org</a>'));
 }
 
 
@@ -44,7 +44,7 @@ else if ($action == 'phpinfo' && $pun_user['g_id'] == PUN_ADMIN)
 {
 	// Is phpinfo() a disabled function?
 	if (strpos(strtolower((string) ini_get('disable_functions')), 'phpinfo') !== false)
-		message($lang_admin_index['PHPinfo disabled message']);
+		fama_message($lang_admin_index['PHPinfo disabled message']);
 
 	phpinfo();
 	exit;
@@ -77,7 +77,7 @@ else
 
 
 // Get number of current visitors
-$result = $db->query('SELECT COUNT(user_id) FROM '.$db->prefix.'online WHERE idle=0'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch online count', __FILE__, __LINE__, $db->error());
+$result = $db->query('SELECT COUNT(user_id) FROM '.$db->prefix.'online WHERE idle=0'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch online count', __FILE__, __LINE__, $db->error());
 $num_online = $db->result($result);
 
 
@@ -85,7 +85,7 @@ $num_online = $db->result($result);
 if ($db_type == 'mysql' || $db_type == 'mysqli' || $db_type == 'mysql_innodb' || $db_type == 'mysqli_innodb')
 {
 	// Calculate total db size/row count
-	$result = $db->query('SHOW TABLE STATUS LIKE \''.$db->prefix.'%\''.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch table status', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SHOW TABLE STATUS LIKE \''.$db->prefix.'%\''.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch table status', __FILE__, __LINE__, $db->error());
 
 	$total_records = $total_size = 0;
 	while ($status = $db->fetch_assoc($result))
@@ -94,7 +94,7 @@ if ($db_type == 'mysql' || $db_type == 'mysqli' || $db_type == 'mysql_innodb' ||
 		$total_size += $status['Data_length'] + $status['Index_length'];
 	}
 
-	$total_size = file_size($total_size);
+	$total_size = fama_file_size($total_size);
 }
 
 
@@ -115,7 +115,7 @@ else
 	$php_accelerator = $lang_admin_index['NA'];
 
 
-$page_title = array(pun_htmlspecialchars($pun_config['o_board_title']), $lang_admin_common['Admin'], $lang_admin_common['Index']);
+$page_title = array(fama_htmlspecialchars($pun_config['o_board_title']), $lang_admin_common['Admin'], $lang_admin_common['Index']);
 define('PUN_ACTIVE_PAGE', 'admin');
 require PUN_ROOT.'header.php';
 

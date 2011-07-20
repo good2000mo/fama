@@ -15,7 +15,7 @@ require PUN_ROOT.'include/common_admin.php';
 
 
 if ($pun_user['g_id'] != PUN_ADMIN)
-	message($lang_common['No permission']);
+	fama_message($lang_common['No permission']);
 
 // Load the admin_options.php language file
 require PUN_ROOT.'lang/'.$admin_language.'/admin_options.php';
@@ -47,11 +47,11 @@ if (isset($_POST['form_sent']))
 	);
 
 	if ($form['board_title'] == '')
-		message($lang_admin_options['Must enter title message']);
+		fama_message($lang_admin_options['Must enter title message']);
 
 	$languages = forum_list_langs();
 	if (!in_array($form['default_lang'], $languages))
-		message($lang_common['Bad request']);
+		fama_message($lang_common['Bad request']);
 
 	if ($form['time_format'] == '')
 		$form['time_format'] = 'H:i:s';
@@ -63,10 +63,10 @@ if (isset($_POST['form_sent']))
 	require PUN_ROOT.'include/email.php';
 
 	if (!is_valid_email($form['admin_email']))
-		message($lang_admin_options['Invalid e-mail message']);
+		fama_message($lang_admin_options['Invalid e-mail message']);
 
 	if (!is_valid_email($form['webmaster_email']))
-		message($lang_admin_options['Invalid webmaster e-mail message']);
+		fama_message($lang_admin_options['Invalid webmaster e-mail message']);
 
 	// Change or enter a SMTP password
 	if (isset($_POST['form']['smtp_change_pass']))
@@ -77,7 +77,7 @@ if (isset($_POST['form_sent']))
 		if ($smtp_pass1 == $smtp_pass2)
 			$form['smtp_pass'] = $smtp_pass1;
 		else
-			message($lang_admin_options['SMTP passwords did not match']);
+			fama_message($lang_admin_options['SMTP passwords did not match']);
 	}
 
 	// Make sure the number of displayed topics and posts is between 3 and 75
@@ -92,7 +92,7 @@ if (isset($_POST['form_sent']))
 		$form['disp_posts_default'] = 75;
 
 	if ($form['timeout_online'] >= $form['timeout_visit'])
-		message($lang_admin_options['Timeout error message']);
+		fama_message($lang_admin_options['Timeout error message']);
 
 	foreach ($form as $key => $input)
 	{
@@ -104,7 +104,7 @@ if (isset($_POST['form_sent']))
 			else
 				$value = 'NULL';
 
-			$db->query('UPDATE '.$db->prefix.'config SET conf_value='.$value.' WHERE conf_name=\'o_'.$db->escape($key).'\''.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update board config', __FILE__, __LINE__, $db->error());
+			$db->query('UPDATE '.$db->prefix.'config SET conf_value='.$value.' WHERE conf_name=\'o_'.$db->escape($key).'\''.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to update board config', __FILE__, __LINE__, $db->error());
 		}
 	}
 
@@ -117,7 +117,7 @@ if (isset($_POST['form_sent']))
 	redirect('admin_options.php', $lang_admin_options['Options updated redirect']);
 }
 
-$page_title = array(pun_htmlspecialchars($pun_config['o_board_title']), $lang_admin_common['Admin'], $lang_admin_common['Options']);
+$page_title = array(fama_htmlspecialchars($pun_config['o_board_title']), $lang_admin_common['Admin'], $lang_admin_common['Options']);
 define('PUN_ACTIVE_PAGE', 'admin');
 require PUN_ROOT.'header.php';
 
@@ -138,14 +138,14 @@ generate_admin_menu('options');
 								<tr>
 									<th scope="row"><?php echo $lang_admin_options['Board title label'] ?></th>
 									<td>
-										<input type="text" name="form[board_title]" size="50" maxlength="255" value="<?php echo pun_htmlspecialchars($pun_config['o_board_title']) ?>" />
+										<input type="text" name="form[board_title]" size="50" maxlength="255" value="<?php echo fama_htmlspecialchars($pun_config['o_board_title']) ?>" />
 										<span><?php echo $lang_admin_options['Board title help'] ?></span>
 									</td>
 								</tr>
 								<tr>
 									<th scope="row"><?php echo $lang_admin_options['Board desc label'] ?></th>
 									<td>
-										<input type="text" name="form[board_desc]" size="50" maxlength="255" value="<?php echo pun_htmlspecialchars($pun_config['o_board_desc']) ?>" />
+										<input type="text" name="form[board_desc]" size="50" maxlength="255" value="<?php echo fama_htmlspecialchars($pun_config['o_board_desc']) ?>" />
 										<span><?php echo $lang_admin_options['Board desc help'] ?></span>
 									</td>
 								</tr>
@@ -236,14 +236,14 @@ generate_admin_menu('options');
 								<tr>
 									<th scope="row"><?php echo $lang_admin_options['Time format label'] ?></th>
 									<td>
-										<input type="text" name="form[time_format]" size="25" maxlength="25" value="<?php echo pun_htmlspecialchars($pun_config['o_time_format']) ?>" />
+										<input type="text" name="form[time_format]" size="25" maxlength="25" value="<?php echo fama_htmlspecialchars($pun_config['o_time_format']) ?>" />
 										<span><?php printf($lang_admin_options['Time format help'], gmdate($pun_config['o_time_format'], $timestamp), '<a href="http://www.php.net/manual/en/function.date.php">'.$lang_admin_options['PHP manual'].'</a>') ?></span>
 									</td>
 								</tr>
 								<tr>
 									<th scope="row"><?php echo $lang_admin_options['Date format label'] ?></th>
 									<td>
-										<input type="text" name="form[date_format]" size="25" maxlength="25" value="<?php echo pun_htmlspecialchars($pun_config['o_date_format']) ?>" />
+										<input type="text" name="form[date_format]" size="25" maxlength="25" value="<?php echo fama_htmlspecialchars($pun_config['o_date_format']) ?>" />
 										<span><?php printf($lang_admin_options['Date format help'], gmdate($pun_config['o_date_format'], $timestamp), '<a href="http://www.php.net/manual/en/function.date.php">'.$lang_admin_options['PHP manual'].'</a>') ?></span>
 									</td>
 								</tr>
@@ -347,14 +347,14 @@ generate_admin_menu('options');
 								<tr>
 									<th scope="row"><?php echo $lang_admin_options['SMTP address label'] ?></th>
 									<td>
-										<input type="text" name="form[smtp_host]" size="30" maxlength="100" value="<?php echo pun_htmlspecialchars($pun_config['o_smtp_host']) ?>" />
+										<input type="text" name="form[smtp_host]" size="30" maxlength="100" value="<?php echo fama_htmlspecialchars($pun_config['o_smtp_host']) ?>" />
 										<span><?php echo $lang_admin_options['SMTP address help'] ?></span>
 									</td>
 								</tr>
 								<tr>
 									<th scope="row"><?php echo $lang_admin_options['SMTP username label'] ?></th>
 									<td>
-										<input type="text" name="form[smtp_user]" size="25" maxlength="50" value="<?php echo pun_htmlspecialchars($pun_config['o_smtp_user']) ?>" />
+										<input type="text" name="form[smtp_user]" size="25" maxlength="50" value="<?php echo fama_htmlspecialchars($pun_config['o_smtp_user']) ?>" />
 										<span><?php echo $lang_admin_options['SMTP username help'] ?></span>
 									</td>
 								</tr>

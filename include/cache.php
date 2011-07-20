@@ -19,14 +19,14 @@ function generate_config_cache()
 	global $db;
 
 	// Get the forum config from the DB
-	$result = $db->query('SELECT * FROM '.$db->prefix.'config'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --', true) or error('Unable to fetch forum config', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SELECT * FROM '.$db->prefix.'config'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --', true) or fama_error('Unable to fetch forum config', __FILE__, __LINE__, $db->error());
 	while ($cur_config_item = $db->fetch_row($result))
 		$output[$cur_config_item[0]] = $cur_config_item[1];
 
 	// Output config as PHP code
 	$fh = @fopen(FORUM_CACHE_DIR.'cache_config.php', 'wb');
 	if (!$fh)
-		error('Unable to write configuration cache file to cache directory. Please make sure PHP has write access to the directory \''.pun_htmlspecialchars(FORUM_CACHE_DIR).'\'', __FILE__, __LINE__);
+		error('Unable to write configuration cache file to cache directory. Please make sure PHP has write access to the directory \''.fama_htmlspecialchars(FORUM_CACHE_DIR).'\'', __FILE__, __LINE__);
 
 	fwrite($fh, '<?php'."\n\n".'define(\'PUN_CONFIG_LOADED\', 1);'."\n\n".'$pun_config = '.var_export($output, true).';'."\n\n".'?>');
 
@@ -62,7 +62,7 @@ function generate_stopwords_cache()
 	// Output stopwords as PHP code
 	$fh = @fopen(FORUM_CACHE_DIR.'cache_stopwords.php', 'wb');
 	if (!$fh)
-		error('Unable to write stopwords cache file to cache directory. Please make sure PHP has write access to the directory \''.pun_htmlspecialchars(FORUM_CACHE_DIR).'\'', __FILE__, __LINE__);
+		error('Unable to write stopwords cache file to cache directory. Please make sure PHP has write access to the directory \''.fama_htmlspecialchars(FORUM_CACHE_DIR).'\'', __FILE__, __LINE__);
 
 	fwrite($fh, '<?php'."\n\n".'$cache_id = \''.generate_stopwords_cache_id().'\';'."\n".'if ($cache_id != generate_stopwords_cache_id()) return;'."\n\n".'define(\'PUN_STOPWORDS_LOADED\', 1);'."\n\n".'$stopwords = '.var_export($stopwords, true).';'."\n\n".'?>');
 

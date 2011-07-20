@@ -15,7 +15,7 @@ require PUN_ROOT.'include/common_admin.php';
 
 
 if ($pun_user['g_id'] != PUN_ADMIN)
-	message($lang_common['No permission']);
+	fama_message($lang_common['No permission']);
 
 // Load the admin_groups.php language file
 require PUN_ROOT.'lang/'.$admin_language.'/admin_groups.php';
@@ -27,7 +27,8 @@ if (isset($_POST['add_group']) || isset($_GET['edit_group']))
 	{
 		$base_group = intval($_POST['base_group']);
 
-		$result = $db->query('SELECT * FROM '.$db->prefix.'groups WHERE g_id='.$base_group.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user group info', __FILE__, __LINE__, $db->error());
+		// dbquery: g.g_id
+		$result = $db->query('SELECT * FROM '.$db->prefix.'groups WHERE g_id='.$base_group.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch user group info', __FILE__, __LINE__, $db->error());
 		$group = $db->fetch_assoc($result);
 
 		$mode = 'add';
@@ -36,11 +37,12 @@ if (isset($_POST['add_group']) || isset($_GET['edit_group']))
 	{
 		$group_id = intval($_GET['edit_group']);
 		if ($group_id < 1)
-			message($lang_common['Bad request']);
+			fama_message($lang_common['Bad request']);
 
-		$result = $db->query('SELECT * FROM '.$db->prefix.'groups WHERE g_id='.$group_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user group info', __FILE__, __LINE__, $db->error());
+		// dbquery: g.g_id
+		$result = $db->query('SELECT * FROM '.$db->prefix.'groups WHERE g_id='.$group_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch user group info', __FILE__, __LINE__, $db->error());
 		if (!$db->num_rows($result))
-			message($lang_common['Bad request']);
+			fama_message($lang_common['Bad request']);
 
 		$group = $db->fetch_assoc($result);
 
@@ -48,7 +50,7 @@ if (isset($_POST['add_group']) || isset($_GET['edit_group']))
 	}
 
 
-	$page_title = array(pun_htmlspecialchars($pun_config['o_board_title']), $lang_admin_common['Admin'], $lang_admin_common['User groups']);
+	$page_title = array(fama_htmlspecialchars($pun_config['o_board_title']), $lang_admin_common['Admin'], $lang_admin_common['User groups']);
 	$required_fields = array('req_title' => $lang_admin_groups['Group title label']);
 	$focus_element = array('groups2', 'req_title');
 	define('PUN_ACTIVE_PAGE', 'admin');
@@ -74,13 +76,13 @@ if (isset($_POST['add_group']) || isset($_GET['edit_group']))
 								<tr>
 									<th scope="row"><?php echo $lang_admin_groups['Group title label'] ?></th>
 									<td>
-										<input type="text" name="req_title" size="25" maxlength="50" value="<?php if ($mode == 'edit') echo pun_htmlspecialchars($group['g_title']); ?>" tabindex="1" />
+										<input type="text" name="req_title" size="25" maxlength="50" value="<?php if ($mode == 'edit') echo fama_htmlspecialchars($group['g_title']); ?>" tabindex="1" />
 									</td>
 								</tr>
 								<tr>
 									<th scope="row"><?php echo $lang_admin_groups['User title label'] ?></th>
 									<td>
-										<input type="text" name="user_title" size="25" maxlength="50" value="<?php echo pun_htmlspecialchars($group['g_user_title']) ?>" tabindex="2" />
+										<input type="text" name="user_title" size="25" maxlength="50" value="<?php echo fama_htmlspecialchars($group['g_user_title']) ?>" tabindex="2" />
 										<span><?php echo $lang_admin_groups['User title help'] ?></span>
 									</td>
 								</tr>
@@ -257,31 +259,34 @@ else if (isset($_POST['add_edit_group']))
 	$email_flood = isset($_POST['email_flood']) ? intval($_POST['email_flood']) : '0';
 
 	if ($title == '')
-		message($lang_admin_groups['Must enter title message']);
+		fama_message($lang_admin_groups['Must enter title message']);
 
 	$user_title = ($user_title != '') ? '\''.$db->escape($user_title).'\'' : 'NULL';
 
 	if ($_POST['mode'] == 'add')
 	{
-		$result = $db->query('SELECT 1 FROM '.$db->prefix.'groups WHERE g_title=\''.$db->escape($title).'\''.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to check group title collision', __FILE__, __LINE__, $db->error());
+		// dbquery: g.g_title
+		$result = $db->query('SELECT 1 FROM '.$db->prefix.'groups WHERE g_title=\''.$db->escape($title).'\''.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to check group title collision', __FILE__, __LINE__, $db->error());
 		if ($db->num_rows($result))
-			message(sprintf($lang_admin_groups['Title already exists message'], pun_htmlspecialchars($title)));
+			fama_message(sprintf($lang_admin_groups['Title already exists message'], fama_htmlspecialchars($title)));
 
-		$db->query('INSERT INTO '.$db->prefix.'groups (g_title, g_user_title, g_moderator, g_mod_edit_users, g_mod_rename_users, g_mod_change_passwords, g_read_board, g_view_users, g_post_replies, g_post_topics, g_edit_posts, g_delete_posts, g_delete_topics, g_set_title, g_search, g_search_users, g_send_email, g_post_flood, g_search_flood, g_email_flood) VALUES(\''.$db->escape($title).'\', '.$user_title.', '.$moderator.', '.$mod_edit_users.', '.$mod_rename_users.', '.$mod_change_passwords.', '.$read_board.', '.$view_users.', '.$post_replies.', '.$post_topics.', '.$edit_posts.', '.$delete_posts.', '.$delete_topics.', '.$set_title.', '.$search.', '.$search_users.', '.$send_email.', '.$post_flood.', '.$search_flood.', '.$email_flood.')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to add group', __FILE__, __LINE__, $db->error());
+		// dbquery: g.g_title, g.g_user_title, g.g_moderator, g.g_mod_edit_users, g.g_mod_rename_users, g.g_mod_change_passwords, g.g_read_board, g.g_view_users, g.g_post_replies, g.g_post_topics, g.g_edit_posts,g. g_delete_posts, g.g_delete_topics, g.g_set_title, g.g_search, g.g_search_users, g.g_send_email, g.g_post_flood, g.g_search_flood, g.g_email_flood
+		$db->query('INSERT INTO '.$db->prefix.'groups (g_title, g_user_title, g_moderator, g_mod_edit_users, g_mod_rename_users, g_mod_change_passwords, g_read_board, g_view_users, g_post_replies, g_post_topics, g_edit_posts, g_delete_posts, g_delete_topics, g_set_title, g_search, g_search_users, g_send_email, g_post_flood, g_search_flood, g_email_flood) VALUES(\''.$db->escape($title).'\', '.$user_title.', '.$moderator.', '.$mod_edit_users.', '.$mod_rename_users.', '.$mod_change_passwords.', '.$read_board.', '.$view_users.', '.$post_replies.', '.$post_topics.', '.$edit_posts.', '.$delete_posts.', '.$delete_topics.', '.$set_title.', '.$search.', '.$search_users.', '.$send_email.', '.$post_flood.', '.$search_flood.', '.$email_flood.')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to add group', __FILE__, __LINE__, $db->error());
 		$new_group_id = $db->insert_id();
 
 		// Now lets copy the forum specific permissions from the group which this group is based on
-		$result = $db->query('SELECT forum_id, read_forum, post_replies, post_topics FROM '.$db->prefix.'forum_perms WHERE group_id='.intval($_POST['base_group']).' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch group forum permission list', __FILE__, __LINE__, $db->error());
+		// dbquery: fp.forum_id, fp.read_forum, fp.post_replies, fp.post_topics, fp.group_id
+		$result = $db->query('SELECT forum_id, read_forum, post_replies, post_topics FROM '.$db->prefix.'forum_perms WHERE group_id='.intval($_POST['base_group']).' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch group forum permission list', __FILE__, __LINE__, $db->error());
 		while ($cur_forum_perm = $db->fetch_assoc($result))
-			$db->query('INSERT INTO '.$db->prefix.'forum_perms (group_id, forum_id, read_forum, post_replies, post_topics) VALUES('.$new_group_id.', '.$cur_forum_perm['forum_id'].', '.$cur_forum_perm['read_forum'].', '.$cur_forum_perm['post_replies'].', '.$cur_forum_perm['post_topics'].')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to insert group forum permissions', __FILE__, __LINE__, $db->error());
+			$db->query('INSERT INTO '.$db->prefix.'forum_perms (group_id, forum_id, read_forum, post_replies, post_topics) VALUES('.$new_group_id.', '.$cur_forum_perm['forum_id'].', '.$cur_forum_perm['read_forum'].', '.$cur_forum_perm['post_replies'].', '.$cur_forum_perm['post_topics'].')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to insert group forum permissions', __FILE__, __LINE__, $db->error());
 	}
 	else
 	{
-		$result = $db->query('SELECT 1 FROM '.$db->prefix.'groups WHERE g_title=\''.$db->escape($title).'\' AND g_id!='.intval($_POST['group_id']).' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to check group title collision', __FILE__, __LINE__, $db->error());
+		$result = $db->query('SELECT 1 FROM '.$db->prefix.'groups WHERE g_title=\''.$db->escape($title).'\' AND g_id!='.intval($_POST['group_id']).' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to check group title collision', __FILE__, __LINE__, $db->error());
 		if ($db->num_rows($result))
-			message(sprintf($lang_admin_groups['Title already exists message'], pun_htmlspecialchars($title)));
+			fama_message(sprintf($lang_admin_groups['Title already exists message'], fama_htmlspecialchars($title)));
 
-		$db->query('UPDATE '.$db->prefix.'groups SET g_title=\''.$db->escape($title).'\', g_user_title='.$user_title.', g_moderator='.$moderator.', g_mod_edit_users='.$mod_edit_users.', g_mod_rename_users='.$mod_rename_users.', g_mod_change_passwords='.$mod_change_passwords.', g_read_board='.$read_board.', g_view_users='.$view_users.', g_post_replies='.$post_replies.', g_post_topics='.$post_topics.', g_edit_posts='.$edit_posts.', g_delete_posts='.$delete_posts.', g_delete_topics='.$delete_topics.', g_set_title='.$set_title.', g_search='.$search.', g_search_users='.$search_users.', g_send_email='.$send_email.', g_post_flood='.$post_flood.', g_search_flood='.$search_flood.', g_email_flood='.$email_flood.' WHERE g_id='.intval($_POST['group_id']).' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update group', __FILE__, __LINE__, $db->error());
+		$db->query('UPDATE '.$db->prefix.'groups SET g_title=\''.$db->escape($title).'\', g_user_title='.$user_title.', g_moderator='.$moderator.', g_mod_edit_users='.$mod_edit_users.', g_mod_rename_users='.$mod_rename_users.', g_mod_change_passwords='.$mod_change_passwords.', g_read_board='.$read_board.', g_view_users='.$view_users.', g_post_replies='.$post_replies.', g_post_topics='.$post_topics.', g_edit_posts='.$edit_posts.', g_delete_posts='.$delete_posts.', g_delete_topics='.$delete_topics.', g_set_title='.$set_title.', g_search='.$search.', g_search_users='.$search_users.', g_send_email='.$send_email.', g_post_flood='.$post_flood.', g_search_flood='.$search_flood.', g_email_flood='.$email_flood.' WHERE g_id='.intval($_POST['group_id']).' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to update group', __FILE__, __LINE__, $db->error());
 	}
 
 	if ($_POST['mode'] == 'edit')
@@ -300,14 +305,14 @@ else if (isset($_POST['set_default_group']))
 
 	// Make sure it's not the admin or guest groups
 	if ($group_id == PUN_ADMIN || $group_id == PUN_GUEST)
-		message($lang_common['Bad request']);
+		fama_message($lang_common['Bad request']);
 
 	// Make sure it's not a moderator group
-	$result = $db->query('SELECT 1 FROM '.$db->prefix.'groups WHERE g_id='.$group_id.' AND g_moderator=0'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to check group moderator status', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SELECT 1 FROM '.$db->prefix.'groups WHERE g_id='.$group_id.' AND g_moderator=0'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to check group moderator status', __FILE__, __LINE__, $db->error());
 	if (!$db->num_rows($result))
-		message($lang_common['Bad request']);
+		fama_message($lang_common['Bad request']);
 
-	$db->query('UPDATE '.$db->prefix.'config SET conf_value='.$group_id.' WHERE conf_name=\'o_default_user_group\''.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update board config', __FILE__, __LINE__, $db->error());
+	$db->query('UPDATE '.$db->prefix.'config SET conf_value='.$group_id.' WHERE conf_name=\'o_default_user_group\''.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to update board config', __FILE__, __LINE__, $db->error());
 
 	// Regenerate the config cache
 	if (!defined('FORUM_CACHE_FUNCTIONS_LOADED'))
@@ -326,14 +331,14 @@ else if (isset($_GET['del_group']))
 
 	$group_id = isset($_POST['group_to_delete']) ? intval($_POST['group_to_delete']) : intval($_GET['del_group']);
 	if ($group_id < 5)
-		message($lang_common['Bad request']);
+		fama_message($lang_common['Bad request']);
 
 	// Make sure we don't remove the default group
 	if ($group_id == $pun_config['o_default_user_group'])
-		message($lang_admin_groups['Cannot remove default message']);
+		fama_message($lang_admin_groups['Cannot remove default message']);
 
 	// Check if this group has any members
-	$result = $db->query('SELECT g.g_title, COUNT(u.id) FROM '.$db->prefix.'groups AS g INNER JOIN '.$db->prefix.'users AS u ON g.g_id=u.group_id WHERE g.g_id='.$group_id.' GROUP BY g.g_id, g_title'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch group info', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SELECT g.g_title, COUNT(u.id) FROM '.$db->prefix.'groups AS g INNER JOIN '.$db->prefix.'users AS u ON g.g_id=u.group_id WHERE g.g_id='.$group_id.' GROUP BY g.g_id, g_title'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch group info', __FILE__, __LINE__, $db->error());
 
 	// If the group doesn't have any members or if we've already selected a group to move the members to
 	if (!$db->num_rows($result) || isset($_POST['del_group']))
@@ -343,21 +348,21 @@ else if (isset($_GET['del_group']))
 			if (isset($_POST['del_group']))
 			{
 				$move_to_group = intval($_POST['move_to_group']);
-				$db->query('UPDATE '.$db->prefix.'users SET group_id='.$move_to_group.' WHERE group_id='.$group_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to move users into group', __FILE__, __LINE__, $db->error());
+				$db->query('UPDATE '.$db->prefix.'users SET group_id='.$move_to_group.' WHERE group_id='.$group_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to move users into group', __FILE__, __LINE__, $db->error());
 			}
 
 			// Delete the group and any forum specific permissions
-			$db->query('DELETE FROM '.$db->prefix.'groups WHERE g_id='.$group_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to delete group', __FILE__, __LINE__, $db->error());
-			$db->query('DELETE FROM '.$db->prefix.'forum_perms WHERE group_id='.$group_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to delete group forum permissions', __FILE__, __LINE__, $db->error());
+			$db->query('DELETE FROM '.$db->prefix.'groups WHERE g_id='.$group_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to delete group', __FILE__, __LINE__, $db->error());
+			$db->query('DELETE FROM '.$db->prefix.'forum_perms WHERE group_id='.$group_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to delete group forum permissions', __FILE__, __LINE__, $db->error());
 
 			redirect('admin_groups.php', $lang_admin_groups['Group removed redirect']);
 		}
 		else
 		{
-			$result = $db->query('SELECT g_title FROM '.$db->prefix.'groups WHERE g_id='.$group_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch group title', __FILE__, __LINE__, $db->error());
+			$result = $db->query('SELECT g_title FROM '.$db->prefix.'groups WHERE g_id='.$group_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch group title', __FILE__, __LINE__, $db->error());
 			$group_title = $db->result($result);
 
-			$page_title = array(pun_htmlspecialchars($pun_config['o_board_title']), $lang_admin_common['Admin'], $lang_admin_common['User groups']);
+			$page_title = array(fama_htmlspecialchars($pun_config['o_board_title']), $lang_admin_common['Admin'], $lang_admin_common['User groups']);
 			define('PUN_ACTIVE_PAGE', 'admin');
 			require PUN_ROOT.'header.php';
 
@@ -373,7 +378,7 @@ else if (isset($_GET['del_group']))
 					<fieldset>
 						<legend><?php echo $lang_admin_groups['Confirm delete subhead'] ?></legend>
 						<div class="infldset">
-							<p><?php printf($lang_admin_groups['Confirm delete info'], pun_htmlspecialchars($group_title)) ?></p>
+							<p><?php printf($lang_admin_groups['Confirm delete info'], fama_htmlspecialchars($group_title)) ?></p>
 							<p class="warntext"><?php echo $lang_admin_groups['Confirm delete warn'] ?></p>
 						</div>
 					</fieldset>
@@ -392,7 +397,7 @@ else if (isset($_GET['del_group']))
 
 	list($group_title, $group_members) = $db->fetch_row($result);
 
-	$page_title = array(pun_htmlspecialchars($pun_config['o_board_title']), $lang_admin_common['Admin'], $lang_admin_common['User groups']);
+	$page_title = array(fama_htmlspecialchars($pun_config['o_board_title']), $lang_admin_common['Admin'], $lang_admin_common['User groups']);
 	define('PUN_ACTIVE_PAGE', 'admin');
 	require PUN_ROOT.'header.php';
 
@@ -407,19 +412,19 @@ else if (isset($_GET['del_group']))
 					<fieldset>
 						<legend><?php echo $lang_admin_groups['Move users subhead'] ?></legend>
 						<div class="infldset">
-							<p><?php printf($lang_admin_groups['Move users info'], pun_htmlspecialchars($group_title), forum_number_format($group_members)) ?></p>
+							<p><?php printf($lang_admin_groups['Move users info'], fama_htmlspecialchars($group_title), forum_number_format($group_members)) ?></p>
 							<label><?php echo $lang_admin_groups['Move users label'] ?>
 							<select name="move_to_group">
 <?php
 
-	$result = $db->query('SELECT g_id, g_title FROM '.$db->prefix.'groups WHERE g_id!='.PUN_GUEST.' AND g_id!='.$group_id.' ORDER BY g_title'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user group list', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SELECT g_id, g_title FROM '.$db->prefix.'groups WHERE g_id!='.PUN_GUEST.' AND g_id!='.$group_id.' ORDER BY g_title'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch user group list', __FILE__, __LINE__, $db->error());
 
 	while ($cur_group = $db->fetch_assoc($result))
 	{
 		if ($cur_group['g_id'] == PUN_MEMBER) // Pre-select the pre-defined Members group
-			echo "\t\t\t\t\t\t\t\t\t\t".'<option value="'.$cur_group['g_id'].'" selected="selected">'.pun_htmlspecialchars($cur_group['g_title']).'</option>'."\n";
+			echo "\t\t\t\t\t\t\t\t\t\t".'<option value="'.$cur_group['g_id'].'" selected="selected">'.fama_htmlspecialchars($cur_group['g_title']).'</option>'."\n";
 		else
-			echo "\t\t\t\t\t\t\t\t\t\t".'<option value="'.$cur_group['g_id'].'">'.pun_htmlspecialchars($cur_group['g_title']).'</option>'."\n";
+			echo "\t\t\t\t\t\t\t\t\t\t".'<option value="'.$cur_group['g_id'].'">'.fama_htmlspecialchars($cur_group['g_title']).'</option>'."\n";
 	}
 
 ?>
@@ -440,7 +445,7 @@ else if (isset($_GET['del_group']))
 }
 
 
-$page_title = array(pun_htmlspecialchars($pun_config['o_board_title']), $lang_admin_common['Admin'], $lang_admin_common['User groups']);
+$page_title = array(fama_htmlspecialchars($pun_config['o_board_title']), $lang_admin_common['Admin'], $lang_admin_common['User groups']);
 define('PUN_ACTIVE_PAGE', 'admin');
 require PUN_ROOT.'header.php';
 
@@ -462,14 +467,14 @@ generate_admin_menu('groups');
 										<select id="base_group" name="base_group" tabindex="1">
 <?php
 
-$result = $db->query('SELECT g_id, g_title FROM '.$db->prefix.'groups WHERE g_id!='.PUN_ADMIN.' AND g_id!='.PUN_GUEST.' ORDER BY g_title'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user group list', __FILE__, __LINE__, $db->error());
+$result = $db->query('SELECT g_id, g_title FROM '.$db->prefix.'groups WHERE g_id!='.PUN_ADMIN.' AND g_id!='.PUN_GUEST.' ORDER BY g_title'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch user group list', __FILE__, __LINE__, $db->error());
 
 while ($cur_group = $db->fetch_assoc($result))
 {
 	if ($cur_group['g_id'] == $pun_config['o_default_user_group'])
-		echo "\t\t\t\t\t\t\t\t\t\t\t".'<option value="'.$cur_group['g_id'].'" selected="selected">'.pun_htmlspecialchars($cur_group['g_title']).'</option>'."\n";
+		echo "\t\t\t\t\t\t\t\t\t\t\t".'<option value="'.$cur_group['g_id'].'" selected="selected">'.fama_htmlspecialchars($cur_group['g_title']).'</option>'."\n";
 	else
-		echo "\t\t\t\t\t\t\t\t\t\t\t".'<option value="'.$cur_group['g_id'].'">'.pun_htmlspecialchars($cur_group['g_title']).'</option>'."\n";
+		echo "\t\t\t\t\t\t\t\t\t\t\t".'<option value="'.$cur_group['g_id'].'">'.fama_htmlspecialchars($cur_group['g_title']).'</option>'."\n";
 }
 
 ?>
@@ -492,14 +497,14 @@ while ($cur_group = $db->fetch_assoc($result))
 										<select id="default_group" name="default_group" tabindex="3">
 <?php
 
-$result = $db->query('SELECT g_id, g_title FROM '.$db->prefix.'groups WHERE g_id>'.PUN_GUEST.' AND g_moderator=0 ORDER BY g_title'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user group list', __FILE__, __LINE__, $db->error());
+$result = $db->query('SELECT g_id, g_title FROM '.$db->prefix.'groups WHERE g_id>'.PUN_GUEST.' AND g_moderator=0 ORDER BY g_title'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch user group list', __FILE__, __LINE__, $db->error());
 
 while ($cur_group = $db->fetch_assoc($result))
 {
 	if ($cur_group['g_id'] == $pun_config['o_default_user_group'])
-		echo "\t\t\t\t\t\t\t\t\t\t\t".'<option value="'.$cur_group['g_id'].'" selected="selected">'.pun_htmlspecialchars($cur_group['g_title']).'</option>'."\n";
+		echo "\t\t\t\t\t\t\t\t\t\t\t".'<option value="'.$cur_group['g_id'].'" selected="selected">'.fama_htmlspecialchars($cur_group['g_title']).'</option>'."\n";
 	else
-		echo "\t\t\t\t\t\t\t\t\t\t\t".'<option value="'.$cur_group['g_id'].'">'.pun_htmlspecialchars($cur_group['g_title']).'</option>'."\n";
+		echo "\t\t\t\t\t\t\t\t\t\t\t".'<option value="'.$cur_group['g_id'].'">'.fama_htmlspecialchars($cur_group['g_title']).'</option>'."\n";
 }
 
 ?>
@@ -527,10 +532,10 @@ while ($cur_group = $db->fetch_assoc($result))
 
 $cur_index = 5;
 
-$result = $db->query('SELECT g_id, g_title FROM '.$db->prefix.'groups ORDER BY g_id'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user group list', __FILE__, __LINE__, $db->error());
+$result = $db->query('SELECT g_id, g_title FROM '.$db->prefix.'groups ORDER BY g_id'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch user group list', __FILE__, __LINE__, $db->error());
 
 while ($cur_group = $db->fetch_assoc($result))
-	echo "\t\t\t\t\t\t\t\t".'<tr><th scope="row"><a href="admin_groups.php?edit_group='.$cur_group['g_id'].'" tabindex="'.$cur_index++.'">'.$lang_admin_groups['Edit link'].'</a>'.(($cur_group['g_id'] > PUN_MEMBER) ? ' | <a href="admin_groups.php?del_group='.$cur_group['g_id'].'" tabindex="'.$cur_index++.'">'.$lang_admin_groups['Delete link'].'</a>' : '').'</th><td>'.pun_htmlspecialchars($cur_group['g_title']).'</td></tr>'."\n";
+	echo "\t\t\t\t\t\t\t\t".'<tr><th scope="row"><a href="admin_groups.php?edit_group='.$cur_group['g_id'].'" tabindex="'.$cur_index++.'">'.$lang_admin_groups['Edit link'].'</a>'.(($cur_group['g_id'] > PUN_MEMBER) ? ' | <a href="admin_groups.php?del_group='.$cur_group['g_id'].'" tabindex="'.$cur_index++.'">'.$lang_admin_groups['Delete link'].'</a>' : '').'</th><td>'.fama_htmlspecialchars($cur_group['g_title']).'</td></tr>'."\n";
 
 ?>
 							</table>

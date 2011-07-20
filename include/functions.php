@@ -50,7 +50,7 @@ function check_cookie(&$pun_user)
 		}
 
 		// Check if there's a user with the user ID and password hash from the cookie
-		$result = $db->query('SELECT u.*, g.*, o.logged, o.idle FROM '.$db->prefix.'users AS u INNER JOIN '.$db->prefix.'groups AS g ON u.group_id=g.g_id LEFT JOIN '.$db->prefix.'online AS o ON o.user_id=u.id WHERE u.id='.intval($cookie['user_id']).' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user information', __FILE__, __LINE__, $db->error());
+		$result = $db->query('SELECT u.*, g.*, o.logged, o.idle FROM '.$db->prefix.'users AS u INNER JOIN '.$db->prefix.'groups AS g ON u.group_id=g.g_id LEFT JOIN '.$db->prefix.'online AS o ON o.user_id=u.id WHERE u.id='.intval($cookie['user_id']).' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch user information', __FILE__, __LINE__, $db->error());
 		$pun_user = $db->fetch_assoc($result);
 
 		// If user authorisation failed
@@ -87,11 +87,11 @@ function check_cookie(&$pun_user)
 					case 'mysql_innodb':
 					case 'mysqli_innodb':
 					case 'sqlite':
-						$db->query('REPLACE INTO '.$db->prefix.'online (user_id, ident, logged) VALUES('.$pun_user['id'].', \''.$db->escape($pun_user['username']).'\', '.$pun_user['logged'].')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to insert into online list', __FILE__, __LINE__, $db->error());
+						$db->query('REPLACE INTO '.$db->prefix.'online (user_id, ident, logged) VALUES('.$pun_user['id'].', \''.$db->escape($pun_user['username']).'\', '.$pun_user['logged'].')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to insert into online list', __FILE__, __LINE__, $db->error());
 						break;
 
 					default:
-						$db->query('INSERT INTO '.$db->prefix.'online (user_id, ident, logged) SELECT '.$pun_user['id'].', \''.$db->escape($pun_user['username']).'\', '.$pun_user['logged'].' WHERE NOT EXISTS (SELECT 1 FROM '.$db->prefix.'online WHERE user_id='.$pun_user['id'].')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to insert into online list', __FILE__, __LINE__, $db->error());
+						$db->query('INSERT INTO '.$db->prefix.'online (user_id, ident, logged) SELECT '.$pun_user['id'].', \''.$db->escape($pun_user['username']).'\', '.$pun_user['logged'].' WHERE NOT EXISTS (SELECT 1 FROM '.$db->prefix.'online WHERE user_id='.$pun_user['id'].')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to insert into online list', __FILE__, __LINE__, $db->error());
 						break;
 				}
 			}
@@ -100,12 +100,12 @@ function check_cookie(&$pun_user)
 				// Special case: We've timed out, but no other user has browsed the forums since we timed out
 				if ($pun_user['logged'] < ($now-$pun_config['o_timeout_visit']))
 				{
-					$db->query('UPDATE '.$db->prefix.'users SET last_visit='.$pun_user['logged'].' WHERE id='.$pun_user['id'].' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update user visit data', __FILE__, __LINE__, $db->error());
+					$db->query('UPDATE '.$db->prefix.'users SET last_visit='.$pun_user['logged'].' WHERE id='.$pun_user['id'].' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to update user visit data', __FILE__, __LINE__, $db->error());
 					$pun_user['last_visit'] = $pun_user['logged'];
 				}
 
 				$idle_sql = ($pun_user['idle'] == '1') ? ', idle=0' : '';
-				$db->query('UPDATE '.$db->prefix.'online SET logged='.$now.$idle_sql.' WHERE user_id='.$pun_user['id'].' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update online list', __FILE__, __LINE__, $db->error());
+				$db->query('UPDATE '.$db->prefix.'online SET logged='.$now.$idle_sql.' WHERE user_id='.$pun_user['id'].' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to update online list', __FILE__, __LINE__, $db->error());
 			}
 		}
 		else
@@ -141,7 +141,7 @@ function authenticate_user($user, $password, $password_is_hash = false)
 	global $db, $pun_user;
 
 	// Check if there's a user matching $user and $password
-	$result = $db->query('SELECT u.*, g.*, o.logged, o.idle FROM '.$db->prefix.'users AS u INNER JOIN '.$db->prefix.'groups AS g ON g.g_id=u.group_id LEFT JOIN '.$db->prefix.'online AS o ON o.user_id=u.id WHERE '.(is_int($user) ? 'u.id='.intval($user) : 'u.username=\''.$db->escape($user).'\'').' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SELECT u.*, g.*, o.logged, o.idle FROM '.$db->prefix.'users AS u INNER JOIN '.$db->prefix.'groups AS g ON g.g_id=u.group_id LEFT JOIN '.$db->prefix.'online AS o ON o.user_id=u.id WHERE '.(is_int($user) ? 'u.id='.intval($user) : 'u.username=\''.$db->escape($user).'\'').' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
 	$pun_user = $db->fetch_assoc($result);
 
 	if (!isset($pun_user['id']) ||
@@ -224,7 +224,7 @@ function set_default_user()
 	$remote_addr = get_remote_address();
 
 	// Fetch guest user
-	$result = $db->query('SELECT u.*, g.*, o.logged, o.last_post, o.last_search FROM '.$db->prefix.'users AS u INNER JOIN '.$db->prefix.'groups AS g ON u.group_id=g.g_id LEFT JOIN '.$db->prefix.'online AS o ON o.ident=\''.$remote_addr.'\' WHERE u.id=1'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch guest information', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SELECT u.*, g.*, o.logged, o.last_post, o.last_search FROM '.$db->prefix.'users AS u INNER JOIN '.$db->prefix.'groups AS g ON u.group_id=g.g_id LEFT JOIN '.$db->prefix.'online AS o ON o.ident=\''.$remote_addr.'\' WHERE u.id=1'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch guest information', __FILE__, __LINE__, $db->error());
 	if (!$db->num_rows($result))
 		exit('Unable to fetch guest information. The table \''.$db->prefix.'users\' must contain an entry with id = 1 that represents anonymous users.');
 
@@ -243,16 +243,16 @@ function set_default_user()
 			case 'mysql_innodb':
 			case 'mysqli_innodb':
 			case 'sqlite':
-				$db->query('REPLACE INTO '.$db->prefix.'online (user_id, ident, logged) VALUES(1, \''.$db->escape($remote_addr).'\', '.$pun_user['logged'].')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to insert into online list', __FILE__, __LINE__, $db->error());
+				$db->query('REPLACE INTO '.$db->prefix.'online (user_id, ident, logged) VALUES(1, \''.$db->escape($remote_addr).'\', '.$pun_user['logged'].')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to insert into online list', __FILE__, __LINE__, $db->error());
 				break;
 
 			default:
-				$db->query('INSERT INTO '.$db->prefix.'online (user_id, ident, logged) SELECT 1, \''.$db->escape($remote_addr).'\', '.$pun_user['logged'].' WHERE NOT EXISTS (SELECT 1 FROM '.$db->prefix.'online WHERE ident=\''.$db->escape($remote_addr).'\')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to insert into online list', __FILE__, __LINE__, $db->error());
+				$db->query('INSERT INTO '.$db->prefix.'online (user_id, ident, logged) SELECT 1, \''.$db->escape($remote_addr).'\', '.$pun_user['logged'].' WHERE NOT EXISTS (SELECT 1 FROM '.$db->prefix.'online WHERE ident=\''.$db->escape($remote_addr).'\')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to insert into online list', __FILE__, __LINE__, $db->error());
 				break;
 		}
 	}
 	else
-		$db->query('UPDATE '.$db->prefix.'online SET logged='.time().' WHERE ident=\''.$db->escape($remote_addr).'\''.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update online list', __FILE__, __LINE__, $db->error());
+		$db->query('UPDATE '.$db->prefix.'online SET logged='.time().' WHERE ident=\''.$db->escape($remote_addr).'\''.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to update online list', __FILE__, __LINE__, $db->error());
 
 	$pun_user['language'] = $pun_config['o_default_lang'];
 	$pun_user['is_guest'] = true;
@@ -351,12 +351,12 @@ function check_username($username, $exclude_id = null)
 	// Check that the username (or a too similar username) is not already registered
 	$query = ($exclude_id) ? ' AND id!='.$exclude_id : '';
 
-	$result = $db->query('SELECT username FROM '.$db->prefix.'users WHERE (UPPER(username)=UPPER(\''.$db->escape($username).'\') OR UPPER(username)=UPPER(\''.$db->escape(ucp_preg_replace('%[^\p{L}\p{N}]%u', '', $username)).'\')) AND id>1'.$query.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SELECT username FROM '.$db->prefix.'users WHERE (UPPER(username)=UPPER(\''.$db->escape($username).'\') OR UPPER(username)=UPPER(\''.$db->escape(ucp_preg_replace('%[^\p{L}\p{N}]%u', '', $username)).'\')) AND id>1'.$query.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
 
 	if ($db->num_rows($result))
 	{
 		$busy = $db->result($result);
-		$errors[] = $lang_register['Username dupe 1'].' '.pun_htmlspecialchars($busy).'. '.$lang_register['Username dupe 2'];
+		$errors[] = $lang_register['Username dupe 1'].' '.fama_htmlspecialchars($busy).'. '.$lang_register['Username dupe 2'];
 	}
 }
 
@@ -371,22 +371,22 @@ function update_users_online()
 	$now = time();
 
 	// Fetch all online list entries that are older than "o_timeout_online"
-	$result = $db->query('SELECT user_id, ident, logged, idle FROM '.$db->prefix.'online WHERE logged<'.($now-$pun_config['o_timeout_online']).' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch old entries from online list', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SELECT user_id, ident, logged, idle FROM '.$db->prefix.'online WHERE logged<'.($now-$pun_config['o_timeout_online']).' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch old entries from online list', __FILE__, __LINE__, $db->error());
 	while ($cur_user = $db->fetch_assoc($result))
 	{
 		// If the entry is a guest, delete it
 		if ($cur_user['user_id'] == '1')
-			$db->query('DELETE FROM '.$db->prefix.'online WHERE ident=\''.$db->escape($cur_user['ident']).'\''.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to delete from online list', __FILE__, __LINE__, $db->error());
+			$db->query('DELETE FROM '.$db->prefix.'online WHERE ident=\''.$db->escape($cur_user['ident']).'\''.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to delete from online list', __FILE__, __LINE__, $db->error());
 		else
 		{
 			// If the entry is older than "o_timeout_visit", update last_visit for the user in question, then delete him/her from the online list
 			if ($cur_user['logged'] < ($now-$pun_config['o_timeout_visit']))
 			{
-				$db->query('UPDATE '.$db->prefix.'users SET last_visit='.$cur_user['logged'].' WHERE id='.$cur_user['user_id'].' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update user visit data', __FILE__, __LINE__, $db->error());
-				$db->query('DELETE FROM '.$db->prefix.'online WHERE user_id='.$cur_user['user_id'].' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to delete from online list', __FILE__, __LINE__, $db->error());
+				$db->query('UPDATE '.$db->prefix.'users SET last_visit='.$cur_user['logged'].' WHERE id='.$cur_user['user_id'].' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to update user visit data', __FILE__, __LINE__, $db->error());
+				$db->query('DELETE FROM '.$db->prefix.'online WHERE user_id='.$cur_user['user_id'].' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to delete from online list', __FILE__, __LINE__, $db->error());
 			}
 			else if ($cur_user['idle'] == '0')
-				$db->query('UPDATE '.$db->prefix.'online SET idle=1 WHERE user_id='.$cur_user['user_id'].' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to insert into online list', __FILE__, __LINE__, $db->error());
+				$db->query('UPDATE '.$db->prefix.'online SET idle=1 WHERE user_id='.$cur_user['user_id'].' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to insert into online list', __FILE__, __LINE__, $db->error());
 		}
 	}
 }
@@ -420,7 +420,7 @@ function generate_profile_menu($page = '')
 //
 // Generate browser's title
 //
-function generate_page_title($page_title, $p = null)
+function fama_generate_page_title($page_title, $p = null)
 {
 	global $pun_config, $lang_common;
 
@@ -442,20 +442,18 @@ function update_forum($forum_id)
 {
 	global $db;
 
-	$result = $db->query('SELECT COUNT(id), SUM(num_replies) FROM '.$db->prefix.'topics WHERE forum_id='.$forum_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch forum topic count', __FILE__, __LINE__, $db->error());
-	list($num_topics, $num_posts) = $db->fetch_row($result);
-
-	$num_posts = $num_posts + $num_topics; // $num_posts is only the sum of all replies (we have to add the topic posts)
-
-	$result = $db->query('SELECT last_post, last_post_id, last_poster FROM '.$db->prefix.'topics WHERE forum_id='.$forum_id.' AND moved_to IS NULL ORDER BY last_post DESC LIMIT 1'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch last_post/last_post_id/last_poster', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SELECT COUNT(id) FROM '.$db->prefix.'topics WHERE forum_id='.$forum_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch forum topic count', __FILE__, __LINE__, $db->error());
+	$num_topics = $db->result($result);
+	
+	$result = $db->query('SELECT last_post, last_post_id, last_poster FROM '.$db->prefix.'topics WHERE forum_id='.$forum_id.' AND moved_to IS NULL ORDER BY last_post DESC LIMIT 1'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch last_post/last_post_id/last_poster', __FILE__, __LINE__, $db->error());
 	if ($db->num_rows($result)) // There are topics in the forum
 	{
 		list($last_post, $last_post_id, $last_poster) = $db->fetch_row($result);
 
-		$db->query('UPDATE '.$db->prefix.'forums SET num_topics='.$num_topics.', num_posts='.$num_posts.', last_post='.$last_post.', last_post_id='.$last_post_id.', last_poster=\''.$db->escape($last_poster).'\' WHERE id='.$forum_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update last_post/last_post_id/last_poster', __FILE__, __LINE__, $db->error());
+		$db->query('UPDATE '.$db->prefix.'forums SET num_topics='.$num_topics.', last_post='.$last_post.', last_post_id='.$last_post_id.', last_poster=\''.$db->escape($last_poster).'\' WHERE id='.$forum_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to update last_post/last_post_id/last_poster', __FILE__, __LINE__, $db->error());
 	}
 	else // There are no topics
-		$db->query('UPDATE '.$db->prefix.'forums SET num_topics='.$num_topics.', num_posts='.$num_posts.', last_post=NULL, last_post_id=NULL, last_poster=NULL WHERE id='.$forum_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update last_post/last_post_id/last_poster', __FILE__, __LINE__, $db->error());
+		$db->query('UPDATE '.$db->prefix.'forums SET num_topics='.$num_topics.', last_post=NULL, last_post_id=NULL, last_poster=NULL WHERE id='.$forum_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to update last_post/last_post_id/last_poster', __FILE__, __LINE__, $db->error());
 }
 
 
@@ -467,11 +465,11 @@ function delete_topic($topic_id)
 	global $db;
 
 	// Delete the topic and any redirect topics
-	$db->query('DELETE FROM '.$db->prefix.'topics WHERE id='.$topic_id.' OR moved_to='.$topic_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to delete topic', __FILE__, __LINE__, $db->error());
+	$db->query('DELETE FROM '.$db->prefix.'topics WHERE id='.$topic_id.' OR moved_to='.$topic_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to delete topic', __FILE__, __LINE__, $db->error());
 
 	// Create a list of the post IDs in this topic
 	$post_ids = '';
-	$result = $db->query('SELECT id FROM '.$db->prefix.'posts WHERE topic_id='.$topic_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch posts', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SELECT id FROM '.$db->prefix.'posts WHERE topic_id='.$topic_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch posts', __FILE__, __LINE__, $db->error());
 	while ($row = $db->fetch_row($result))
 		$post_ids .= ($post_ids != '') ? ','.$row[0] : $row[0];
 
@@ -481,7 +479,7 @@ function delete_topic($topic_id)
 		strip_search_index($post_ids);
 
 		// Delete posts in topic
-		$db->query('DELETE FROM '.$db->prefix.'posts WHERE topic_id='.$topic_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to delete posts', __FILE__, __LINE__, $db->error());
+		$db->query('DELETE FROM '.$db->prefix.'posts WHERE topic_id='.$topic_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to delete posts', __FILE__, __LINE__, $db->error());
 	}
 }
 
@@ -493,17 +491,17 @@ function delete_post($post_id, $topic_id)
 {
 	global $db;
 
-	$result = $db->query('SELECT id, poster, posted FROM '.$db->prefix.'posts WHERE topic_id='.$topic_id.' ORDER BY id DESC LIMIT 2'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch post info', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SELECT id, poster, posted FROM '.$db->prefix.'posts WHERE topic_id='.$topic_id.' ORDER BY id DESC LIMIT 2'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch post info', __FILE__, __LINE__, $db->error());
 	list($last_id, ,) = $db->fetch_row($result);
 	list($second_last_id, $second_poster, $second_posted) = $db->fetch_row($result);
 
 	// Delete the post
-	$db->query('DELETE FROM '.$db->prefix.'posts WHERE id='.$post_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to delete post', __FILE__, __LINE__, $db->error());
+	$db->query('DELETE FROM '.$db->prefix.'posts WHERE id='.$post_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to delete post', __FILE__, __LINE__, $db->error());
 
 	strip_search_index($post_id);
 
 	// Count number of replies in the topic
-	$result = $db->query('SELECT COUNT(id) FROM '.$db->prefix.'posts WHERE topic_id='.$topic_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch post count for topic', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SELECT COUNT(id) FROM '.$db->prefix.'posts WHERE topic_id='.$topic_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch post count for topic', __FILE__, __LINE__, $db->error());
 	$num_replies = $db->result($result, 0) - 1;
 
 	// If the message we deleted is the most recent in the topic (at the end of the topic)
@@ -511,14 +509,14 @@ function delete_post($post_id, $topic_id)
 	{
 		// If there is a $second_last_id there is more than 1 reply to the topic
 		if (!empty($second_last_id))
-			$db->query('UPDATE '.$db->prefix.'topics SET last_post='.$second_posted.', last_post_id='.$second_last_id.', last_poster=\''.$db->escape($second_poster).'\', num_replies='.$num_replies.' WHERE id='.$topic_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update topic', __FILE__, __LINE__, $db->error());
+			$db->query('UPDATE '.$db->prefix.'topics SET last_post='.$second_posted.', last_post_id='.$second_last_id.', last_poster=\''.$db->escape($second_poster).'\', num_replies='.$num_replies.' WHERE id='.$topic_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to update topic', __FILE__, __LINE__, $db->error());
 		else
 			// We deleted the only reply, so now last_post/last_post_id/last_poster is posted/id/poster from the topic itself
-			$db->query('UPDATE '.$db->prefix.'topics SET last_post=posted, last_post_id=id, last_poster=poster, num_replies='.$num_replies.' WHERE id='.$topic_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update topic', __FILE__, __LINE__, $db->error());
+			$db->query('UPDATE '.$db->prefix.'topics SET last_post=posted, last_post_id=id, last_poster=poster, num_replies='.$num_replies.' WHERE id='.$topic_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to update topic', __FILE__, __LINE__, $db->error());
 	}
 	else
 		// Otherwise we just decrement the reply counter
-		$db->query('UPDATE '.$db->prefix.'topics SET num_replies='.$num_replies.' WHERE id='.$topic_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update topic', __FILE__, __LINE__, $db->error());
+		$db->query('UPDATE '.$db->prefix.'topics SET num_replies='.$num_replies.' WHERE id='.$topic_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to update topic', __FILE__, __LINE__, $db->error());
 }
 
 
@@ -547,10 +545,10 @@ function get_title($user)
 
 	// If the user has a custom title
 	if ($user['title'] != '')
-		$user_title = pun_htmlspecialchars($user['title']);
+		$user_title = fama_htmlspecialchars($user['title']);
 	// If the user group has a default user title
 	else if ($user['g_user_title'] != '')
-		$user_title = pun_htmlspecialchars($user['g_user_title']);
+		$user_title = fama_htmlspecialchars($user['g_user_title']);
 	// If the user is a guest
 	else if ($user['g_id'] == PUN_GUEST)
 		$user_title = $lang_common['Guest'];
@@ -625,13 +623,13 @@ function paginate($num_pages, $cur_page, $link)
 //
 // Display a message
 //
-function message($message, $no_back_link = false)
+function fama_message($message, $no_back_link = false)
 {
 	global $db, $lang_common, $pun_config, $pun_start, $tpl_main, $pun_user;
 
 	if (!defined('PUN_HEADER'))
 	{
-		$page_title = array(pun_htmlspecialchars($pun_config['o_board_title']), $lang_common['Info']);
+		$page_title = array(fama_htmlspecialchars($pun_config['o_board_title']), $lang_common['Info']);
 		define('PUN_ACTIVE_PAGE', 'index');
 		require PUN_ROOT.'header.php';
 	}
@@ -737,7 +735,7 @@ function confirm_referrer($script, $error_msg = false)
 
 	// There is no referrer
 	if (empty($_SERVER['HTTP_REFERER']))
-		message($error_msg ? $error_msg : $lang_common['Bad referrer']);
+		fama_message($error_msg ? $error_msg : $lang_common['Bad referrer']);
 
 	$referrer = parse_url(strtolower($_SERVER['HTTP_REFERER']));
 	// Remove www subdomain if it exists
@@ -751,7 +749,7 @@ function confirm_referrer($script, $error_msg = false)
 
 	// Check the host and path match. Ignore the scheme, port, etc.
 	if ($referrer['host'] != $valid['host'] || $referrer['path'] != $valid['path'])
-		message($error_msg ? $error_msg : $lang_common['Bad referrer']);
+		fama_message($error_msg ? $error_msg : $lang_common['Bad referrer']);
 }
 
 
@@ -802,7 +800,7 @@ function get_remote_address()
 //
 // Calls htmlspecialchars with a few options already set
 //
-function pun_htmlspecialchars($str)
+function fama_htmlspecialchars($str)
 {
 	return htmlspecialchars($str, ENT_QUOTES, 'UTF-8');
 }
@@ -933,7 +931,7 @@ function redirect($destination_url, $message)
 		else if (file_exists(PUN_ROOT.'include/user/'.$cur_include[1].'.'.$cur_include[2]))
 			require PUN_ROOT.'include/user/'.$cur_include[1].'.'.$cur_include[2];
 		else
-			error(sprintf($lang_common['Pun include error'], htmlspecialchars($cur_include[0]), basename($tpl_file)));
+			error(sprintf($lang_common['Pun include error'], fama_htmlspecialchars($cur_include[0]), basename($tpl_file)));
 
 		$tpl_temp = ob_get_contents();
 		$tpl_redir = str_replace($cur_include[0], $tpl_temp, $tpl_redir);
@@ -955,11 +953,11 @@ function redirect($destination_url, $message)
 	// START SUBST - <pun_head>
 	ob_start();
 
-	$page_title = array(pun_htmlspecialchars($pun_config['o_board_title']), $lang_common['Redirecting']);
+	$page_title = array(fama_htmlspecialchars($pun_config['o_board_title']), $lang_common['Redirecting']);
 
 ?>
 <meta http-equiv="refresh" content="<?php echo $pun_config['o_redirect_delay'] ?>;URL=<?php echo str_replace(array('<', '>', '"'), array('&lt;', '&gt;', '&quot;'), $destination_url) ?>" />
-<title><?php echo generate_page_title($page_title) ?></title>
+<title><?php echo fama_generate_page_title($page_title) ?></title>
 <link rel="stylesheet" type="text/css" href="style/base.css" />
 <?php
 
@@ -997,7 +995,7 @@ function redirect($destination_url, $message)
 
 	// Display executed queries (if enabled)
 	if (defined('PUN_SHOW_QUERIES'))
-		display_saved_queries();
+		fama_display_saved_queries();
 
 	$tpl_temp = trim(ob_get_contents());
 	$tpl_redir = str_replace('<pun_footer>', $tpl_temp, $tpl_redir);
@@ -1015,7 +1013,7 @@ function redirect($destination_url, $message)
 //
 // Display a simple error message
 //
-function error($message, $file = null, $line = null, $db_error = false)
+function fama_error($message, $file = null, $line = null, $db_error = false)
 {
 	global $pun_config, $lang_common;
 
@@ -1058,8 +1056,8 @@ function error($message, $file = null, $line = null, $db_error = false)
 <html xmlns="http://www.w3.org/1999/xhtml" dir="ltr">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<?php $page_title = array(pun_htmlspecialchars($pun_config['o_board_title']), 'Error') ?>
-<title><?php echo generate_page_title($page_title) ?></title>
+<?php $page_title = array(fama_htmlspecialchars($pun_config['o_board_title']), 'Error') ?>
+<title><?php echo fama_generate_page_title($page_title) ?></title>
 <style type="text/css">
 <!--
 BODY {MARGIN: 10% 20% auto 20%; font: 10px Verdana, Arial, Helvetica, sans-serif}
@@ -1082,10 +1080,10 @@ H2 {MARGIN: 0; COLOR: #FFFFFF; BACKGROUND-COLOR: #B84623; FONT-SIZE: 1.1em; PADD
 
 		if ($db_error)
 		{
-			echo "\t\t".'<br /><br /><strong>Database reported:</strong> '.pun_htmlspecialchars($db_error['error_msg']).(($db_error['error_no']) ? ' (Errno: '.$db_error['error_no'].')' : '')."\n";
+			echo "\t\t".'<br /><br /><strong>Database reported:</strong> '.fama_htmlspecialchars($db_error['error_msg']).(($db_error['error_no']) ? ' (Errno: '.$db_error['error_no'].')' : '')."\n";
 
 			if ($db_error['error_sql'] != '')
-				echo "\t\t".'<br /><br /><strong>Failed query:</strong> '.pun_htmlspecialchars($db_error['error_sql'])."\n";
+				echo "\t\t".'<br /><br /><strong>Failed query:</strong> '.fama_htmlspecialchars($db_error['error_sql'])."\n";
 		}
 	}
 	else
@@ -1217,7 +1215,7 @@ function remove_bad_characters($array)
 //
 // Converts the file size in bytes to a human readable file size
 //
-function file_size($size)
+function fama_file_size($size)
 {
 	$units = array('B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB');
 
@@ -1469,7 +1467,7 @@ function ucp_preg_replace($pattern, $replace, $subject)
 //
 // Display executed queries (if enabled)
 //
-function display_saved_queries()
+function fama_display_saved_queries()
 {
 	global $db, $lang_common;
 
@@ -1500,7 +1498,7 @@ function display_saved_queries()
 ?>
 				<tr>
 					<td class="tcl"><?php echo ($cur_query[1] != 0) ? $cur_query[1] : '&#160;' ?></td>
-					<td class="tcr"><?php echo pun_htmlspecialchars($cur_query[0]) ?></td>
+					<td class="tcr"><?php echo fama_htmlspecialchars($cur_query[0]) ?></td>
 				</tr>
 <?php
 

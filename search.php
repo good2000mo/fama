@@ -18,9 +18,9 @@ require PUN_ROOT.'lang/'.$pun_user['language'].'/forum.php';
 
 
 if ($pun_user['g_read_board'] == '0')
-	message($lang_common['No view']);
+	fama_message($lang_common['No view']);
 else if ($pun_user['g_search'] == '0')
-	message($lang_search['No search permission']);
+	fama_message($lang_search['No search permission']);
 
 require PUN_ROOT.'include/search_idx.php';
 
@@ -42,7 +42,7 @@ if (isset($_GET['action']) || isset($_GET['search_id']))
 	{
 		$search_id = intval($_GET['search_id']);
 		if ($search_id < 1)
-			message($lang_common['Bad request']);
+			fama_message($lang_common['Bad request']);
 	}
 	// If it's a regular search (keywords and/or author)
 	else if ($action == 'search')
@@ -57,7 +57,7 @@ if (isset($_GET['action']) || isset($_GET['search_id']))
 			$author = '';
 
 		if (!$keywords && !$author)
-			message($lang_search['No terms']);
+			fama_message($lang_search['No terms']);
 
 		if ($author)
 			$author = str_replace('*', '%', $author);
@@ -71,17 +71,17 @@ if (isset($_GET['action']) || isset($_GET['search_id']))
 	{
 		$user_id = (isset($_GET['user_id'])) ? intval($_GET['user_id']) : $pun_user['id'];
 		if ($user_id < 2)
-			message($lang_common['Bad request']);
+			fama_message($lang_common['Bad request']);
 	}
 	else if ($action == 'show_recent')
 		$interval = isset($_GET['value']) ? intval($_GET['value']) : 86400;
 	else if ($action == 'show_replies')
 	{
 		if ($pun_user['is_guest'])
-			message($lang_common['Bad request']);
+			fama_message($lang_common['Bad request']);
 	}
 	else if ($action != 'show_new' && $action != 'show_unanswered')
-		message($lang_common['Bad request']);
+		fama_message($lang_common['Bad request']);
 
 
 	// If a valid search_id was supplied we attempt to fetch the search results from the db
@@ -89,7 +89,7 @@ if (isset($_GET['action']) || isset($_GET['search_id']))
 	{
 		$ident = ($pun_user['is_guest']) ? get_remote_address() : $pun_user['username'];
 
-		$result = $db->query('SELECT search_data FROM '.$db->prefix.'search_cache WHERE id='.$search_id.' AND ident=\''.$db->escape($ident).'\''.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch search results', __FILE__, __LINE__, $db->error());
+		$result = $db->query('SELECT search_data FROM '.$db->prefix.'search_cache WHERE id='.$search_id.' AND ident=\''.$db->escape($ident).'\''.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch search results', __FILE__, __LINE__, $db->error());
 		if ($row = $db->fetch_assoc($result))
 		{
 			$temp = unserialize($row['search_data']);
@@ -104,7 +104,7 @@ if (isset($_GET['action']) || isset($_GET['search_id']))
 			unset($temp);
 		}
 		else
-			message($lang_search['No hits']);
+			fama_message($lang_search['No hits']);
 	}
 	else
 	{
@@ -117,12 +117,12 @@ if (isset($_GET['action']) || isset($_GET['search_id']))
 		{
 			// Flood protection
 			if ($pun_user['last_search'] && (time() - $pun_user['last_search']) < $pun_user['g_search_flood'] && (time() - $pun_user['last_search']) >= 0)
-				message(sprintf($lang_search['Search flood'], $pun_user['g_search_flood']));
+				fama_message(sprintf($lang_search['Search flood'], $pun_user['g_search_flood']));
 
 			if (!$pun_user['is_guest'])
-				$db->query('UPDATE '.$db->prefix.'users SET last_search='.time().' WHERE id='.$pun_user['id'].' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update user', __FILE__, __LINE__, $db->error());
+				$db->query('UPDATE '.$db->prefix.'users SET last_search='.time().' WHERE id='.$pun_user['id'].' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to update user', __FILE__, __LINE__, $db->error());
 			else
-				$db->query('UPDATE '.$db->prefix.'online SET last_search='.time().' WHERE ident=\''.$db->escape(get_remote_address()).'\'' .' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update user', __FILE__, __LINE__, $db->error());
+				$db->query('UPDATE '.$db->prefix.'online SET last_search='.time().' WHERE ident=\''.$db->escape(get_remote_address()).'\'' .' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to update user', __FILE__, __LINE__, $db->error());
 
 			switch ($sort_by)
 			{
@@ -159,7 +159,7 @@ if (isset($_GET['action']) || isset($_GET['search_id']))
 				$keywords_array = split_words($keywords, false);
 
 				if (empty($keywords_array))
-					message($lang_search['No hits']);
+					fama_message($lang_search['No hits']);
 
 				// Should we search in message body or topic subject specifically?
 				$search_in_cond = ($search_in) ? (($search_in > 0) ? ' AND m.subject_match = 0' : ' AND m.subject_match = 1') : '';
@@ -185,10 +185,10 @@ if (isset($_GET['action']) || isset($_GET['search_id']))
 								$where_cond = str_replace('*', '%', $cur_word);
 								$where_cond = ($search_in ? (($search_in > 0) ? 'p.message LIKE \'%'.$db->escape($where_cond).'%\'' : 't.subject LIKE \'%'.$db->escape($where_cond).'%\'') : 'p.message LIKE \'%'.$db->escape($where_cond).'%\' OR t.subject LIKE \'%'.$db->escape($where_cond).'%\'');
 
-								$result = $db->query('SELECT p.id AS post_id, p.topic_id, '.$sort_by_sql.' AS sort_by FROM '.$db->prefix.'posts AS p INNER JOIN '.$db->prefix.'topics AS t ON t.id=p.topic_id LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (fp.forum_id=t.forum_id AND fp.group_id='.$pun_user['g_id'].') WHERE ('.$where_cond.') AND (fp.read_forum IS NULL OR fp.read_forum=1)'.$forum_sql.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --', true) or error('Unable to search for posts', __FILE__, __LINE__, $db->error());
+								$result = $db->query('SELECT p.id AS post_id, p.topic_id, '.$sort_by_sql.' AS sort_by FROM '.$db->prefix.'posts AS p INNER JOIN '.$db->prefix.'topics AS t ON t.id=p.topic_id LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (fp.forum_id=t.forum_id AND fp.group_id='.$pun_user['g_id'].') WHERE ('.$where_cond.') AND (fp.read_forum IS NULL OR fp.read_forum=1)'.$forum_sql.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --', true) or fama_error('Unable to search for posts', __FILE__, __LINE__, $db->error());
 							}
 							else
-								$result = $db->query('SELECT m.post_id, p.topic_id, '.$sort_by_sql.' AS sort_by FROM '.$db->prefix.'search_words AS w INNER JOIN '.$db->prefix.'search_matches AS m ON m.word_id = w.id INNER JOIN '.$db->prefix.'posts AS p ON p.id=m.post_id INNER JOIN '.$db->prefix.'topics AS t ON t.id=p.topic_id LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (fp.forum_id=t.forum_id AND fp.group_id='.$pun_user['g_id'].') WHERE w.word LIKE \''.$db->escape(str_replace('*', '%', $cur_word)).'\''.$search_in_cond.' AND (fp.read_forum IS NULL OR fp.read_forum=1)'.$forum_sql.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --', true) or error('Unable to search for posts', __FILE__, __LINE__, $db->error());
+								$result = $db->query('SELECT m.post_id, p.topic_id, '.$sort_by_sql.' AS sort_by FROM '.$db->prefix.'search_words AS w INNER JOIN '.$db->prefix.'search_matches AS m ON m.word_id = w.id INNER JOIN '.$db->prefix.'posts AS p ON p.id=m.post_id INNER JOIN '.$db->prefix.'topics AS t ON t.id=p.topic_id LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (fp.forum_id=t.forum_id AND fp.group_id='.$pun_user['g_id'].') WHERE w.word LIKE \''.$db->escape(str_replace('*', '%', $cur_word)).'\''.$search_in_cond.' AND (fp.read_forum IS NULL OR fp.read_forum=1)'.$forum_sql.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --', true) or fama_error('Unable to search for posts', __FILE__, __LINE__, $db->error());
 
 							$row = array();
 							while ($temp = $db->fetch_assoc($result))
@@ -253,11 +253,11 @@ if (isset($_GET['action']) || isset($_GET['search_id']))
 				switch ($db_type)
 				{
 					case 'pgsql':
-						$result = $db->query('SELECT id FROM '.$db->prefix.'users WHERE username ILIKE \''.$db->escape($author).'\''.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch users', __FILE__, __LINE__, $db->error());
+						$result = $db->query('SELECT id FROM '.$db->prefix.'users WHERE username ILIKE \''.$db->escape($author).'\''.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch users', __FILE__, __LINE__, $db->error());
 						break;
 
 					default:
-						$result = $db->query('SELECT id FROM '.$db->prefix.'users WHERE username LIKE \''.$db->escape($author).'\''.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch users', __FILE__, __LINE__, $db->error());
+						$result = $db->query('SELECT id FROM '.$db->prefix.'users WHERE username LIKE \''.$db->escape($author).'\''.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch users', __FILE__, __LINE__, $db->error());
 						break;
 				}
 
@@ -267,7 +267,7 @@ if (isset($_GET['action']) || isset($_GET['search_id']))
 					while ($row = $db->fetch_row($result))
 						$user_ids[] = $row[0];
 
-					$result = $db->query('SELECT p.id AS post_id, p.topic_id FROM '.$db->prefix.'posts AS p INNER JOIN '.$db->prefix.'topics AS t ON t.id=p.topic_id LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (fp.forum_id=t.forum_id AND fp.group_id='.$pun_user['g_id'].') WHERE (fp.read_forum IS NULL OR fp.read_forum=1) AND p.poster_id IN('.implode(',', $user_ids).')'.$forum_sql.' ORDER BY '.$sort_by_sql.' '.$sort_dir.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch matched posts list', __FILE__, __LINE__, $db->error());
+					$result = $db->query('SELECT p.id AS post_id, p.topic_id FROM '.$db->prefix.'posts AS p INNER JOIN '.$db->prefix.'topics AS t ON t.id=p.topic_id LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (fp.forum_id=t.forum_id AND fp.group_id='.$pun_user['g_id'].') WHERE (fp.read_forum IS NULL OR fp.read_forum=1) AND p.poster_id IN('.implode(',', $user_ids).')'.$forum_sql.' ORDER BY '.$sort_by_sql.' '.$sort_dir.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch matched posts list', __FILE__, __LINE__, $db->error());
 					while ($temp = $db->fetch_assoc($result))
 						$author_results[$temp['post_id']] = $temp['topic_id'];
 
@@ -303,7 +303,7 @@ if (isset($_GET['action']) || isset($_GET['search_id']))
 
 			$num_hits = count($search_ids);
 			if (!$num_hits)
-				message($lang_search['No hits']);
+				fama_message($lang_search['No hits']);
 		}
 		else if ($action == 'show_new' || $action == 'show_recent' || $action == 'show_replies' || $action == 'show_user_posts' || $action == 'show_user_topics' || $action == 'show_unanswered')
 		{
@@ -317,42 +317,42 @@ if (isset($_GET['action']) || isset($_GET['search_id']))
 			if ($action == 'show_new')
 			{
 				if ($pun_user['is_guest'])
-					message($lang_common['No permission']);
+					fama_message($lang_common['No permission']);
 
-				$result = $db->query('SELECT t.id FROM '.$db->prefix.'topics AS t LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (fp.forum_id=t.forum_id AND fp.group_id='.$pun_user['g_id'].') WHERE (fp.read_forum IS NULL OR fp.read_forum=1) AND t.last_post>'.$pun_user['last_visit'].' AND t.moved_to IS NULL'.(isset($_GET['fid']) ? ' AND t.forum_id='.intval($_GET['fid']) : '').' ORDER BY t.last_post DESC'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch topic list', __FILE__, __LINE__, $db->error());
+				$result = $db->query('SELECT t.id FROM '.$db->prefix.'topics AS t LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (fp.forum_id=t.forum_id AND fp.group_id='.$pun_user['g_id'].') WHERE (fp.read_forum IS NULL OR fp.read_forum=1) AND t.last_post>'.$pun_user['last_visit'].' AND t.moved_to IS NULL'.(isset($_GET['fid']) ? ' AND t.forum_id='.intval($_GET['fid']) : '').' ORDER BY t.last_post DESC'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch topic list', __FILE__, __LINE__, $db->error());
 				$num_hits = $db->num_rows($result);
 
 				if (!$num_hits)
-					message($lang_search['No new posts']);
+					fama_message($lang_search['No new posts']);
 			}
 			// If it's a search for recent posts (in a certain time interval)
 			else if ($action == 'show_recent')
 			{
-				$result = $db->query('SELECT t.id FROM '.$db->prefix.'topics AS t LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (fp.forum_id=t.forum_id AND fp.group_id='.$pun_user['g_id'].') WHERE (fp.read_forum IS NULL OR fp.read_forum=1) AND t.last_post>'.(time() - $interval).' AND t.moved_to IS NULL'.(isset($_GET['fid']) ? ' AND t.forum_id='.intval($_GET['fid']) : '').' ORDER BY t.last_post DESC'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch topic list', __FILE__, __LINE__, $db->error());
+				$result = $db->query('SELECT t.id FROM '.$db->prefix.'topics AS t LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (fp.forum_id=t.forum_id AND fp.group_id='.$pun_user['g_id'].') WHERE (fp.read_forum IS NULL OR fp.read_forum=1) AND t.last_post>'.(time() - $interval).' AND t.moved_to IS NULL'.(isset($_GET['fid']) ? ' AND t.forum_id='.intval($_GET['fid']) : '').' ORDER BY t.last_post DESC'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch topic list', __FILE__, __LINE__, $db->error());
 				$num_hits = $db->num_rows($result);
 
 				if (!$num_hits)
-					message($lang_search['No recent posts']);
+					fama_message($lang_search['No recent posts']);
 			}
 			// If it's a search for topics in which the user has posted
 			else if ($action == 'show_replies')
 			{
-				$result = $db->query('SELECT t.id FROM '.$db->prefix.'topics AS t INNER JOIN '.$db->prefix.'posts AS p ON t.id=p.topic_id LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (fp.forum_id=t.forum_id AND fp.group_id='.$pun_user['g_id'].') WHERE (fp.read_forum IS NULL OR fp.read_forum=1) AND p.poster_id='.$pun_user['id'].' GROUP BY t.id'.($db_type == 'pgsql' ? ', t.last_post' : '').' ORDER BY t.last_post DESC'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch topic list', __FILE__, __LINE__, $db->error());
+				$result = $db->query('SELECT t.id FROM '.$db->prefix.'topics AS t INNER JOIN '.$db->prefix.'posts AS p ON t.id=p.topic_id LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (fp.forum_id=t.forum_id AND fp.group_id='.$pun_user['g_id'].') WHERE (fp.read_forum IS NULL OR fp.read_forum=1) AND p.poster_id='.$pun_user['id'].' GROUP BY t.id'.($db_type == 'pgsql' ? ', t.last_post' : '').' ORDER BY t.last_post DESC'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch topic list', __FILE__, __LINE__, $db->error());
 				$num_hits = $db->num_rows($result);
 
 				if (!$num_hits)
-					message($lang_search['No user posts']);
+					fama_message($lang_search['No user posts']);
 			}
 			// If it's a search for posts by a specific user ID
 			else if ($action == 'show_user_posts')
 			{
 				$show_as = 'posts';
 
-				$result = $db->query('SELECT p.id FROM '.$db->prefix.'posts AS p INNER JOIN '.$db->prefix.'topics AS t ON p.topic_id=t.id LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (fp.forum_id=t.forum_id AND fp.group_id='.$pun_user['g_id'].') WHERE (fp.read_forum IS NULL OR fp.read_forum=1) AND p.poster_id='.$user_id.' ORDER BY p.posted DESC'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user posts', __FILE__, __LINE__, $db->error());
+				$result = $db->query('SELECT p.id FROM '.$db->prefix.'posts AS p INNER JOIN '.$db->prefix.'topics AS t ON p.topic_id=t.id LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (fp.forum_id=t.forum_id AND fp.group_id='.$pun_user['g_id'].') WHERE (fp.read_forum IS NULL OR fp.read_forum=1) AND p.poster_id='.$user_id.' ORDER BY p.posted DESC'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch user posts', __FILE__, __LINE__, $db->error());
 				$num_hits = $db->num_rows($result);
 
 				if (!$num_hits)
-					message($lang_search['No user posts']);
+					fama_message($lang_search['No user posts']);
 
 				// Pass on the user ID so that we can later know whos posts we're searching for
 				$search_type[2] = $user_id;
@@ -360,11 +360,11 @@ if (isset($_GET['action']) || isset($_GET['search_id']))
 			// If it's a search for topics by a specific user ID
 			else if ($action == 'show_user_topics')
 			{
-				$result = $db->query('SELECT t.id FROM '.$db->prefix.'topics AS t INNER JOIN '.$db->prefix.'posts AS p ON t.first_post_id=p.id LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (fp.forum_id=t.forum_id AND fp.group_id='.$pun_user['g_id'].') WHERE (fp.read_forum IS NULL OR fp.read_forum=1) AND p.poster_id='.$user_id.' ORDER BY t.last_post DESC'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user topics', __FILE__, __LINE__, $db->error());
+				$result = $db->query('SELECT t.id FROM '.$db->prefix.'topics AS t INNER JOIN '.$db->prefix.'posts AS p ON t.first_post_id=p.id LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (fp.forum_id=t.forum_id AND fp.group_id='.$pun_user['g_id'].') WHERE (fp.read_forum IS NULL OR fp.read_forum=1) AND p.poster_id='.$user_id.' ORDER BY t.last_post DESC'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch user topics', __FILE__, __LINE__, $db->error());
 				$num_hits = $db->num_rows($result);
 
 				if (!$num_hits)
-					message($lang_search['No user topics']);
+					fama_message($lang_search['No user topics']);
 
 				// Pass on the user ID so that we can later know whos topics we're searching for
 				$search_type[2] = $user_id;
@@ -372,11 +372,11 @@ if (isset($_GET['action']) || isset($_GET['search_id']))
 			// If it's a search for unanswered posts
 			else
 			{
-				$result = $db->query('SELECT t.id FROM '.$db->prefix.'topics AS t LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (fp.forum_id=t.forum_id AND fp.group_id='.$pun_user['g_id'].') WHERE (fp.read_forum IS NULL OR fp.read_forum=1) AND t.num_replies=0 AND t.moved_to IS NULL ORDER BY t.last_post DESC'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch topic list', __FILE__, __LINE__, $db->error());
+				$result = $db->query('SELECT t.id FROM '.$db->prefix.'topics AS t LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (fp.forum_id=t.forum_id AND fp.group_id='.$pun_user['g_id'].') WHERE (fp.read_forum IS NULL OR fp.read_forum=1) AND t.num_replies=0 AND t.moved_to IS NULL ORDER BY t.last_post DESC'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch topic list', __FILE__, __LINE__, $db->error());
 				$num_hits = $db->num_rows($result);
 
 				if (!$num_hits)
-					message($lang_search['No unanswered']);
+					fama_message($lang_search['No unanswered']);
 			}
 
 			$search_ids = array();
@@ -386,19 +386,19 @@ if (isset($_GET['action']) || isset($_GET['search_id']))
 			$db->free_result($result);
 		}
 		else
-			message($lang_common['Bad request']);
+			fama_message($lang_common['Bad request']);
 
 
 		// Prune "old" search results
 		$old_searches = array();
-		$result = $db->query('SELECT ident FROM '.$db->prefix.'online'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch online list', __FILE__, __LINE__, $db->error());
+		$result = $db->query('SELECT ident FROM '.$db->prefix.'online'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch online list', __FILE__, __LINE__, $db->error());
 
 		if ($db->num_rows($result))
 		{
 			while ($row = $db->fetch_row($result))
 				$old_searches[] = '\''.$db->escape($row[0]).'\'';
 
-			$db->query('DELETE FROM '.$db->prefix.'search_cache WHERE ident NOT IN('.implode(',', $old_searches).')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to delete search results', __FILE__, __LINE__, $db->error());
+			$db->query('DELETE FROM '.$db->prefix.'search_cache WHERE ident NOT IN('.implode(',', $old_searches).')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to delete search results', __FILE__, __LINE__, $db->error());
 		}
 
 		// Fill an array with our results and search properties
@@ -414,7 +414,7 @@ if (isset($_GET['action']) || isset($_GET['search_id']))
 
 		$ident = ($pun_user['is_guest']) ? get_remote_address() : $pun_user['username'];
 
-		$db->query('INSERT INTO '.$db->prefix.'search_cache (id, ident, search_data) VALUES('.$search_id.', \''.$db->escape($ident).'\', \''.$db->escape($temp).'\')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to insert search results', __FILE__, __LINE__, $db->error());
+		$db->query('INSERT INTO '.$db->prefix.'search_cache (id, ident, search_data) VALUES('.$search_id.', \''.$db->escape($ident).'\', \''.$db->escape($temp).'\')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to insert search results', __FILE__, __LINE__, $db->error());
 
 		if ($search_type[0] != 'action')
 		{
@@ -464,9 +464,9 @@ if (isset($_GET['action']) || isset($_GET['search_id']))
 
 		// Run the query and fetch the results
 		if ($show_as == 'posts')
-			$result = $db->query('SELECT p.id AS pid, p.poster AS pposter, p.posted AS pposted, p.poster_id, p.message, t.id AS tid, t.poster, t.subject, t.first_post_id, t.last_post, t.last_post_id, t.last_poster, t.num_replies, t.forum_id, f.forum_name FROM '.$db->prefix.'posts AS p INNER JOIN '.$db->prefix.'topics AS t ON t.id=p.topic_id INNER JOIN '.$db->prefix.'forums AS f ON f.id=t.forum_id WHERE p.id IN('.implode(',', $search_ids).') ORDER BY '.$sort_by_sql.' '.$sort_dir.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch search results', __FILE__, __LINE__, $db->error());
+			$result = $db->query('SELECT p.id AS pid, p.poster AS pposter, p.posted AS pposted, p.poster_id, p.message, t.id AS tid, t.poster, t.subject, t.first_post_id, t.last_post, t.last_post_id, t.last_poster, t.num_replies, t.forum_id, f.forum_name FROM '.$db->prefix.'posts AS p INNER JOIN '.$db->prefix.'topics AS t ON t.id=p.topic_id INNER JOIN '.$db->prefix.'forums AS f ON f.id=t.forum_id WHERE p.id IN('.implode(',', $search_ids).') ORDER BY '.$sort_by_sql.' '.$sort_dir.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch search results', __FILE__, __LINE__, $db->error());
 		else
-			$result = $db->query('SELECT t.id AS tid, t.poster, t.subject, t.last_post, t.last_post_id, t.last_poster, t.num_replies, t.closed, t.sticky, t.forum_id, f.forum_name FROM '.$db->prefix.'topics AS t INNER JOIN '.$db->prefix.'forums AS f ON f.id=t.forum_id WHERE t.id IN('.implode(',', $search_ids).') ORDER BY '.$sort_by_sql.' '.$sort_dir.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch search results', __FILE__, __LINE__, $db->error());
+			$result = $db->query('SELECT t.id AS tid, t.poster, t.subject, t.last_post, t.last_post_id, t.last_poster, t.num_replies, t.closed, t.sticky, t.forum_id, f.forum_name FROM '.$db->prefix.'topics AS t INNER JOIN '.$db->prefix.'forums AS f ON f.id=t.forum_id WHERE t.id IN('.implode(',', $search_ids).') ORDER BY '.$sort_by_sql.' '.$sort_dir.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch search results', __FILE__, __LINE__, $db->error());
 
 		$search_set = array();
 		while ($row = $db->fetch_assoc($result))
@@ -478,9 +478,9 @@ if (isset($_GET['action']) || isset($_GET['search_id']))
 		if ($search_type[0] == 'action')
 		{
 			if ($search_type[1] == 'show_user_topics')
-				$crumbs_text['search_type'] = '<a href="search.php?action=show_user_topics&amp;user_id='.$search_type[2].'">'.sprintf($lang_search['Quick search show_user_topics'], pun_htmlspecialchars($search_set[0]['poster'])).'</a>';
+				$crumbs_text['search_type'] = '<a href="search.php?action=show_user_topics&amp;user_id='.$search_type[2].'">'.sprintf($lang_search['Quick search show_user_topics'], fama_htmlspecialchars($search_set[0]['poster'])).'</a>';
 			else if ($search_type[1] == 'show_user_posts')
-				$crumbs_text['search_type'] = '<a href="search.php?action=show_user_posts&amp;user_id='.$search_type[2].'">'.sprintf($lang_search['Quick search show_user_posts'], pun_htmlspecialchars($search_set[0]['pposter'])).'</a>';
+				$crumbs_text['search_type'] = '<a href="search.php?action=show_user_posts&amp;user_id='.$search_type[2].'">'.sprintf($lang_search['Quick search show_user_posts'], fama_htmlspecialchars($search_set[0]['pposter'])).'</a>';
 			else
 				$crumbs_text['search_type'] = '<a href="search.php?action='.$search_type[1].'">'.$lang_search['Quick search '.$search_type[1]].'</a>';
 		}
@@ -491,23 +491,23 @@ if (isset($_GET['action']) || isset($_GET['search_id']))
 			if ($search_type[0] == 'both')
 			{
 				list ($keywords, $author) = $search_type[1];
-				$crumbs_text['search_type'] = sprintf($lang_search['By both show as '.$show_as], pun_htmlspecialchars($keywords), pun_htmlspecialchars($author));
+				$crumbs_text['search_type'] = sprintf($lang_search['By both show as '.$show_as], fama_htmlspecialchars($keywords), fama_htmlspecialchars($author));
 			}
 			else if ($search_type[0] == 'keywords')
 			{
 				$keywords = $search_type[1];
-				$crumbs_text['search_type'] = sprintf($lang_search['By keywords show as '.$show_as], pun_htmlspecialchars($keywords));
+				$crumbs_text['search_type'] = sprintf($lang_search['By keywords show as '.$show_as], fama_htmlspecialchars($keywords));
 			}
 			else if ($search_type[0] == 'author')
 			{
 				$author = $search_type[1];
-				$crumbs_text['search_type'] = sprintf($lang_search['By user show as '.$show_as], pun_htmlspecialchars($author));
+				$crumbs_text['search_type'] = sprintf($lang_search['By user show as '.$show_as], fama_htmlspecialchars($author));
 			}
 
 			$crumbs_text['search_type'] = '<a href="search.php?action=search&amp;keywords='.urlencode($keywords).'&amp;author='.urlencode($author).'&amp;forum='.$search_type[2].'&amp;search_in='.$search_type[3].'&amp;sort_by='.$sort_by.'&amp;sort_dir='.$sort_dir.'&amp;show_as='.$show_as.'">'.$crumbs_text['search_type'].'</a>';
 		}
 
-		$page_title = array(pun_htmlspecialchars($pun_config['o_board_title']), $lang_search['Search results']);
+		$page_title = array(fama_htmlspecialchars($pun_config['o_board_title']), $lang_search['Search results']);
 		define('PUN_ACTIVE_PAGE', 'search');
 		require PUN_ROOT.'header.php';
 
@@ -561,7 +561,7 @@ if (isset($_GET['action']) || isset($_GET['search_id']))
 
 		foreach ($search_set as $cur_search)
 		{
-			$forum = '<a href="viewforum.php?id='.$cur_search['forum_id'].'">'.pun_htmlspecialchars($cur_search['forum_name']).'</a>';
+			$forum = '<a href="viewforum.php?id='.$cur_search['forum_id'].'">'.fama_htmlspecialchars($cur_search['forum_name']).'</a>';
 
 			if ($show_as == 'posts')
 			{
@@ -571,7 +571,7 @@ if (isset($_GET['action']) || isset($_GET['search_id']))
 				$icon_text = '<!-- -->';
 
 				$message = parse_message($cur_search['message']);
-				$pposter = pun_htmlspecialchars($cur_search['pposter']);
+				$pposter = fama_htmlspecialchars($cur_search['pposter']);
 
 				if ($cur_search['poster_id'] > 1)
 				{
@@ -584,7 +584,7 @@ if (isset($_GET['action']) || isset($_GET['search_id']))
 
 ?>
 <div class="blockpost<?php echo ($post_count % 2 == 0) ? ' roweven' : ' rowodd' ?><?php if ($cur_search['pid'] == $cur_search['first_post_id']) echo ' firstpost' ?><?php if ($post_count == 1) echo ' blockpost1' ?><?php if ($item_status != '') echo ' '.$item_status ?>">
-	<h2><span><span class="conr">#<?php echo ($start_from + $post_count) ?></span> <span><?php if ($cur_search['pid'] != $cur_search['first_post_id']) echo $lang_topic['Re'].' ' ?><?php echo $forum ?></span> <span>»&#160;<a href="viewtopic.php?id=<?php echo $cur_search['tid'] ?>"><?php echo pun_htmlspecialchars($cur_search['subject']) ?></a></span> <span>»&#160;<a href="viewtopic.php?pid=<?php echo $cur_search['pid'].'#p'.$cur_search['pid'] ?>"><?php echo format_time($cur_search['pposted']) ?></a></span></span></h2>
+	<h2><span><span class="conr">#<?php echo ($start_from + $post_count) ?></span> <span><?php if ($cur_search['pid'] != $cur_search['first_post_id']) echo $lang_topic['Re'].' ' ?><?php echo $forum ?></span> <span>»&#160;<a href="viewtopic.php?id=<?php echo $cur_search['tid'] ?>"><?php echo fama_htmlspecialchars($cur_search['subject']) ?></a></span> <span>»&#160;<a href="viewtopic.php?pid=<?php echo $cur_search['pid'].'#p'.$cur_search['pid'] ?>"><?php echo format_time($cur_search['pposted']) ?></a></span></span></h2>
 	<div class="box">
 		<div class="inbox">
 			<div class="postbody">
@@ -626,7 +626,7 @@ if (isset($_GET['action']) || isset($_GET['search_id']))
 				$item_status = ($topic_count % 2 == 0) ? 'roweven' : 'rowodd';
 				$icon_type = 'icon';
 
-				$subject = '<a href="viewtopic.php?id='.$cur_search['tid'].'">'.pun_htmlspecialchars($cur_search['subject']).'</a> <span class="byuser">'.$lang_common['by'].' '.pun_htmlspecialchars($cur_search['poster']).'</span>';
+				$subject = '<a href="viewtopic.php?id='.$cur_search['tid'].'">'.fama_htmlspecialchars($cur_search['subject']).'</a> <span class="byuser">'.$lang_common['by'].' '.fama_htmlspecialchars($cur_search['poster']).'</span>';
 
 				if ($cur_search['sticky'] == '1')
 				{
@@ -668,7 +668,7 @@ if (isset($_GET['action']) || isset($_GET['search_id']))
 					</td>
 					<td class="tc2"><?php echo $forum ?></td>
 					<td class="tc3"><?php echo forum_number_format($cur_search['num_replies']) ?></td>
-					<td class="tcr"><?php echo '<a href="viewtopic.php?pid='.$cur_search['last_post_id'].'#p'.$cur_search['last_post_id'].'">'.format_time($cur_search['last_post']).'</a> <span class="byuser">'.$lang_common['by'].' '.pun_htmlspecialchars($cur_search['last_poster']) ?></span></td>
+					<td class="tcr"><?php echo '<a href="viewtopic.php?pid='.$cur_search['last_post_id'].'#p'.$cur_search['last_post_id'].'">'.format_time($cur_search['last_post']).'</a> <span class="byuser">'.$lang_common['by'].' '.fama_htmlspecialchars($cur_search['last_poster']) ?></span></td>
 				</tr>
 <?php
 
@@ -697,11 +697,11 @@ if (isset($_GET['action']) || isset($_GET['search_id']))
 		require PUN_ROOT.'footer.php';
 	}
 	else
-		message($lang_search['No hits']);
+		fama_message($lang_search['No hits']);
 }
 
 
-$page_title = array(pun_htmlspecialchars($pun_config['o_board_title']), $lang_search['Search']);
+$page_title = array(fama_htmlspecialchars($pun_config['o_board_title']), $lang_search['Search']);
 $focus_element = array('search', 'keywords');
 define('PUN_ACTIVE_PAGE', 'search');
 require PUN_ROOT.'header.php';
@@ -732,11 +732,11 @@ require PUN_ROOT.'header.php';
 
 echo "\t\t\t\t\t\t\t".'<option value="-1">'.$lang_search['All forums'].'</option>'."\n";
 
-$result = $db->query('SELECT f.id AS fid, f.forum_name FROM '.$db->prefix.'forums AS f LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (fp.forum_id=f.id AND fp.group_id='.$pun_user['g_id'].') WHERE fp.read_forum IS NULL OR fp.read_forum=1 ORDER BY f.disp_position'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --', true) or error('Unable to fetch forum list', __FILE__, __LINE__, $db->error());
+$result = $db->query('SELECT f.id AS fid, f.forum_name FROM '.$db->prefix.'forums AS f LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (fp.forum_id=f.id AND fp.group_id='.$pun_user['g_id'].') WHERE fp.read_forum IS NULL OR fp.read_forum=1 ORDER BY f.disp_position'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --', true) or fama_error('Unable to fetch forum list', __FILE__, __LINE__, $db->error());
 
 while ($cur_forum = $db->fetch_assoc($result))
 {
-	echo "\t\t\t\t\t\t\t\t".'<option value="'.$cur_forum['fid'].'">'.pun_htmlspecialchars($cur_forum['forum_name']).'</option>'."\n";
+	echo "\t\t\t\t\t\t\t\t".'<option value="'.$cur_forum['fid'].'">'.fama_htmlspecialchars($cur_forum['forum_name']).'</option>'."\n";
 }
 
 ?>

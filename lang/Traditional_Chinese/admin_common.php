@@ -17,7 +17,7 @@ $lang_admin_common = array(
 'Censoring'				=>	'詞彙過濾',
 'Ranks'					=>	'級別',
 'Bans'					=>	'封禁',
-'Prune'					=>	'帖子清理',
+'Prune'					=>	'文章清理',
 'Maintenance'			=>	'維護',
 'Reports'				=>	'舉報項',
 

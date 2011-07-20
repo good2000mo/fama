@@ -15,7 +15,7 @@ require PUN_ROOT.'include/common_admin.php';
 
 
 if ($pun_user['g_id'] != PUN_ADMIN)
-	message($lang_common['No permission']);
+	fama_message($lang_common['No permission']);
 
 // Load the admin_forums.php language file
 require PUN_ROOT.'lang/'.$admin_language.'/admin_forums.php';
@@ -25,7 +25,8 @@ if (isset($_POST['add_forum']))
 {
 	confirm_referrer('admin_forums.php');
 
-	$db->query('INSERT INTO '.$db->prefix.'forums (forum_name) VALUES(\''.$db->escape($lang_admin_forums['New forum']).'\')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to create forum', __FILE__, __LINE__, $db->error());
+	// dbquery: f.forum_name
+	$db->query('INSERT INTO '.$db->prefix.'forums (forum_name) VALUES(\''.$db->escape($lang_admin_forums['New forum']).'\')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to create forum', __FILE__, __LINE__, $db->error());
 
 	redirect('admin_forums.php', $lang_admin_forums['Forum added redirect']);
 }
@@ -37,7 +38,7 @@ else if (isset($_GET['del_forum']))
 
 	$forum_id = intval($_GET['del_forum']);
 	if ($forum_id < 1)
-		message($lang_common['Bad request']);
+		fama_message($lang_common['Bad request']);
 
 	if (isset($_POST['del_forum_comply'])) // Delete a forum with all posts
 	{
@@ -47,7 +48,8 @@ else if (isset($_GET['del_forum']))
 		prune($forum_id, 1, -1);
 
 		// Locate any "orphaned redirect topics" and delete them
-		$result = $db->query('SELECT t1.id FROM '.$db->prefix.'topics AS t1 LEFT JOIN '.$db->prefix.'topics AS t2 ON t1.moved_to=t2.id WHERE t2.id IS NULL AND t1.moved_to IS NOT NULL'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch redirect topics', __FILE__, __LINE__, $db->error());
+		// dbquery: t.id, t.moved_to
+		$result = $db->query('SELECT t1.id FROM '.$db->prefix.'topics AS t1 LEFT JOIN '.$db->prefix.'topics AS t2 ON t1.moved_to=t2.id WHERE t2.id IS NULL AND t1.moved_to IS NOT NULL'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch redirect topics', __FILE__, __LINE__, $db->error());
 		$num_orphans = $db->num_rows($result);
 
 		if ($num_orphans)
@@ -55,20 +57,24 @@ else if (isset($_GET['del_forum']))
 			for ($i = 0; $i < $num_orphans; ++$i)
 				$orphans[] = $db->result($result, $i);
 
-			$db->query('DELETE FROM '.$db->prefix.'topics WHERE id IN('.implode(',', $orphans).')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to delete redirect topics', __FILE__, __LINE__, $db->error());
+			// dbquery: t.id
+			$db->query('DELETE FROM '.$db->prefix.'topics WHERE id IN('.implode(',', $orphans).')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to delete redirect topics', __FILE__, __LINE__, $db->error());
 		}
 
 		// Delete the forum and any forum specific group permissions
-		$db->query('DELETE FROM '.$db->prefix.'forums WHERE id='.$forum_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to delete forum', __FILE__, __LINE__, $db->error());
-		$db->query('DELETE FROM '.$db->prefix.'forum_perms WHERE forum_id='.$forum_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to delete group forum permissions', __FILE__, __LINE__, $db->error());
+		// dbquery: f.id
+		$db->query('DELETE FROM '.$db->prefix.'forums WHERE id='.$forum_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to delete forum', __FILE__, __LINE__, $db->error());
+		// dbquery: fp.forum_id
+		$db->query('DELETE FROM '.$db->prefix.'forum_perms WHERE forum_id='.$forum_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to delete group forum permissions', __FILE__, __LINE__, $db->error());
 		redirect('admin_forums.php', $lang_admin_forums['Forum deleted redirect']);
 	}
 	else // If the user hasn't confirmed the delete
 	{
-		$result = $db->query('SELECT forum_name FROM '.$db->prefix.'forums WHERE id='.$forum_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch forum info', __FILE__, __LINE__, $db->error());
-		$forum_name = pun_htmlspecialchars($db->result($result));
+		// dbquery: f.forum_name, f.id
+		$result = $db->query('SELECT forum_name FROM '.$db->prefix.'forums WHERE id='.$forum_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch forum info', __FILE__, __LINE__, $db->error());
+		$forum_name = fama_htmlspecialchars($db->result($result));
 
-		$page_title = array(pun_htmlspecialchars($pun_config['o_board_title']), $lang_admin_common['Admin'], $lang_admin_common['Forums']);
+		$page_title = array(fama_htmlspecialchars($pun_config['o_board_title']), $lang_admin_common['Admin'], $lang_admin_common['Forums']);
 		define('PUN_ACTIVE_PAGE', 'admin');
 		require PUN_ROOT.'header.php';
 
@@ -109,9 +115,10 @@ else if (isset($_POST['update_positions']))
 	{
 		$disp_position = trim($disp_position);
 		if ($disp_position == '' || preg_match('%[^0-9]%', $disp_position))
-			message($lang_admin_forums['Must be integer message']);
+			fama_message($lang_admin_forums['Must be integer message']);
 
-		$db->query('UPDATE '.$db->prefix.'forums SET disp_position='.$disp_position.' WHERE id='.intval($forum_id).' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update forum', __FILE__, __LINE__, $db->error());
+		// dbquery: f.disp_position, f.id
+		$db->query('UPDATE '.$db->prefix.'forums SET disp_position='.$disp_position.' WHERE id='.intval($forum_id).' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to update forum', __FILE__, __LINE__, $db->error());
 	}
 
 	redirect('admin_forums.php', $lang_admin_forums['Forums updated redirect']);
@@ -121,7 +128,7 @@ else if (isset($_GET['edit_forum']))
 {
 	$forum_id = intval($_GET['edit_forum']);
 	if ($forum_id < 1)
-		message($lang_common['Bad request']);
+		fama_message($lang_common['Bad request']);
 
 	// Update group permissions for $forum_id
 	if (isset($_POST['save']))
@@ -134,16 +141,18 @@ else if (isset($_GET['edit_forum']))
 		$sort_by = intval($_POST['sort_by']);
 
 		if ($forum_name == '')
-			message($lang_admin_forums['Must enter name message']);
+			fama_message($lang_admin_forums['Must enter name message']);
 
 		$forum_desc = ($forum_desc != '') ? '\''.$db->escape($forum_desc).'\'' : 'NULL';
 
-		$db->query('UPDATE '.$db->prefix.'forums SET forum_name=\''.$db->escape($forum_name).'\', forum_desc='.$forum_desc.', sort_by='.$sort_by.' WHERE id='.$forum_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update forum', __FILE__, __LINE__, $db->error());
+		// dbquery: f.forum_name, f.forum_desc, f.sort_by, f.id
+		$db->query('UPDATE '.$db->prefix.'forums SET forum_name=\''.$db->escape($forum_name).'\', forum_desc='.$forum_desc.', sort_by='.$sort_by.' WHERE id='.$forum_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to update forum', __FILE__, __LINE__, $db->error());
 
 		// Now let's deal with the permissions
 		if (isset($_POST['read_forum_old']))
 		{
-			$result = $db->query('SELECT g_id, g_read_board, g_post_replies, g_post_topics FROM '.$db->prefix.'groups WHERE g_id!='.PUN_ADMIN.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user group list', __FILE__, __LINE__, $db->error());
+			// dbquery: g.g_id, g.g_read_board, g.g_post_replies, g.g_post_topics
+			$result = $db->query('SELECT g_id, g_read_board, g_post_replies, g_post_topics FROM '.$db->prefix.'groups WHERE g_id!='.PUN_ADMIN.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch user group list', __FILE__, __LINE__, $db->error());
 			while ($cur_group = $db->fetch_assoc($result))
 			{
 				$read_forum_new = ($cur_group['g_read_board'] == '1') ? isset($_POST['read_forum_new'][$cur_group['g_id']]) ? '1' : '0' : intval($_POST['read_forum_old'][$cur_group['g_id']]);
@@ -155,13 +164,16 @@ else if (isset($_GET['edit_forum']))
 				{
 					// If the new settings are identical to the default settings for this group, delete it's row in forum_perms
 					if ($read_forum_new == '1' && $post_replies_new == $cur_group['g_post_replies'] && $post_topics_new == $cur_group['g_post_topics'])
-						$db->query('DELETE FROM '.$db->prefix.'forum_perms WHERE group_id='.$cur_group['g_id'].' AND forum_id='.$forum_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to delete group forum permissions', __FILE__, __LINE__, $db->error());
+						// dbquery: fp.group_id, fp.forum_id
+						$db->query('DELETE FROM '.$db->prefix.'forum_perms WHERE group_id='.$cur_group['g_id'].' AND forum_id='.$forum_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to delete group forum permissions', __FILE__, __LINE__, $db->error());
 					else
 					{
 						// Run an UPDATE and see if it affected a row, if not, INSERT
-						$db->query('UPDATE '.$db->prefix.'forum_perms SET read_forum='.$read_forum_new.', post_replies='.$post_replies_new.', post_topics='.$post_topics_new.' WHERE group_id='.$cur_group['g_id'].' AND forum_id='.$forum_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to insert group forum permissions', __FILE__, __LINE__, $db->error());
+						// dbquery: fp.read_forum, fp.post_replies, fp.post_topics, fp.group_id, fp.forum_id
+						$db->query('UPDATE '.$db->prefix.'forum_perms SET read_forum='.$read_forum_new.', post_replies='.$post_replies_new.', post_topics='.$post_topics_new.' WHERE group_id='.$cur_group['g_id'].' AND forum_id='.$forum_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to insert group forum permissions', __FILE__, __LINE__, $db->error());
 						if (!$db->affected_rows())
-							$db->query('INSERT INTO '.$db->prefix.'forum_perms (group_id, forum_id, read_forum, post_replies, post_topics) VALUES('.$cur_group['g_id'].', '.$forum_id.', '.$read_forum_new.', '.$post_replies_new.', '.$post_topics_new.')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to insert group forum permissions', __FILE__, __LINE__, $db->error());
+							// dbquery: fp.group_id, fp.forum_id, fp.read_forum, fp.post_replies, fp.post_topics
+							$db->query('INSERT INTO '.$db->prefix.'forum_perms (group_id, forum_id, read_forum, post_replies, post_topics) VALUES('.$cur_group['g_id'].', '.$forum_id.', '.$read_forum_new.', '.$post_replies_new.', '.$post_topics_new.')'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to insert group forum permissions', __FILE__, __LINE__, $db->error());
 					}
 				}
 			}
@@ -173,19 +185,21 @@ else if (isset($_GET['edit_forum']))
 	{
 		confirm_referrer('admin_forums.php');
 
-		$db->query('DELETE FROM '.$db->prefix.'forum_perms WHERE forum_id='.$forum_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to delete group forum permissions', __FILE__, __LINE__, $db->error());
+		// dbquery: fp.forum_id
+		$db->query('DELETE FROM '.$db->prefix.'forum_perms WHERE forum_id='.$forum_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to delete group forum permissions', __FILE__, __LINE__, $db->error());
 
 		redirect('admin_forums.php?edit_forum='.$forum_id, $lang_admin_forums['Perms reverted redirect']);
 	}
 
 	// Fetch forum info
-	$result = $db->query('SELECT id, forum_name, forum_desc, num_topics, sort_by FROM '.$db->prefix.'forums WHERE id='.$forum_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch forum info', __FILE__, __LINE__, $db->error());
+	// dbquery: f.id, f.forum_name, f.forum_desc, f.num_topics, f.sort_by
+	$result = $db->query('SELECT id, forum_name, forum_desc, num_topics, sort_by FROM '.$db->prefix.'forums WHERE id='.$forum_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch forum info', __FILE__, __LINE__, $db->error());
 	if (!$db->num_rows($result))
-		message($lang_common['Bad request']);
+		fama_message($lang_common['Bad request']);
 
 	$cur_forum = $db->fetch_assoc($result);
 
-	$page_title = array(pun_htmlspecialchars($pun_config['o_board_title']), $lang_admin_common['Admin'], $lang_admin_common['Forums']);
+	$page_title = array(fama_htmlspecialchars($pun_config['o_board_title']), $lang_admin_common['Admin'], $lang_admin_common['Forums']);
 	define('PUN_ACTIVE_PAGE', 'admin');
 	require PUN_ROOT.'header.php';
 
@@ -204,11 +218,11 @@ else if (isset($_GET['edit_forum']))
 							<table class="aligntop" cellspacing="0">
 								<tr>
 									<th scope="row"><?php echo $lang_admin_forums['Forum name label'] ?></th>
-									<td><input type="text" name="forum_name" size="35" maxlength="80" value="<?php echo pun_htmlspecialchars($cur_forum['forum_name']) ?>" tabindex="1" /></td>
+									<td><input type="text" name="forum_name" size="35" maxlength="80" value="<?php echo fama_htmlspecialchars($cur_forum['forum_name']) ?>" tabindex="1" /></td>
 								</tr>
 								<tr>
 									<th scope="row"><?php echo $lang_admin_forums['Forum description label'] ?></th>
-									<td><textarea name="forum_desc" rows="3" cols="50" tabindex="2"><?php echo pun_htmlspecialchars($cur_forum['forum_desc']) ?></textarea></td>
+									<td><textarea name="forum_desc" rows="3" cols="50" tabindex="2"><?php echo fama_htmlspecialchars($cur_forum['forum_desc']) ?></textarea></td>
 								</tr>
 								<tr>
 									<th scope="row"><?php echo $lang_admin_forums['Sort by label'] ?></th>
@@ -241,7 +255,8 @@ else if (isset($_GET['edit_forum']))
 							<tbody>
 <?php
 
-	$result = $db->query('SELECT g.g_id, g.g_title, g.g_read_board, g.g_post_replies, g.g_post_topics, fp.read_forum, fp.post_replies, fp.post_topics FROM '.$db->prefix.'groups AS g LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (g.g_id=fp.group_id AND fp.forum_id='.$forum_id.') WHERE g.g_id!='.PUN_ADMIN.' ORDER BY g.g_id'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch group forum permission list', __FILE__, __LINE__, $db->error());
+	// dbquery: g.g_id, g.g_title, g.g_read_board, g.g_post_replies, g.g_post_topics, fp.read_forum, fp.post_replies, fp.post_topics, fp.group_id, fp.forum_id
+	$result = $db->query('SELECT g.g_id, g.g_title, g.g_read_board, g.g_post_replies, g.g_post_topics, fp.read_forum, fp.post_replies, fp.post_topics FROM '.$db->prefix.'groups AS g LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (g.g_id=fp.group_id AND fp.forum_id='.$forum_id.') WHERE g.g_id!='.PUN_ADMIN.' ORDER BY g.g_id'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch group forum permission list', __FILE__, __LINE__, $db->error());
 
 	$cur_index = 7;
 
@@ -258,7 +273,7 @@ else if (isset($_GET['edit_forum']))
 
 ?>
 								<tr>
-									<th class="atcl"><?php echo pun_htmlspecialchars($cur_perm['g_title']) ?></th>
+									<th class="atcl"><?php echo fama_htmlspecialchars($cur_perm['g_title']) ?></th>
 									<td<?php if (!$read_forum_def) echo ' class="nodefault"'; ?>>
 										<input type="hidden" name="read_forum_old[<?php echo $cur_perm['g_id'] ?>]" value="<?php echo ($read_forum) ? '1' : '0'; ?>" />
 										<input type="checkbox" name="read_forum_new[<?php echo $cur_perm['g_id'] ?>]" value="1"<?php echo ($read_forum) ? ' checked="checked"' : ''; ?><?php echo ($cur_perm['g_read_board'] == '0') ? ' disabled="disabled"' : ''; ?> tabindex="<?php echo $cur_index++ ?>" />
@@ -295,7 +310,7 @@ else if (isset($_GET['edit_forum']))
 	require PUN_ROOT.'footer.php';
 }
 
-$page_title = array(pun_htmlspecialchars($pun_config['o_board_title']), $lang_admin_common['Admin'], $lang_admin_common['Forums']);
+$page_title = array(fama_htmlspecialchars($pun_config['o_board_title']), $lang_admin_common['Admin'], $lang_admin_common['Forums']);
 define('PUN_ACTIVE_PAGE', 'admin');
 require PUN_ROOT.'header.php';
 
@@ -319,7 +334,8 @@ generate_admin_menu('forums');
 <?php
 
 // Display all the forums
-$result = $db->query('SELECT f.id AS fid, f.forum_name, f.disp_position FROM '.$db->prefix.'forums AS f ORDER BY f.disp_position'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch forum list', __FILE__, __LINE__, $db->error());
+// dbquery: f.id, f.forum_name, f.disp_position
+$result = $db->query('SELECT f.id AS fid, f.forum_name, f.disp_position FROM '.$db->prefix.'forums AS f ORDER BY f.disp_position'.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch forum list', __FILE__, __LINE__, $db->error());
 
 if ($db->num_rows($result) > 0)
 {
@@ -353,7 +369,7 @@ while ($cur_forum = $db->fetch_assoc($result))
 								<tr>
 									<td class="tcl"><a href="admin_forums.php?edit_forum=<?php echo $cur_forum['fid'] ?>" tabindex="<?php echo $cur_index++ ?>"><?php echo $lang_admin_forums['Edit link'] ?></a> | <a href="admin_forums.php?del_forum=<?php echo $cur_forum['fid'] ?>" tabindex="<?php echo $cur_index++ ?>"><?php echo $lang_admin_forums['Delete link'] ?></a></td>
 									<td class="tc2"><input type="text" name="position[<?php echo $cur_forum['fid'] ?>]" size="3" maxlength="3" value="<?php echo $cur_forum['disp_position'] ?>" tabindex="<?php echo $cur_index++ ?>" /></td>
-									<td class="tcr"><strong><?php echo pun_htmlspecialchars($cur_forum['forum_name']) ?></strong></td>
+									<td class="tcr"><strong><?php echo fama_htmlspecialchars($cur_forum['forum_name']) ?></strong></td>
 								</tr>
 <?php
 

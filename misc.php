@@ -22,15 +22,15 @@ $action = isset($_GET['action']) ? $_GET['action'] : null;
 if (isset($_GET['email']))
 {
 	if ($pun_user['is_guest'] || $pun_user['g_send_email'] == '0')
-		message($lang_common['No permission']);
+		fama_message($lang_common['No permission']);
 
 	$recipient_id = intval($_GET['email']);
 	if ($recipient_id < 2)
-		message($lang_common['Bad request']);
+		fama_message($lang_common['Bad request']);
 
-	$result = $db->query('SELECT username, email FROM '.$db->prefix.'users WHERE id='.$recipient_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SELECT username, email FROM '.$db->prefix.'users WHERE id='.$recipient_id.' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
 	if (!$db->num_rows($result))
-		message($lang_common['Bad request']);
+		fama_message($lang_common['Bad request']);
 
 	list($recipient, $recipient_email) = $db->fetch_row($result);
 
@@ -42,14 +42,14 @@ if (isset($_GET['email']))
 		$message = pun_trim($_POST['req_message']);
 
 		if ($subject == '')
-			message($lang_misc['No email subject']);
+			fama_message($lang_misc['No email subject']);
 		else if ($message == '')
-			message($lang_misc['No email message']);
+			fama_message($lang_misc['No email message']);
 		else if (pun_strlen($message) > PUN_MAX_POSTSIZE)
-			message($lang_misc['Too long email message']);
+			fama_message($lang_misc['Too long email message']);
 
 		if ($pun_user['last_email_sent'] != '' && (time() - $pun_user['last_email_sent']) < $pun_user['g_email_flood'] && (time() - $pun_user['last_email_sent']) >= 0)
-			message(sprintf($lang_misc['Email flood'], $pun_user['g_email_flood']));
+			fama_message(sprintf($lang_misc['Email flood'], $pun_user['g_email_flood']));
 
 		// Load the "form email" template
 		$mail_tpl = trim(file_get_contents(PUN_ROOT.'lang/'.$pun_user['language'].'/mail_templates/form_email.tpl'));
@@ -69,9 +69,9 @@ if (isset($_GET['email']))
 
 		pun_mail($recipient_email, $mail_subject, $mail_message, $pun_user['email'], $pun_user['username']);
 
-		$db->query('UPDATE '.$db->prefix.'users SET last_email_sent='.time().' WHERE id='.$pun_user['id'].' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or error('Unable to update user', __FILE__, __LINE__, $db->error());
+		$db->query('UPDATE '.$db->prefix.'users SET last_email_sent='.time().' WHERE id='.$pun_user['id'].' -- sqlcomment: '.__FILE__.' line:'.__LINE__.' --') or fama_error('Unable to update user', __FILE__, __LINE__, $db->error());
 
-		redirect(htmlspecialchars($_POST['redirect_url']), $lang_misc['Email sent redirect']);
+		redirect(fama_htmlspecialchars($_POST['redirect_url']), $lang_misc['Email sent redirect']);
 	}
 
 
@@ -95,7 +95,7 @@ if (isset($_GET['email']))
 	if (!isset($redirect_url))
 		$redirect_url = 'profile.php?id='.$recipient_id;
 
-	$page_title = array(pun_htmlspecialchars($pun_config['o_board_title']), $lang_misc['Send email to'].' '.pun_htmlspecialchars($recipient));
+	$page_title = array(fama_htmlspecialchars($pun_config['o_board_title']), $lang_misc['Send email to'].' '.fama_htmlspecialchars($recipient));
 	$required_fields = array('req_subject' => $lang_misc['Email subject'], 'req_message' => $lang_misc['Email message']);
 	$focus_element = array('email', 'req_subject');
 	define('PUN_ACTIVE_PAGE', 'index');
@@ -103,7 +103,7 @@ if (isset($_GET['email']))
 
 ?>
 <div id="emailform" class="blockform">
-	<h2><span><?php echo $lang_misc['Send email to'] ?> <?php echo pun_htmlspecialchars($recipient) ?></span></h2>
+	<h2><span><?php echo $lang_misc['Send email to'] ?> <?php echo fama_htmlspecialchars($recipient) ?></span></h2>
 	<div class="box">
 		<form id="email" method="post" action="misc.php?email=<?php echo $recipient_id ?>" onsubmit="this.submit.disabled=true;if(process_form(this)){return true;}else{this.submit.disabled=false;return false;}">
 			<div class="inform">
@@ -111,7 +111,7 @@ if (isset($_GET['email']))
 					<legend><?php echo $lang_misc['Write email'] ?></legend>
 					<div class="infldset txtarea">
 						<input type="hidden" name="form_sent" value="1" />
-						<input type="hidden" name="redirect_url" value="<?php echo pun_htmlspecialchars($redirect_url) ?>" />
+						<input type="hidden" name="redirect_url" value="<?php echo fama_htmlspecialchars($redirect_url) ?>" />
 						<label class="required"><strong><?php echo $lang_misc['Email subject'] ?> <span><?php echo $lang_common['Required'] ?></span></strong><br />
 						<input class="longinput" type="text" name="req_subject" size="75" maxlength="70" tabindex="1" /><br /></label>
 						<label class="required"><strong><?php echo $lang_misc['Email message'] ?> <span><?php echo $lang_common['Required'] ?></span></strong><br />
@@ -131,4 +131,4 @@ if (isset($_GET['email']))
 
 
 else
-	message($lang_common['Bad request']);
+	fama_message($lang_common['Bad request']);
